@@ -4,7 +4,8 @@ import "./index.css";
 import App from "./App.tsx";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import About from "./pages/About.tsx";
-
+import QueryProvider from "./provider/QueryProvider.tsx";
+import { Toaster } from "sonner";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -17,6 +18,9 @@ const router = createBrowserRouter([
 ]);
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <QueryProvider>
+      <Toaster duration={1500} />
+      <RouterProvider router={router} />
+    </QueryProvider>
   </StrictMode>
 );

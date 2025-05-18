@@ -47,3 +47,9 @@
   background-position: center;
   background-size: cover;
 }
+
+@layer components {
+  .disabled:disabled {
+    @apply bg-zinc-800/50 text-zinc-400;
+  }
+}
