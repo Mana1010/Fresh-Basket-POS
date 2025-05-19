@@ -20,6 +20,7 @@ function PasswordInputBox<T extends Record<string, unknown>>({
   register,
   className,
   type,
+  name,
   ...props
 }: Omit<InputBoxProps<T>, "label" | "error">) {
   const [togglePassword, setTogglePassword] = useState(false);
@@ -27,7 +28,7 @@ function PasswordInputBox<T extends Record<string, unknown>>({
     <div className={className}>
       <input
         type={togglePassword ? "text" : type}
-        {...register}
+        {...register(name)}
         {...props}
         className="flex-grow outline-none text-sm bg-transparent p-1.5 poppins-bold text-secondary "
       />
@@ -44,9 +45,10 @@ function PasswordInputBox<T extends Record<string, unknown>>({
 function TextInputBox<T extends Record<string, unknown>>({
   register,
   className,
+  name,
   ...props
 }: Omit<InputBoxProps<T>, "label" | "error">) {
-  return <input {...register} className={className} {...props} />;
+  return <input {...register(name)} className={className} {...props} />;
 }
 function InputBox<T extends Record<string, unknown>>({
   register,
@@ -68,7 +70,7 @@ function InputBox<T extends Record<string, unknown>>({
         <PasswordInputBox
           register={register}
           className={cn(
-            "rounded-sm w-full bg-secondary/40 p-1 flex items-center disabled",
+            "rounded-sm w-full bg-secondary/30 p-1 flex items-center disabled",
             className
           )}
           type={type}
@@ -79,7 +81,7 @@ function InputBox<T extends Record<string, unknown>>({
         <TextInputBox
           register={register}
           className={cn(
-            "rounded-sm w-full text-secondary poppins-bold bg-secondary/40 p-2.5 text-sm disabled",
+            "rounded-sm w-full text-secondary poppins-bold bg-secondary/30 p-2.5 text-sm disabled",
             className
           )}
           type={type}

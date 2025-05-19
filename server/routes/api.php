@@ -6,6 +6,12 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::post('/auth/login', [AuthController::class, 'login']);
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::prefix('auth')->controller(AuthController::class)->group(function () {
+        Route::get('/user', 'user');
+        Route::post('/logout', 'logout');
+    });
+});
+
+
