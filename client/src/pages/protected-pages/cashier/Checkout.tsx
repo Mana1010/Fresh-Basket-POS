@@ -1,7 +1,5 @@
-import React from "react";
-
 function Checkout() {
-  return <div>Checkout</div>;
+  return <div className=" w-full h-full">Checkout</div>;
 }
 
 export default Checkout;

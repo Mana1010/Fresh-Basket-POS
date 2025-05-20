@@ -4,13 +4,12 @@ import getUser from "../utils/get-user";
 import { toast } from "sonner";
 import { useAuthStore } from "../store/useAuthStore";
 import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import { Navigate } from "react-router-dom";
+import type { UserType } from "../types/user.types";
 const axiosInterceptor = axios.create({
   baseURL: CLIENT_URL,
   headers: {
     "Content-Type": "application/json",
-    Authorization: `Bearer ${localStorage.getItem("session_token")}`,
   },
 });
 function useAxiosInterceptor() {
@@ -30,6 +29,7 @@ function useAxiosInterceptor() {
         if (!user) {
           toast.error("Something went wrong while fetching the user's details");
         }
+        setUser(user as UserType);
         config.headers["Authorization"] = `Bearer ${session_token}`;
         return config;
       }
@@ -55,7 +55,7 @@ function useAxiosInterceptor() {
       axiosInterceptor.interceptors.request.eject(requestInterceptor);
       axiosInterceptor.interceptors.response.eject(responseInterceptor);
     };
-  }, []);
+  }, [setUser]);
   return axiosInterceptor;
 }
 

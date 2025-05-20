@@ -6,7 +6,7 @@ import { roleVariants } from "../animation/auth.animation";
 import { useForm } from "react-hook-form";
 import InputBox from "../components/InputBox";
 import { useMutation } from "@tanstack/react-query";
-import { AUTH_URL } from "../environment";
+import { AUTH_URL } from "../api/request-api";
 import { toast } from "sonner";
 import axios, { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
@@ -43,12 +43,14 @@ function Login() {
       const response = await axios.post(`${AUTH_URL}/login?type=${type}`, data);
       return response.data;
     },
-    onSuccess: async ({ message, token }) => {
+    onSuccess: async ({ message, token, role }) => {
       reset();
       setPasscode(["", "", "", "", "", ""]);
       localStorage.setItem("session_token", token);
       toast.success(message);
-      navigate("/checkout");
+      if (role === "cashier") {
+        navigate("/checkout");
+      }
     },
     onError: (err: AxiosError<{ message: string }>) => {
       console.log(err);

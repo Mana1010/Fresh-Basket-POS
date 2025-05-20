@@ -17,7 +17,11 @@ function App() {
     {
       path: "/",
       element: <ProtectedLayout />,
-      children: [{ path: "checkout", element: <Checkout /> }],
+      children: [
+        { path: "dashboard", element: <Checkout /> },
+        { path: "pos", element: <Checkout /> },
+        { path: "transaction", element: <Checkout /> },
+      ],
     },
   ]);
   return <RouterProvider router={router} />;
