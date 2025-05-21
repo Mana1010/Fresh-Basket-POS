@@ -3,7 +3,7 @@ import About from "./pages/About";
 import Login from "./pages/Login";
 import "./App.css";
 import ProtectedLayout from "./layouts/ProtectedLayout";
-import Checkout from "./pages/protected-pages/cashier/Checkout";
+import Pos from "./pages/protected-pages/cashier/Pos";
 function App() {
   const router = createBrowserRouter([
     {
@@ -18,9 +18,9 @@ function App() {
       path: "/",
       element: <ProtectedLayout />,
       children: [
-        { path: "dashboard", element: <Checkout /> },
-        { path: "pos", element: <Checkout /> },
-        { path: "transaction", element: <Checkout /> },
+        { path: "dashboard", element: <Pos /> },
+        { path: "pos", element: <Pos /> },
+        { path: "transaction", element: <Pos /> },
       ],
     },
   ]);

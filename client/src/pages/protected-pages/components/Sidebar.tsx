@@ -1,42 +1,44 @@
 import { motion } from "framer-motion";
 import { navigationList } from "../../../constant/navigation-list";
-import { getTimeOfDay } from "../../../utils/get-time-day";
+import logout from "../../../assets/navigation-sticker/logout.svg";
 function Sidebar() {
   return (
-    <motion.header className="shrink-0 flex flex-col justify-between items-center h-full py-3 px-2.5 w-[230px] bg-secondary shadow-md border-r border-r-white/35">
+    <motion.header className="shrink-0 flex flex-col justify-between items-center h-full py-3 px-2.5 w-[80px] bg-white shadow-sm border border-zinc-400/35 rounded-md relative">
       <div className=" w-full flex-col flex">
-        <div className="flex py-2 poppins-semibold text-md text-white flex-col">
-          <h1>{getTimeOfDay()},</h1>{" "}
-          <span className="text-orange-300">Cashier</span>
-        </div>
         <div className="flex flex-col space-y-2 pt-5">
-          <small className="text-[#F5F4F3] text-[0.6rem] poppins-extrabold">
-            <span className="text-primary">MAIN </span> MENU
+          <small className="text-primary text-[0.6rem] text-center poppins-extrabold">
+            MENUS
           </small>
           <ul className=" flex flex-col w-full">
             {navigationList.map((navigation) => {
-              const Icon = navigation.icon;
-
               return (
                 <a
                   key={navigation.name}
                   href={navigation.link}
                   className={`${
-                    navigation.roles.includes("cashier") ? "inline" : "hidden"
-                  } p-1.5 hover:bg-zinc-200/25 group hover:border-r-2 hover:border-r-primary`}
+                    navigation.roles.includes("cashier") ? "block" : "hidden"
+                  } p-1.5 hover:bg-primary/10 rounded-md group border-b-2 border-b-transparent hover:border-b-primary`}
                 >
-                  <li className="text-center flex space-x-2 items-center text-[#F5F4F3] poppins-medium">
-                    <span className="text-gray-200 poppins-semibold group-hover:text-orange-300">
-                      <Icon />
+                  <li className="text-center flex space-y-1.5 items-center text-[#F5F4F3] poppins-medium flex-col">
+                    <img
+                      src={navigation.icon}
+                      width={20}
+                      height={20}
+                      alt="icon"
+                    />
+                    <span className="text-[0.65rem] text-secondary poppins-semibold">
+                      {navigation.name}
                     </span>
-                    <span className="text-[0.8rem]">{navigation.name}</span>
                   </li>
                 </a>
               );
             })}
           </ul>
         </div>
-      </div>
+      </div>{" "}
+      <button className="p-2 bg-secondary text-sm rounded-sm">
+        <img src={logout} width={20} height={20} alt="logout" />
+      </button>
     </motion.header>
   );
 }

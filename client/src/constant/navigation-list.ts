@@ -1,29 +1,29 @@
-import { LuComputer, LuLayoutDashboard, LuUser } from "react-icons/lu";
-
-import { HiPrinter, HiUser } from "react-icons/hi2";
-import { MdDashboard } from "react-icons/md";
-import { SlGraph } from "react-icons/sl";
+import printer from "../assets/navigation-sticker/printer.svg";
+import profile from "../assets/navigation-sticker/profile.svg";
+import reports from "../assets/navigation-sticker/reports.svg";
+import dashboard from "../assets/navigation-sticker/dashboard.svg";
+// import dashboard from '../assets/navigation-sticker/'
 export const navigationList = [
   {
     name: "Dashboard",
     roles: ["manager", "admin"],
     link: "/dashboard",
     path: ["dashboard"],
-    icon: MdDashboard,
+    icon: dashboard,
   },
   {
     name: "Pos",
     roles: ["cashier"],
     link: "/pos",
     path: ["pos"],
-    icon: HiPrinter,
+    icon: printer,
   },
   {
     name: "Profile",
     roles: ["cashier", "manager", "admin"],
     link: "/profile",
     path: ["profile"],
-    icon: HiUser,
+    icon: profile,
   },
 
   {
@@ -31,6 +31,6 @@ export const navigationList = [
     roles: ["cashier", "manager", "admin"],
     link: "/reports",
     path: ["reports"],
-    icon: SlGraph,
+    icon: reports,
   },
 ];

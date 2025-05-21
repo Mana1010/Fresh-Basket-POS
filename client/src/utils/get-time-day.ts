@@ -1,4 +1,6 @@
-export function getTimeOfDay() {
+type ReturnType = "Good Morning" | "Good Afternoon" | "Good Evening";
+
+export function getTimeOfDay(): ReturnType {
   const getHours = new Date().getHours();
   if (getHours >= 0 && getHours < 12) {
     return "Good Morning";
