@@ -19,7 +19,7 @@ return new class extends Migration
             $table->enum('status', ['active', 'inactive', 'blocked'])->default('active');
             $table->string('password');
             $table->string('profile_picture')->nullable();
-            $table->bigInteger('passcode')->unique();
+            $table->string('passcode')->unique();
             $table->rememberToken();
             $table->timestamps();
         });

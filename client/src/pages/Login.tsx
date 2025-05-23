@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import axios, { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../components/Spinner";
-
+import { useAuthStore } from "../store/useAuthStore";
 type FormData = {
   username: string;
   password: string;
@@ -22,6 +22,7 @@ type LoginMutationType = {
 };
 
 function Login() {
+  const { setUser } = useAuthStore();
   const navigate = useNavigate();
   const roles = ["Admin", "Manager", "Cashier"];
   const [roleIndex, setRoleIndex] = useState(0);
@@ -43,13 +44,16 @@ function Login() {
       const response = await axios.post(`${AUTH_URL}/login?type=${type}`, data);
       return response.data;
     },
-    onSuccess: async ({ message, token, role }) => {
+    onSuccess: async ({ message, token, role, user }) => {
+      setUser(user);
       reset();
       setPasscode(["", "", "", "", "", ""]);
       localStorage.setItem("session_token", token);
       toast.success(message);
       if (role === "cashier") {
         navigate("/checkout");
+      } else {
+        navigate("/dashboard");
       }
     },
     onError: (err: AxiosError<{ message: string }>) => {

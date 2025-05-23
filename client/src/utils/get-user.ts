@@ -4,12 +4,12 @@ import { type UserType } from "../types/user.types";
 
 export default async function getUser(): Promise<UserType | undefined> {
   try {
-    const response = await axios.get(`${AUTH_URL}/auth/user`, {
+    const response = await axios.get(`${AUTH_URL}/user`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("session_token")}`,
       },
     });
-    return response.data;
+    return response.data.user;
   } catch (err) {
     if (isAxiosError(err)) {
       throw err;
