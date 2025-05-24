@@ -135,6 +135,7 @@ function Login() {
                   placeholder="Enter your username"
                   name="username"
                   label="Username"
+                  className="bg-secondary/25"
                 />
                 <InputBox
                   tabIndex={2}
@@ -146,6 +147,7 @@ function Login() {
                   placeholder="••••••••••"
                   name="password"
                   label="Password"
+                  className="bg-secondary/25"
                 />
 
                 <button

@@ -13,7 +13,7 @@ type InputBoxProps<T extends Record<string, unknown>> = {
   placeholder: string;
   disabled?: boolean;
   required?: boolean;
-  error?: string;
+  errorMessage?: string;
 };
 
 function PasswordInputBox<T extends Record<string, unknown>>({
@@ -46,9 +46,17 @@ function TextInputBox<T extends Record<string, unknown>>({
   register,
   className,
   name,
+  errorMessage,
   ...props
 }: Omit<InputBoxProps<T>, "label" | "error">) {
-  return <input {...register(name)} className={className} {...props} />;
+  return (
+    <div className="block space-y-0.5">
+      <input {...register(name)} className={className} {...props} />
+      {errorMessage && (
+        <p className="text-[0.65rem] text-red-500">{errorMessage}</p>
+      )}
+    </div>
+  );
 }
 function InputBox<T extends Record<string, unknown>>({
   register,
@@ -57,6 +65,7 @@ function InputBox<T extends Record<string, unknown>>({
   label,
   type,
   required,
+
   ...props
 }: InputBoxProps<T>) {
   return (
@@ -71,7 +80,7 @@ function InputBox<T extends Record<string, unknown>>({
         <PasswordInputBox
           register={register}
           className={cn(
-            "rounded-sm w-full bg-secondary/25 p-1 flex items-center disabled",
+            "rounded-sm w-full p-1 flex items-center disabled  border border-zinc-300",
             className
           )}
           type={type}
@@ -82,7 +91,7 @@ function InputBox<T extends Record<string, unknown>>({
         <TextInputBox
           register={register}
           className={cn(
-            "rounded-sm w-full text-secondary p-2 text-[0.85rem] disabled border border-zinc-200 outline-primary",
+            "rounded-sm w-full text-secondary p-2 text-[0.85rem] disabled outline-primary  border border-zinc-300",
             className
           )}
           type={type}

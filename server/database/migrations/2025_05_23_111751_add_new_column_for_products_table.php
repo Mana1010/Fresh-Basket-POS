@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::table('products', function (Blueprint $table) {
             $table->string('manufacturer')->nullable();
+            $table->integer('discount_rate')->default(0);
+              $table->integer('tax_rate')->default(0);
         });
     }
 
@@ -22,7 +24,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('products', function (Blueprint $table) {
-            //
+            $table->dropColumn('manufacturer');
+             $table->dropColumn('discount_rate');
+             $table->dropColumn('tax_rate');
         });
     }
 };

@@ -6,8 +6,11 @@ import useAxiosInterceptor from "../../../hooks/useAxiosInterceptor";
 import { PRODUCT_URL } from "../../../api/request-api";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { BREADCRUMB_NAVIGATION_LIST } from "../../../constant/breadcrumb-navigation-list";
+import { useLocation } from "react-router-dom";
 function Products() {
   const navigate = useNavigate();
+  const location = useLocation();
   const axiosInterceptor = useAxiosInterceptor();
   const [hasNextProducts, setHasNextProducts] = useState(true);
   const { data } = useInfiniteQuery({
@@ -28,10 +31,9 @@ function Products() {
       }
     },
   });
+  console.log(location.pathname.split("/").slice(1));
   return (
-    <div className="flex flex-col w-full gap-2">
-      <h1 className="text-secondary text-md poppins-semibold">Products</h1>
-
+    <div className="w-full flex flex-col gap-2">
       <div className="flex space-x-1.5 items-center w-full">
         <div className="flex-grow rounded-sm bg-secondary/15 border border-zinc-400/35 flex items-center justify-center px-1 py-2">
           <button type="button" className="px-1 text-secondary">
