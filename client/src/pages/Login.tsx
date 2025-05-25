@@ -12,6 +12,8 @@ import axios, { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../components/Spinner";
 import { useAuthStore } from "../store/useAuthStore";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginValidation } from "../validation/auth.validation";
 type FormData = {
   username: string;
   password: string;
@@ -32,11 +34,17 @@ function Login() {
     "passcode-based" | "credential-based"
   >("credential-based");
   const passcodeRef = useRef<Array<HTMLInputElement | null>>([]);
-  const { register, handleSubmit, reset } = useForm<FormData>({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<FormData>({
     defaultValues: {
       username: "",
       password: "",
     },
+    resolver: zodResolver(loginValidation),
   });
 
   const loginMutation = useMutation({
@@ -57,7 +65,11 @@ function Login() {
       }
     },
     onError: (err: AxiosError<{ message: string }>) => {
-      console.log(err);
+      if (err.response?.status === 429) {
+        toast.error("You’ve made too many requests. Try again in 1 minute.");
+        return;
+      }
+
       toast.error(err.response?.data.message);
     },
   });
@@ -131,11 +143,12 @@ function Login() {
                   id="username"
                   type="text"
                   disabled={loginMutation.isPending}
-                  required={true}
+                  isRequired
                   placeholder="Enter your username"
                   name="username"
                   label="Username"
                   className="bg-secondary/25"
+                  errorMessage={errors.username?.message}
                 />
                 <InputBox
                   tabIndex={2}
@@ -143,11 +156,12 @@ function Login() {
                   id="password"
                   type="password"
                   disabled={loginMutation.isPending}
-                  required={true}
+                  isRequired
                   placeholder="••••••••••"
                   name="password"
                   label="Password"
                   className="bg-secondary/25"
+                  errorMessage={errors.password?.message}
                 />
 
                 <button

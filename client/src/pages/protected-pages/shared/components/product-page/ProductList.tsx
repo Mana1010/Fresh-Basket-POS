@@ -6,7 +6,6 @@ import { AnimatePresence } from "framer-motion";
 function ProductList() {
   const [openFilterProduct, setOpenFilterProduct] = useState(false);
   const [openFilterPrice, setOpenFilterPrice] = useState(false);
-  const [openFilterCategory, setOpenFilterCategory] = useState(false);
   return (
     <div className="flex flex-col gap-2 col-span-4">
       <div className="w-full">

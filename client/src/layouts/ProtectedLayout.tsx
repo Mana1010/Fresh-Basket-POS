@@ -3,15 +3,17 @@ import Header from "../pages/protected-pages/components/Header";
 import Sidebar from "../pages/protected-pages/components/Sidebar";
 import { Outlet } from "react-router-dom";
 import useBreadCrumbs from "use-react-router-breadcrumbs";
+import { useNavigate } from "react-router-dom";
 function ProtectedLayout() {
   const breadcrumbs = useBreadCrumbs(BREADCRUMB_NAVIGATION_LIST);
+  const navigate = useNavigate();
   return (
     <div className="flex items-center h-screen w-full bg-[#F5F5F5] p-2">
       <div className="flex-grow h-full flex flex-col gap-1">
         <Header />
-        <div className="flex-grow flex w-full">
+        <div className="flex-grow flex w-full h-1">
           <Sidebar />
-          <div className="h-full w-full flex flex-col p-2 space-y-1">
+          <div className="h-full w-full flex flex-col p-2 space-y-1 overflow-y-auto">
             <div className="flex space-x-1.5">
               {breadcrumbs.map(({ match, breadcrumb }, i) => {
                 return (
@@ -20,8 +22,8 @@ function ProtectedLayout() {
                     className="flex items-center justify-center space-x-1"
                   >
                     {i > 1 && <span>{">"}</span>}
-                    <a
-                      href={match.pathname}
+                    <button
+                      onClick={() => navigate(match.pathname)}
                       className={`text-primary hover:underline text-[0.7rem] ${
                         i === 0 && "hidden"
                       } ${
@@ -38,7 +40,7 @@ function ProtectedLayout() {
                         />
                       )}
                       <span>{breadcrumb}</span>
-                    </a>{" "}
+                    </button>{" "}
                   </div>
                 );
               })}

@@ -1,4 +1,3 @@
-import React, { useEffect } from "react";
 import defaultUser from "../../../../assets/stickers/default-user.svg";
 import useUserDetails from "../../../../hooks/useUserDetails";
 import { capitalizeFirstLetter } from "../../../../utils/capitalize-first-letter";

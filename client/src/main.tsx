@@ -8,7 +8,12 @@ import { Toaster } from "sonner";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryProvider>
-      <Toaster duration={1500} />
+      <Toaster
+        duration={1500}
+        style={{
+          color: "#434343",
+        }}
+      />
       <App />
     </QueryProvider>
   </StrictMode>
