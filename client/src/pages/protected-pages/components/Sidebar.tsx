@@ -5,7 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import useAxiosInterceptor from "../../../hooks/useAxiosInterceptor";
 import { AUTH_URL } from "../../../api/request-api";
 import { toast } from "sonner";
-import { useAuthStore } from "../../../store/useAuthStore";
+import { useAuthStore } from "../../../store/auth.store";
 import { useNavigate } from "react-router-dom";
 import type { UserRole } from "../../../types/user.types";
 import brandLogo from "../../../assets/brand-logo.png";

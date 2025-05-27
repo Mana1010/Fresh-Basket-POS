@@ -1,12 +1,47 @@
 import { BREADCRUMB_NAVIGATION_LIST } from "../constant/breadcrumb-navigation-list";
 import Header from "../pages/protected-pages/components/Header";
 import Sidebar from "../pages/protected-pages/components/Sidebar";
-import { Outlet } from "react-router-dom";
+import { Navigate, Outlet, replace } from "react-router-dom";
 import useBreadCrumbs from "use-react-router-breadcrumbs";
 import { useNavigate } from "react-router-dom";
+import { useQuery, type UseQueryResult } from "@tanstack/react-query";
+import type { AxiosError } from "axios";
+import axios from "axios";
+import { AUTH_URL } from "../api/request-api";
+import { useEffect } from "react";
 function ProtectedLayout() {
   const breadcrumbs = useBreadCrumbs(BREADCRUMB_NAVIGATION_LIST);
   const navigate = useNavigate();
+  const token = localStorage.getItem("session_token");
+  const checkAuth: UseQueryResult<
+    { message: string },
+    AxiosError<{ message: string }>
+  > = useQuery({
+    queryKey: ["check-auth"],
+    queryFn: async () => {
+      const response = await axios.get(`${AUTH_URL}/check-auth`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    },
+  });
+  useEffect(() => {
+    if (checkAuth.isError) {
+      const errStatus = checkAuth.error.response?.status;
+      if (errStatus === 401) {
+        localStorage.removeItem("session_token");
+        navigate("/", { replace: true });
+      } else {
+        console.log(
+          "An error occurred while checking authentication:",
+          checkAuth.error.message
+        );
+      }
+    }
+  }, [checkAuth.isError, checkAuth.error, navigate]);
+
   return (
     <div className="flex items-center h-screen w-full bg-[#F5F5F5] p-2">
       <div className="flex-grow h-full flex flex-col gap-1">

@@ -3,7 +3,7 @@ import HeaderClock from "./HeaderClock";
 import morning from "../../../assets/header-sticker/morning.svg";
 import afternoon from "../../../assets/header-sticker/afternoon.svg";
 import evening from "../../../assets/header-sticker/evening.svg";
-import { useAuthStore } from "../../../store/useAuthStore";
+import { useAuthStore } from "../../../store/auth.store";
 import { capitalizeFirstLetter } from "../../../utils/capitalize-first-letter";
 import HeaderProfile from "./header/HeaderProfile";
 function Header() {

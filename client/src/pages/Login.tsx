@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import axios, { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../components/Spinner";
-import { useAuthStore } from "../store/useAuthStore";
+import { useAuthStore } from "../store/auth.store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginValidation } from "../validation/auth.validation";
 type FormData = {
@@ -73,7 +73,6 @@ function Login() {
       toast.error(err.response?.data.message);
     },
   });
-
   useEffect(() => {
     const interval = setInterval(() => {
       setRoleIndex((prev) => (prev + 1) % roles.length);
@@ -97,6 +96,7 @@ function Login() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [passcode, passcodeIndex]);
+
   return (
     <div className=" poppins-regular w-full h-screen home-background flex justify-center items-center p-3">
       <div className="w-full lg:w-2/3 bg-white/80 rounded-sm p-2.5 h-full lg:min-h-[300px] md:h-[80%] grid grid-cols-1 md:grid-cols-2 relative gap-0 md:gap-2">

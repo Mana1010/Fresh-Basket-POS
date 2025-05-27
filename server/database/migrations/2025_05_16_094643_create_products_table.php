@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('sku')->unique();
             $table->integer('stock')->default(0);
             $table->string('product_image')->nullable();
+
         });
 
 

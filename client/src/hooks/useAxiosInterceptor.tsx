@@ -2,10 +2,10 @@ import axios, { isAxiosError } from "axios";
 import { CLIENT_URL } from "../environment";
 import getUser from "../utils/get-user";
 import { toast } from "sonner";
-import { useAuthStore } from "../store/useAuthStore";
+import { useAuthStore } from "../store/auth.store";
 import { useEffect } from "react";
-import { Navigate } from "react-router-dom";
 import type { UserType } from "../types/user.types";
+import { useNavigate } from "react-router-dom";
 const axiosInterceptor = axios.create({
   baseURL: CLIENT_URL,
   headers: {
@@ -13,22 +13,29 @@ const axiosInterceptor = axios.create({
   },
 });
 function useAxiosInterceptor() {
-  const { setUser } = useAuthStore();
+  const { setUser, user, clearUser } = useAuthStore();
+  const navigate = useNavigate();
   useEffect(() => {
     const requestInterceptor = axiosInterceptor.interceptors.request.use(
       async (config) => {
         const session_token = localStorage.getItem("session_token");
         if (!session_token) {
           //Back to log in
-          <Navigate to={"/"} replace />;
+          navigate("/");
+          clearUser();
           return Promise.reject("No token available");
         }
         //Will get the user
-        const user = await getUser();
         if (!user) {
-          toast.error("Something went wrong while fetching the user's details");
+          const user = await getUser();
+          if (!user) {
+            toast.error(
+              "Something went wrong while fetching the user's details"
+            );
+          }
+          setUser(user as UserType);
         }
-        setUser(user as UserType);
+
         config.headers["Authorization"] = `Bearer ${session_token}`;
         return config;
       }
@@ -41,7 +48,8 @@ function useAxiosInterceptor() {
       (err) => {
         if (isAxiosError(err) && err.response) {
           if (err.response?.status === 401) {
-            <Navigate to={"/"} replace />;
+            navigate("/");
+            clearUser();
             localStorage.removeItem("session_token");
             return;
           }
@@ -54,7 +62,7 @@ function useAxiosInterceptor() {
       axiosInterceptor.interceptors.request.eject(requestInterceptor);
       axiosInterceptor.interceptors.response.eject(responseInterceptor);
     };
-  }, [setUser]);
+  }, [clearUser, navigate, setUser, user]);
   return axiosInterceptor;
 }
 

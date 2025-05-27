@@ -11,6 +11,7 @@ Route::post('/auth/login', [AuthController::class, 'login'])->middleware(['throt
 Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('auth')->controller(AuthController::class)->group(function () {
         Route::get('/user', 'user');
+        Route::get('/check-auth', 'check_auth');
         Route::post('/logout', 'logout');
     });
         Route::prefix('user')->controller(UserController::class)->group(function () {
@@ -18,6 +19,9 @@ Route::middleware('auth:sanctum')->group(function () {
     });
       Route::prefix('product')->controller(ProductController::class)->group(function () {
         Route::get('/list', 'all_products');
+        Route::get('/all-categories', 'all_categories');
+        Route::post('/create-category', 'create_category');
+        Route::post('/create-product', 'create_product');
     });
 });
 

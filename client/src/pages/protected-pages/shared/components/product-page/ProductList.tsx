@@ -2,6 +2,7 @@ import { useState } from "react";
 import { FiFilter } from "react-icons/fi";
 import SelectBox from "../../../components/SelectBox";
 import { AnimatePresence } from "framer-motion";
+import { CgArrowsExchangeAltV } from "react-icons/cg";
 
 function ProductList() {
   const [openFilterProduct, setOpenFilterProduct] = useState(false);
@@ -11,18 +12,18 @@ function ProductList() {
       <div className="w-full">
         <table className="w-full h-full">
           <thead className="product-thead">
-            <tr className="divide-x divide-zinc-300/60">
+            <tr className="divide-x divide-zinc-300/70">
               <td className="relative">
-                <div className="inline-block space-x-1">
+                <div className="flex items-center justify-center space-x-1">
                   <span>Product</span>
                   <button
                     onClick={() => setOpenFilterProduct((prev) => !prev)}
-                    className={`p-2 ring ring-zinc-200/5 rounded-full cursor-pointer ${
+                    className={`p-2 ring ring-zinc-200/5 rounded-full cursor-pointer text-lg ${
                       openFilterProduct &&
-                      "bg-secondary/25 transition-colors duration-150"
+                      "bg-secondary/15 transition-colors duration-150"
                     }`}
                   >
-                    <FiFilter />
+                    <CgArrowsExchangeAltV />
                   </button>
                   <AnimatePresence mode="wait">
                     {openFilterProduct && (
@@ -45,16 +46,16 @@ function ProductList() {
               <td> SKU</td>
               <td> Category</td>
               <td className="relative">
-                <div className="inline-block space-x-1">
+                <div className="flex items-center justify-center space-x-1">
                   <span>Price</span>
                   <button
                     onClick={() => setOpenFilterPrice((prev) => !prev)}
-                    className={`p-2 ring ring-zinc-200/5 rounded-full cursor-pointer ${
+                    className={`p-2 ring ring-zinc-200/5 rounded-full cursor-pointer text-lg ${
                       openFilterPrice &&
-                      "bg-secondary/25 transition-colors duration-150"
+                      "bg-secondary/15 transition-colors duration-150 "
                     }`}
                   >
-                    <FiFilter />
+                    <CgArrowsExchangeAltV />
                   </button>
                   <AnimatePresence mode="wait">
                     {openFilterPrice && (
@@ -79,7 +80,15 @@ function ProductList() {
             </tr>
           </thead>
           <tbody className="product-tbody">
-            <tr>
+            <tr className=" border-b border-zinc-200">
+              <td>Apple</td>
+              <td>Apple-21-RED</td>
+              <td>Age</td>
+              <td>25.5</td>
+              <td>Bulacan</td>
+              <td>Bulacan</td>
+            </tr>
+            <tr className=" border-b border-zinc-200">
               <td>Apple</td>
               <td>Apple-21-RED</td>
               <td>Age</td>

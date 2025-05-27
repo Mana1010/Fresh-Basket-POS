@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { CategoryType } from "../types/product.types";
 
 const requiredValidation = (message: string) => {
   return z
@@ -20,7 +21,7 @@ export const productValidation = z.object({
   product_name: z.string().min(1, "Product Name is required").max(1000),
   barcode: z.string().min(1, "Product Barcode is required").max(100),
   sku: z.string().min(1, "Product Sku is required").max(1000),
-  product_category: z.string().min(1),
+  product_category_id: z.number(),
   price: requiredValidation("Price is required.").transform((price) => {
     if (price !== undefined) return parseFloat(price.toFixed(2));
   }),
@@ -67,10 +68,13 @@ export const productValidation = z.object({
   manufacturer: z.string().max(1000),
 });
 
-export function productCategoryValidation(all_existing_categories: string[]) {
+export function productCategoryValidation(
+  all_existing_categories: CategoryType[]
+) {
   const transformToLowerCase = all_existing_categories.map((category) =>
-    category.toLowerCase().trim()
+    category.category_name.toLowerCase().replace(/\s+/g, "")
   );
+
   return z.object({
     category_name: z
       .string()
@@ -78,7 +82,11 @@ export function productCategoryValidation(all_existing_categories: string[]) {
       .max(20, "Product Category should be less than to 20 characters only.")
       .refine((category) => {
         //Is new category already exist?
-        if (transformToLowerCase.includes(category.toLowerCase().trim())) {
+        if (
+          transformToLowerCase.includes(
+            category.toLowerCase().replace(/\s+/g, "")
+          )
+        ) {
           return false;
         }
         return true;

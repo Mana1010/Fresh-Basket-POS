@@ -86,10 +86,11 @@
 
 @layer utilities {
   .product-thead > tr > td {
-    @apply text-white text-[0.8rem] bg-primary p-2.5 text-center;
+    @apply text-primary text-[0.8rem] p-2 text-center bg-primary/10;
   }
+
   .product-tbody > tr > td {
-    @apply text-secondary text-[0.75rem] bg-zinc-200 p-2.5 text-center;
+    @apply text-[0.75rem] text-secondary p-3 text-center;
   }
 }
 

@@ -8,18 +8,27 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import AddCategoryForm from "./components/product-page/AddCategoryForm";
 import PreviewProductThumbnail from "./components/product-page/PreviewProductThumbnail";
 import { useModalStore } from "../../../store/modal.store";
+import { AnimatePresence } from "framer-motion";
+import useAxiosInterceptor from "../../../hooks/useAxiosInterceptor";
+import { useQuery, type UseQueryResult } from "@tanstack/react-query";
+import { PRODUCT_URL } from "../../../api/request-api";
+import type { AxiosError } from "axios";
+import ProductCategoryLoading from "./components/loading/ProductCategoryLoading";
+import type { CategoryType } from "../../../types/product.types";
 function AddProduct() {
+  const axiosInstance = useAxiosInterceptor();
   const {
     register,
     reset,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors },
   } = useForm({
     defaultValues: {
       product_name: "",
       barcode: "",
-      product_category: "",
+      product_category_id: 1, // Default to the first category
       price: "",
       discount_rate: 0,
       tax_rate: 0,
@@ -35,6 +44,15 @@ function AddProduct() {
   const [previewProductThumbnail, setPreviewProductThumbnail] = useState<
     string | null
   >(null);
+
+  const allCategories: UseQueryResult<CategoryType[], AxiosError> = useQuery({
+    queryKey: ["all-product-categories"],
+    queryFn: async () => {
+      const response = await axiosInstance.get(`${PRODUCT_URL}/all-categories`);
+
+      return response.data.categories;
+    },
+  });
 
   function uploadProductThumbnail(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -52,9 +70,18 @@ function AddProduct() {
 
     reader.readAsDataURL(file);
   }
+  console.log(allCategories.data);
   return (
     <div className="pt-3 bg-white/20 rounded-sm border border-zinc-800/15 p-2 w-full h-full relative">
-      {isOpenAddCategoryForm && <AddCategoryForm allCategories={[]} />}
+      <AnimatePresence mode="wait">
+        {" "}
+        {isOpenAddCategoryForm && (
+          <AddCategoryForm
+            allCategories={allCategories.data ?? []}
+            axiosInstance={axiosInstance}
+          />
+        )}
+      </AnimatePresence>
       <form onSubmit={handleSubmit()} className=" flex flex-col h-full w-full">
         <div className="flex flex-col space-y-1.5 w-full">
           <div className="block">
@@ -65,26 +92,34 @@ function AddProduct() {
               Select only one <span className="text-red-500">*</span>
             </span>
           </div>
-
-          <div className="flex gap-1.5 overflow-x-auto items-center w-full thin-scrollbar pb-1">
-            {Array(1)
-              .fill(null)
-              .map((_, i) => (
+          <div className="pb-1 thin-scrollbar w-full">
+            {allCategories.isLoading || !allCategories.data ? (
+              <ProductCategoryLoading />
+            ) : (
+              <div className="flex gap-1.5 overflow-x-auto items-center w-full">
+                {allCategories?.data.map((name, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setValue("product_category_id", name.id)}
+                    type="button"
+                    className={` custom-border rounded-md p-3  min-h-10 flex items-center justify-center basis-[20%] flex-shrink-0 text-sm relative ${
+                      watch("product_category_id") === name.id
+                        ? "border-primary text-primary bg-primary/15"
+                        : "text-secondary/75"
+                    }`}
+                  >
+                    {name.category_name}
+                  </button>
+                ))}
                 <button
-                  key={i}
+                  onClick={() => toggleCategoryForm(true)}
                   type="button"
-                  className="custom-border rounded-md p-3 text-secondary/75 min-h-10 flex items-center justify-center basis-[20%] flex-shrink-0 text-sm relative"
+                  className="custom-border rounded-md p-3 text-primary min-h-10 flex items-center justify-center basis-[20%] flex-shrink-0 text-xl cursor-pointer"
                 >
-                  Bread
+                  <IoIosAddCircleOutline />
                 </button>
-              ))}
-            <button
-              onClick={() => toggleCategoryForm(true)}
-              type="button"
-              className="custom-border rounded-md p-3 text-primary min-h-10 flex items-center justify-center basis-[20%] flex-shrink-0 text-xl cursor-pointer"
-            >
-              <IoIosAddCircleOutline />
-            </button>
+              </div>
+            )}
           </div>
         </div>
         <span className="w-full h-[1px] bg-zinc-800/25 my-4"></span>

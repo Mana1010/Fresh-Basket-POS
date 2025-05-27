@@ -62,6 +62,19 @@ class AuthController extends Controller
         return response()->json(['user' => $data], 200);
     }
 
+    public function check_auth(Request $request) {
+        $token_payload = $request->bearerToken();
+
+        if(!$token_payload) {
+            return response()->json(['message' => 'You are unauthorized to use this, please try logging in again'], 401);
+        }
+       $token = PersonalAccessToken::findToken($token_payload);
+        if(!$token) {
+            return response()->json(['message' => 'You are unauthorized to use this, please try logging in again'], 401);
+        }
+        return response()->json(['message' => 'You are authorized to use this'], 200);
+    }
+
     public function logout(Request $request) {
 
         $token = $request->bearerToken();
