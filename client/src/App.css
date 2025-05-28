@@ -76,7 +76,7 @@
 
 @layer components {
   .disabled:disabled {
-    @apply bg-zinc-800/50 text-zinc-400;
+    @apply bg-zinc-400/35 text-zinc-400;
   }
 
   .custom-border {
@@ -86,11 +86,17 @@
 
 @layer utilities {
   .product-thead > tr > td {
-    @apply text-primary text-[0.8rem] p-2 text-center bg-primary/10;
+    @apply text-primary text-[0.7rem] p-2 text-center bg-primary/10;
   }
 
   .product-tbody > tr > td {
-    @apply text-[0.75rem] text-secondary p-3 text-center;
+    @apply text-[0.75rem] text-secondary p-3 text-center group-hover:text-zinc-100 transition-colors ease-in-out duration-75;
+  }
+  /* .product-tfoot > tr {
+    @apply p-3;
+  } */
+  .product-tfoot > tr > td > div {
+    @apply rounded-3xl bg-zinc-400 animate-pulse w-5 h-3;
   }
 }
 

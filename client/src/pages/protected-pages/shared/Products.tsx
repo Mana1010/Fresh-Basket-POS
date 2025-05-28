@@ -1,54 +1,66 @@
-import { MdOutlineManageSearch } from "react-icons/md";
-
-import ProductList from "./components/product-page/ProductList";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import useAxiosInterceptor from "../../../hooks/useAxiosInterceptor";
-import { PRODUCT_URL } from "../../../api/request-api";
-import { useState } from "react";
+import { lazy, Suspense, type ReactNode } from "react";
+import { ErrorBoundary } from "react-error-boundary";
+import ProductGraphLoading from "./components/loading/ProductGraphLoading";
 import { useNavigate } from "react-router-dom";
+import { MdOutlineManageSearch } from "react-icons/md";
 import RecordBox from "../components/RecordBox";
-import { AiOutlineProduct } from "react-icons/ai";
 import { PiMoneyLight } from "react-icons/pi";
+import type { IconType } from "react-icons/lib";
+import { AiOutlineProduct } from "react-icons/ai";
 import { LuShapes } from "react-icons/lu";
+const ProductList = lazy(() => import("./components/product-page/ProductList"));
+const LazyTotalAmountProduct = lazy(
+  () => import("./components/product-page/product-stats/TotalAmountProduct")
+);
+const LazyTotalProduct = lazy(
+  () => import("./components/product-page/product-stats/TotalProducts")
+);
+const LazyTotalProductCategories = lazy(
+  () => import("./components/product-page/product-stats/TotalProductCategories")
+);
+
+type ProductStatProps = {
+  children: ReactNode;
+  label: string;
+  value: string;
+  Icon: IconType;
+  className?: string;
+};
+function ProductStat({ children, ...props }: ProductStatProps) {
+  return (
+    <Suspense fallback={<RecordBox {...props} isLoading={true} />}>
+      <ErrorBoundary fallback={<RecordBox {...props} isLoading={true} />}>
+        {children}
+      </ErrorBoundary>
+    </Suspense>
+  );
+}
 function Products() {
   const navigate = useNavigate();
-  const axiosInterceptor = useAxiosInterceptor();
-  const [hasNextProducts, setHasNextProducts] = useState(true);
-  const { data } = useInfiniteQuery({
-    queryKey: ["products"],
-    queryFn: async ({ pageParam = 1 }) => {
-      const response = await axiosInterceptor.get(
-        `${PRODUCT_URL}/list?limit=10&page=${pageParam}`
-      );
-      return response.data;
-    },
-    initialPageParam: 1,
-    getNextPageParam: (getNextProducts) => {
-      if (getNextProducts === null && hasNextProducts) {
-        setHasNextProducts(false);
-      } else {
-        return getNextProducts;
-      }
-    },
-  });
 
   return (
     <div className="flex flex-col gap-2 w-full h-auto lg:h-full">
       <div className="grid gap-1.5 grid-cols-4 p-2 border border-zinc-200 rounded-sm">
-        <RecordBox
+        <ProductStat
           label="Total Number of Products"
           value="25"
           Icon={AiOutlineProduct}
-        />
-        <RecordBox
+        >
+          <LazyTotalProduct />
+        </ProductStat>
+        <ProductStat
           label="Total Amount of Products"
           value="₱ 25.00"
           Icon={PiMoneyLight}
           className="col-span-2"
-        />
-        <RecordBox label="Total Categories" value="5" Icon={LuShapes} />
+        >
+          <LazyTotalAmountProduct />
+        </ProductStat>
+        <ProductStat label="Total Categories" value="5" Icon={LuShapes}>
+          <LazyTotalProductCategories />
+        </ProductStat>
       </div>
-      <div className="w-full flex flex-col gap-2">
+      <div className="w-full flex-grow gap-2 flex flex-col">
         <div className="flex space-x-1.5 items-center w-full">
           <div className="flex-grow rounded-sm bg-zinc-200 secondary/15 border border-zinc-400/35 flex items-center justify-center px-1 py-2">
             <button type="button" className="px-1 text-secondary">
@@ -67,7 +79,11 @@ function Products() {
             Add Product
           </button>
         </div>
-        <ProductList />
+        <Suspense fallback={<ProductGraphLoading />}>
+          <ErrorBoundary fallback={<ProductGraphLoading />}>
+            <ProductList />
+          </ErrorBoundary>
+        </Suspense>
       </div>
     </div>
   );

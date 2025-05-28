@@ -18,8 +18,6 @@ function useUserDetails(type: "basic" | "full") {
       return response.data;
     },
   });
-
-  console.log(data);
   return {
     user: data?.data,
     userLoading: isLoading,

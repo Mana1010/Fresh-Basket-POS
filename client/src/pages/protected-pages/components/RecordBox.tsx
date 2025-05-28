@@ -6,9 +6,16 @@ export type RecordBoxProps = {
   label: string;
   value: string;
   className?: string;
+  isLoading?: boolean;
   Icon?: IconType;
 };
-function RecordBox({ label, value, className, Icon }: RecordBoxProps) {
+function RecordBox({
+  label,
+  value,
+  className,
+  Icon,
+  isLoading,
+}: RecordBoxProps) {
   return (
     <div
       className={cn(
@@ -17,7 +24,13 @@ function RecordBox({ label, value, className, Icon }: RecordBoxProps) {
       )}
     >
       <h1 className="text-[0.8rem] text-secondary poppins-semibold">{label}</h1>
-      <span className="text-secondary text-2xl relative z-1">{value}</span>
+
+      {isLoading ? (
+        <div className="h-4 w-24 rounded-3xl bg-secondary/80 animate-pulse"></div>
+      ) : (
+        <span className="text-secondary text-2xl relative z-1">{value}</span>
+      )}
+
       {Icon && (
         <span className="right-1 absolute bottom-1 text-5xl text-zinc-300">
           {" "}

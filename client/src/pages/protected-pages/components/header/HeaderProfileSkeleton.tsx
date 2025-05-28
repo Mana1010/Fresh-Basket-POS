@@ -1,5 +1,3 @@
-import React from "react";
-
 function HeaderProfileSkeleton() {
   return (
     <div className="flex items-center border-l-2 border-primary pl-2 min-w-[200px] space-x-1">

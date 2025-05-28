@@ -18,11 +18,11 @@ return new class extends Migration
             $table->timestamps();
             $table->string('product_name');
             $table->string('barcode')->unique();
-            $table->foreignId('product_category_id')->constrained('product_categories')->onDelete('cascade');
+            $table->foreignId('product_category_id')->nullable()->constrained('product_categories')->onDelete('set null');
             $table->decimal('price', 10, 2);
             $table->string('sku')->unique();
             $table->integer('stock')->default(0);
-            $table->string('product_image')->nullable();
+            $table->string('product_thumbnail')->nullable();
 
         });
 

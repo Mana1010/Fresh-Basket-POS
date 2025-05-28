@@ -1,7 +1,7 @@
 import { BREADCRUMB_NAVIGATION_LIST } from "../constant/breadcrumb-navigation-list";
 import Header from "../pages/protected-pages/components/Header";
 import Sidebar from "../pages/protected-pages/components/Sidebar";
-import { Navigate, Outlet, replace } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import useBreadCrumbs from "use-react-router-breadcrumbs";
 import { useNavigate } from "react-router-dom";
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";

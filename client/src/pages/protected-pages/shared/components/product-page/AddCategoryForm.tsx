@@ -53,8 +53,6 @@ function AddCategoryForm({
       toast.error(err.response?.data.message || "Something went wrong");
     },
   });
-
-  console.log("Hello YOWW".trim());
   return (
     <motion.form
       variants={addCategoryModalVariants}

@@ -13,7 +13,7 @@ export const BREADCRUMB_NAVIGATION_LIST = [
   },
   {
     path: "/products",
-    breadcrumb: "Product",
+    breadcrumb: "Products",
     icon: products,
   },
   {

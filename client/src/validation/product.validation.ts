@@ -19,9 +19,18 @@ const requiredValidation = (message: string) => {
 
 export const productValidation = z.object({
   product_name: z.string().min(1, "Product Name is required").max(1000),
-  barcode: z.string().min(1, "Product Barcode is required").max(100),
+  barcode: z
+    .string()
+    .min(8, "Barcode must be 8 characters long")
+    .max(8, "Barcode must be 8 characters long"),
   sku: z.string().min(1, "Product Sku is required").max(1000),
-  product_category_id: z.number(),
+  product_category_id: z
+    .number()
+    .nullable()
+    .refine((category) => {
+      if (category === null) return false;
+      return true;
+    }, "Product Category is required."),
   price: requiredValidation("Price is required.").transform((price) => {
     if (price !== undefined) return parseFloat(price.toFixed(2));
   }),
@@ -64,7 +73,7 @@ export const productValidation = z.object({
         return false;
       }
     }, "Stock must be a whole number"),
-  product_image: z.instanceof(File).nullable(),
+  product_thumbnail: z.instanceof(File).nullable(),
   manufacturer: z.string().max(1000),
 });
 

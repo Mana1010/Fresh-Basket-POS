@@ -3,19 +3,33 @@ import InputBox from "../../../components/InputBox";
 import { useForm } from "react-hook-form";
 import { IoIosAddCircleOutline } from "react-icons/io";
 import { toast } from "sonner";
-import { productValidation } from "../../../validation/product.validation";
+import {
+  productValidation,
+  type ProductDetailsType,
+} from "../../../validation/product.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import AddCategoryForm from "./components/product-page/AddCategoryForm";
 import PreviewProductThumbnail from "./components/product-page/PreviewProductThumbnail";
 import { useModalStore } from "../../../store/modal.store";
 import { AnimatePresence } from "framer-motion";
 import useAxiosInterceptor from "../../../hooks/useAxiosInterceptor";
-import { useQuery, type UseQueryResult } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  type UseQueryResult,
+} from "@tanstack/react-query";
 import { PRODUCT_URL } from "../../../api/request-api";
 import type { AxiosError } from "axios";
 import ProductCategoryLoading from "./components/loading/ProductCategoryLoading";
 import type { CategoryType } from "../../../types/product.types";
+import Button from "../../../components/Button";
+import { generateBarcode } from "../../../utils/generate-barcode";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 function AddProduct() {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const axiosInstance = useAxiosInterceptor();
   const {
     register,
@@ -27,14 +41,14 @@ function AddProduct() {
   } = useForm({
     defaultValues: {
       product_name: "",
-      barcode: "",
-      product_category_id: 1, // Default to the first category
+      barcode: generateBarcode(),
+      product_category_id: null,
       price: "",
       discount_rate: 0,
       tax_rate: 0,
       sku: "",
       stock: 0,
-      product_image: null,
+      product_thumbnail: null,
       manufacturer: "",
     },
     resolver: zodResolver(productValidation),
@@ -44,6 +58,7 @@ function AddProduct() {
   const [previewProductThumbnail, setPreviewProductThumbnail] = useState<
     string | null
   >(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const allCategories: UseQueryResult<CategoryType[], AxiosError> = useQuery({
     queryKey: ["all-product-categories"],
@@ -54,14 +69,62 @@ function AddProduct() {
     },
   });
 
-  function uploadProductThumbnail(e: ChangeEvent<HTMLInputElement>) {
+  const addProduct = useMutation({
+    mutationFn: async (data: ProductDetailsType) => {
+      const response = await axiosInstance.post(
+        `${PRODUCT_URL}/create-product`,
+        data
+      );
+      return response.data;
+    },
+    onSuccess: ({ message }) => {
+      toast.success(message);
+      reset();
+      navigate("/products");
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+    onError: (err: AxiosError<{ message: string }>) => {
+      console.log(err);
+      toast.error(err.response?.data.message);
+    },
+  });
+
+  const uploadProductThumbnail = useMutation({
+    mutationFn: async (data: File) => {
+      const thumbnail = new FormData();
+      thumbnail.set("project-thumbnail", data);
+
+      const response = await axios.post(
+        `${PRODUCT_URL}/upload-thumbnail`,
+        thumbnail,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("session_token")}`,
+            "Content-Type": "multipart/form-data",
+          },
+          onUploadProgress: (data) => {
+            console.log(data);
+          },
+        }
+      );
+      return response.data;
+    },
+    onSuccess: ({ data }) => {
+      setValue("product_thumbnail", data.secure_url);
+    },
+    onError: () => {
+      setPreviewProductThumbnail(null);
+    },
+  });
+
+  function handleUploadProductThumbnail(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     const reader = new FileReader();
     if (!file) return "No File attach";
     reader.onload = (e) => {
       if (e.target?.result && typeof e.target.result === "string") {
         setPreviewProductThumbnail(e.target?.result);
-        setValue("product_image", file);
+        uploadProductThumbnail.mutate(file);
       }
     };
     reader.onerror = () => {
@@ -70,7 +133,7 @@ function AddProduct() {
 
     reader.readAsDataURL(file);
   }
-  console.log(allCategories.data);
+
   return (
     <div className="pt-3 bg-white/20 rounded-sm border border-zinc-800/15 p-2 w-full h-full relative">
       <AnimatePresence mode="wait">
@@ -82,15 +145,26 @@ function AddProduct() {
           />
         )}
       </AnimatePresence>
-      <form onSubmit={handleSubmit()} className=" flex flex-col h-full w-full">
+      <form
+        onSubmit={handleSubmit((data: ProductDetailsType) => {
+          addProduct.mutate(data);
+        })}
+        className=" flex flex-col h-full w-full"
+      >
         <div className="flex flex-col space-y-1.5 w-full">
           <div className="block">
             <h1 className="text-primary text-sm poppins-semibold">
               Select Product Category
             </h1>
-            <span className="text-slate-400 text-[0.7rem]">
-              Select only one <span className="text-red-500">*</span>
-            </span>
+            {errors.product_category_id ? (
+              <span className="text-red-500 text-[0.7rem]">
+                {errors.product_category_id.message}
+              </span>
+            ) : (
+              <span className="text-slate-400 text-[0.7rem]">
+                Select only one <span className="text-red-500">*</span>
+              </span>
+            )}
           </div>
           <div className="pb-1 thin-scrollbar w-full">
             {allCategories.isLoading || !allCategories.data ? (
@@ -150,6 +224,7 @@ function AddProduct() {
                 type="text"
                 placeholder="Enter Product Barcode"
                 errorMessage={errors.barcode?.message}
+                disabled
                 isRequired
               />
               <InputBox
@@ -218,17 +293,18 @@ function AddProduct() {
                 errorMessage={errors.manufacturer?.message}
               />
 
-              <button
+              <Button
                 type="submit"
-                className="col-span-full bg-primary py-1.5 px-2 text-zinc-100 text-sm rounded-sm custom-border"
-              >
-                Upload New Product
-              </button>
+                disabled={false}
+                label="Upload Product"
+                labelWhileLoading="Uploading..."
+                className="col-span-2 text-[0.8rem]"
+              />
             </div>
             <div className="flex flex-col justify-center w-full items-center h-full p-3">
               <input
-                {...register("product_image")}
-                onChange={uploadProductThumbnail}
+                {...register("product_thumbnail")}
+                onChange={handleUploadProductThumbnail}
                 type="file"
                 id="upload-thumbnail"
                 accept="image/png, image/jpeg, image/jpg"
@@ -238,7 +314,7 @@ function AddProduct() {
                 previewProductThumbnail={previewProductThumbnail}
                 onClick={() => {
                   setPreviewProductThumbnail(null);
-                  setValue("product_image", null);
+                  setValue("product_thumbnail", null);
                 }}
               />
             </div>

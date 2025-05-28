@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
+use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 
 
@@ -20,8 +21,10 @@ Route::middleware('auth:sanctum')->group(function () {
       Route::prefix('product')->controller(ProductController::class)->group(function () {
         Route::get('/list', 'all_products');
         Route::get('/all-categories', 'all_categories');
+        Route::get('/stats', 'product_stats');
         Route::post('/create-category', 'create_category');
         Route::post('/create-product', 'create_product');
+        Route::post("/upload-thumbnail", "upload_thumbnail");
     });
 });
 

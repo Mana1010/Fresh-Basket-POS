@@ -61,7 +61,7 @@ function Login() {
       if (role === "cashier") {
         navigate("/checkout");
       } else {
-        navigate("/dashboard");
+        navigate("/reports");
       }
     },
     onError: (err: AxiosError<{ message: string }>) => {
