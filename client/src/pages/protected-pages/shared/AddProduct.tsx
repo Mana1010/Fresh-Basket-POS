@@ -47,7 +47,6 @@ function AddProduct() {
       discount_rate: 0,
       tax_rate: 0,
       sku: "",
-      stock: 0,
       product_thumbnail: null,
       manufacturer: "",
     },
@@ -67,6 +66,7 @@ function AddProduct() {
 
       return response.data.categories;
     },
+    staleTime: Infinity,
   });
 
   const addProduct = useMutation({
@@ -271,27 +271,18 @@ function AddProduct() {
                 errorMessage={errors.tax_rate?.message}
                 isRequired
               />
-              <InputBox
-                register={register}
-                tabIndex={6}
-                id="stock"
-                name="stock"
-                label="Total Stock"
-                type="number"
-                placeholder="Enter Product Quantity"
-                errorMessage={errors.stock?.message}
-                isRequired
-              />
-              <InputBox
-                register={register}
-                tabIndex={7}
-                id="manufacturer"
-                name="manufacturer"
-                label="Manufacturer"
-                type="text"
-                placeholder="Enter Product Manufacturer"
-                errorMessage={errors.manufacturer?.message}
-              />
+              <div className="col-span-2">
+                <InputBox
+                  register={register}
+                  tabIndex={6}
+                  id="manufacturer"
+                  name="manufacturer"
+                  label="Manufacturer"
+                  type="text"
+                  placeholder="Enter Product Manufacturer"
+                  errorMessage={errors.manufacturer?.message}
+                />
+              </div>
 
               <Button
                 type="submit"

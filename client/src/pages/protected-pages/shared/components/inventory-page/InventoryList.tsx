@@ -8,12 +8,9 @@ import { PRODUCT_URL } from "../../../../../api/request-api";
 import useAxiosInterceptor from "../../../../../hooks/useAxiosInterceptor";
 import { useInView } from "react-intersection-observer";
 import type { FullProductDetailsType } from "../../../../../types/product.types";
-import {
-  formatToFormalNumber,
-  formatToPhpMoney,
-} from "../../../../../utils/format-to-money";
+import { formatToPhpMoney } from "../../../../../utils/format-to-money";
 
-function ProductList() {
+function InventoryList() {
   const [openFilterProduct, setOpenFilterProduct] = useState(false);
   const [openFilterPrice, setOpenFilterPrice] = useState(false);
   const { ref, inView } = useInView();
@@ -51,7 +48,6 @@ function ProductList() {
       fetchNextPage();
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
-
   return (
     <div className="flex-grow w-full h-1">
       <div className="w-full h-full overflow-y-auto thin-scrollbar pr-1">
@@ -60,7 +56,7 @@ function ProductList() {
             <tr className="divide-x divide-zinc-300/70">
               <td className="relative">
                 <div className="flex items-center justify-center space-x-1">
-                  <span>Product</span>
+                  <span>Product Name</span>
                   <button
                     onClick={() => setOpenFilterProduct((prev) => !prev)}
                     className={`p-2 ring ring-zinc-200/5 rounded-full cursor-pointer text-lg ${
@@ -87,10 +83,10 @@ function ProductList() {
                   </AnimatePresence>
                 </div>
               </td>
-              <td>Barcode</td>
               <td>SKU</td>
-              <td>Category</td>
               <td>Stock</td>
+              <td>Type</td>
+              <td>Reason</td>
               <td className="relative">
                 <div className="flex items-center justify-center space-x-1">
                   <span>Price</span>
@@ -117,18 +113,14 @@ function ProductList() {
                   </AnimatePresence>
                 </div>
               </td>
-              <td>Tax Rate</td>
-              <td>Discount Rate</td>
-              <td>Manufacturer</td>
+              <td>Date</td>
             </tr>
           </thead>
           <tbody className="product-tbody">
             {allProducts.map((product: FullProductDetailsType, i) => (
               <tr
                 key={`${product.barcode}-${i}`} // Better key using product ID
-                className={`border-b border-zinc-200 hover:bg-secondary/85 group transition-opacity duration-75 ease-in-out ${
-                  +product.inventories_sum_stock === 0 && "bg-red-500/35"
-                }`}
+                className="border-b border-zinc-200 hover:bg-secondary/85 group transition-opacity duration-75 ease-in-out"
               >
                 <td>{product.product_name}</td>
                 <td>{product.barcode.slice(0, 8)}</td>
@@ -139,16 +131,12 @@ function ProductList() {
                     {product.category.category_name}
                   </span>
                 </td>
-                <td>
-                  {formatToFormalNumber(product.inventories_sum_stock ?? "0")}
-                </td>
+                <td>{25}</td>
                 <td>
                   <span className="px-3 py-0.5 bg-green-300/35 border border-green-400 rounded-3xl">
                     {formatToPhpMoney(String(product.price ?? 0))}
                   </span>
                 </td>
-                <td>{product.tax_rate}</td>
-                <td>{product.discount_rate}</td>
                 <td>{product.manufacturer}</td>
               </tr>
             ))}
@@ -173,4 +161,4 @@ function ProductList() {
   );
 }
 
-export default ProductList;
+export default InventoryList;

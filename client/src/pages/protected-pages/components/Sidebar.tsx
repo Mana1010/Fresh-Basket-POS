@@ -41,14 +41,14 @@ function Sidebar() {
           <ul className=" flex flex-col w-full">
             {navigationList.map((navigation) => {
               return (
-                <a
+                <button
                   key={navigation.name}
-                  href={navigation.link}
+                  onClick={() => navigate(navigation.link)}
                   className={`${
                     navigation.roles.includes(role as UserRole)
                       ? "block"
                       : "hidden"
-                  } p-1.5 hover:bg-primary/10 rounded-md group border-b-2 border-b-transparent hover:border-b-primary`}
+                  } p-1.5 hover:bg-primary/10 rounded-md group border-b-2 border-b-transparent hover:border-b-primary cursor-pointer`}
                 >
                   <li className="text-center flex space-y-1.5 items-center text-[#F5F4F3] poppins-medium flex-col">
                     <img
@@ -61,7 +61,7 @@ function Sidebar() {
                       {navigation.name}
                     </span>
                   </li>
-                </a>
+                </button>
               );
             })}
           </ul>

@@ -5,6 +5,7 @@ export type CategoryType = {
   category_name: string;
 };
 
-export type FullProductDetailsType = ProductDetailsType & {
+export type FullProductDetailsType = Omit<ProductDetailsType, "stock"> & {
+  inventories_sum_stock: string;
   category: { category_name: string };
 };

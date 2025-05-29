@@ -4,6 +4,7 @@ import { AiOutlineProduct } from "react-icons/ai";
 import useAxiosInterceptor from "../../../../../../hooks/useAxiosInterceptor";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { PRODUCT_URL } from "../../../../../../api/request-api";
+import { formatToFormalNumber } from "../../../../../../utils/format-to-money";
 function TotalProducts() {
   const axiosInstance = useAxiosInterceptor();
   const { data } = useSuspenseQuery({
@@ -14,12 +15,13 @@ function TotalProducts() {
       );
       return response.data;
     },
+    staleTime: 1000 * 30,
   });
 
   return (
     <RecordBox
       label="Total Number of Products"
-      value={data.stat}
+      value={formatToFormalNumber(data.stat)}
       Icon={AiOutlineProduct}
     />
   );

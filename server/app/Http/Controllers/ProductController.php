@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Inventory;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use Cloudinary\Cloudinary as CloudinaryCloudinary;
@@ -23,10 +24,10 @@ class ProductController extends Controller
         // if($sort === "default" || !$sort) {
         //  $products = Product::with('product_categories')->simplePaginate($limit);
         // }
-
-     $products = Product::with(['category' => function($query) {
-        $query->select('id', 'category_name');
-     }])->orderBy('product_name', 'asc')->simplePaginate(10);
+$products = Product::with('category')
+    ->withSum('inventories', 'stock')
+    ->orderBy('product_name', 'asc')
+    ->simplePaginate(10);
     return response()->json(['data' => $products], 200);
     }
 
@@ -35,7 +36,7 @@ class ProductController extends Controller
             'category_name' => 'required|string|max:255|unique:product_categories,category_name',
         ]);
 
-        $category = ProductCategory::create([
+          ProductCategory::create([
             'category_name' => $request->category_name,
         ]);
 
@@ -64,7 +65,6 @@ class ProductController extends Controller
             'product_category_id' => 'required|exists:product_categories,id',
             'discount_rate' => 'required|numeric',
             'tax_rate' => 'required|numeric',
-            'stock' => 'required|numeric',
             'product_thumbnail' => 'nullable|string',
             'manufacturer' => 'nullable|string|max:1000',
         ]);
@@ -77,7 +77,6 @@ class ProductController extends Controller
             'product_category_id' => $validated["product_category_id"],
             'discount_rate' => $validated["discount_rate"],
             'tax_rate' => $validated['tax_rate'],
-            'stock' => $validated['stock'],
             'manufacturer' => $validated['manufacturer'],
             'product_thumbnail' => $validated['product_thumbnail'],
         ]);
@@ -94,10 +93,14 @@ class ProductController extends Controller
         $type = $request->query('type');
         $product_stat = 0;
         if($type === "total_products") {
-            $product_stat = Product::count();
+            $product_stat = Inventory::all()->sum('stock');
         }
         else if ($type === "total_amount") {
-            $product_stat = DB::table('products')->selectRaw('SUM(price * stock) as total_amount')->value('total_amount');
+          $product_stat = DB::table('products')
+       ->join('inventories', 'products.id', '=', 'inventories.product_id')
+       ->selectRaw('SUM(products.price * inventories.stock) as total_amount')
+       ->value('total_amount');
+
         }
         else {
             $product_stat = ProductCategory::count();

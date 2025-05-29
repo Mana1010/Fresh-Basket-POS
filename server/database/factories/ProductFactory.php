@@ -29,10 +29,6 @@ class ProductFactory extends Factory
             // SKU (Stock Keeping Unit), an alphanumeric identifier (e.g., "ABC-12345")
             'sku' => strtoupper($this->faker->bothify('???-#####')),
 
-            // Available stock quantity for the product (e.g., 0 to 1000 units)
-            'stock' => $this->faker->numberBetween(0, 1000),
-
-            // A URL pointing to a sample product image
             // 'product_thumbnail' => $this->faker->imageUrl(300, 300, 'products'),
             'product_thumbnail' => null,
 

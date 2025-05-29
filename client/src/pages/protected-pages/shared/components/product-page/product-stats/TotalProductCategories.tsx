@@ -13,6 +13,7 @@ function TotalProductCategories() {
       );
       return response.data;
     },
+    staleTime: Infinity,
   });
 
   return (

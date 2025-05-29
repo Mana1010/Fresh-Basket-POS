@@ -14,6 +14,7 @@ function TotalAmountProduct() {
       );
       return response.data;
     },
+    refetchInterval: 10000,
   });
   return (
     <RecordBox

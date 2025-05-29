@@ -26,4 +26,14 @@ export const BREADCRUMB_NAVIGATION_LIST = [
     breadcrumb: "POS Page",
     icon: "",
   },
+  {
+    path: "/inventory",
+    breadcrumb: "Inventory",
+    icon: inventory,
+  },
+  {
+    path: "/add-inventory",
+    breadcrumb: "Add Inventory",
+    icon: "",
+  },
 ];

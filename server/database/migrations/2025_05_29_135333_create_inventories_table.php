@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('orders', function (Blueprint $table) {
+        Schema::create('inventories', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('customer_id')->constrained('customers');
             $table->foreignId('product_id')->nullable()->constrained('products')->onDelete('set null');
-            $table->integer('quantity');
-            $table->decimal('total_price', 10, 2);
+            $table->enum('type', ['in', 'out'])->default('in');
+            $table->integer('stock')->default(0);
+            $table->enum('reason', ['customer_sale', 'supplier_delivery', 'damaged_or_spoiled'])->default('supplier_delivery');
+            $table->boolean('is_deleted')->default(false);
             $table->timestamps();
         });
     }
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('orders');
+        Schema::dropIfExists('inventories');
     }
 };

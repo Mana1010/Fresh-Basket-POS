@@ -9,6 +9,9 @@ import Products from "./pages/protected-pages/shared/Products";
 import ProductPageLayout from "./layouts/ProductPageLayout";
 import AddProduct from "./pages/protected-pages/shared/AddProduct";
 import EditProduct from "./pages/protected-pages/shared/components/EditProduct";
+import Inventory from "./pages/protected-pages/shared/Inventory";
+import AddInventory from "./pages/protected-pages/shared/AddInventory";
+import InventoryPageLayout from "./layouts/InventoryPageLayout";
 function App() {
   const router = createBrowserRouter([
     {
@@ -40,6 +43,20 @@ function App() {
             {
               path: "edit-product/:id",
               element: <EditProduct />,
+            },
+          ],
+        },
+        {
+          path: "inventory",
+          element: <InventoryPageLayout />,
+          children: [
+            {
+              index: true,
+              element: <Inventory />,
+            },
+            {
+              path: "add-inventory",
+              element: <AddInventory />,
             },
           ],
         },

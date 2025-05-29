@@ -60,19 +60,6 @@ export const productValidation = z.object({
         return false;
       }
     }, "Tax rate must be a whole number"),
-  stock: requiredValidation("Stock is required.")
-    .refine((data) => {
-      if (data !== undefined && data < 0) {
-        return false;
-      }
-      return true;
-    }, "Stock must not be negative.")
-    .refine((data) => {
-      if (Number.isInteger(data)) return true;
-      else {
-        return false;
-      }
-    }, "Stock must be a whole number"),
   product_thumbnail: z.instanceof(File).nullable(),
   manufacturer: z.string().max(1000),
 });

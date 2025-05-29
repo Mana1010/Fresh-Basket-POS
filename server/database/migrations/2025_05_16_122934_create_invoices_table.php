@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users');
             $table->foreignId('order_id')->constrained('orders');
             $table->decimal('total_amount', 10, 2);
+            $table->boolean('is_deleted')->default(false);
             $table->timestamps();
         });
     }

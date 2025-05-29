@@ -35,6 +35,7 @@ function ProductStat({ children, ...props }: ProductStatProps) {
     </Suspense>
   );
 }
+
 function Products() {
   const navigate = useNavigate();
 
