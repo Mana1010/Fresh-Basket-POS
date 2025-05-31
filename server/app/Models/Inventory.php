@@ -8,8 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Inventory extends Model
 {
     use HasFactory;
-    protected $fillable = ["stock", "type", "reason"];
+    protected $fillable = ["stock", "type", "reason", "created_at", "product_id"];
     public function product() {
-        return $this->belongsTo(User::class, 'product_id');
+        return $this->belongsTo(Product::class, 'product_id');
     }
 }

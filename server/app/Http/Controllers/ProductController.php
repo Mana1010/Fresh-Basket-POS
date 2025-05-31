@@ -26,7 +26,7 @@ class ProductController extends Controller
         // }
 $products = Product::with('category')
     ->withSum('inventories', 'stock')
-    ->orderBy('product_name', 'asc')
+    // ->orderBy('product_name', 'asc')
     ->simplePaginate(10);
     return response()->json(['data' => $products], 200);
     }

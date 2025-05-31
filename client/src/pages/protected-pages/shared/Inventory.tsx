@@ -41,7 +41,7 @@ function Inventory() {
             <input
               type="text"
               className="text-sm bg-transparent flex-grow text-secondary w-full outline-0 px-1"
-              placeholder="Search Product (@e g Product Name or Sku)"
+              placeholder="Search Inventory"
             />
           </div>
           <button

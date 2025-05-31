@@ -1,20 +1,17 @@
 import InputBox from "../../../components/InputBox";
-import { useForm } from "react-hook-form";
-import { IoIosAddCircleOutline } from "react-icons/io";
-import { toast } from "sonner";
-import { type ProductDetailsType } from "../../../validation/product.validation";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useModalStore } from "../../../store/modal.store";
-import useAxiosInterceptor from "../../../hooks/useAxiosInterceptor";
 import {
-  useMutation,
-  useQuery,
-  type UseQueryResult,
-} from "@tanstack/react-query";
-import { PRODUCT_URL } from "../../../api/request-api";
+  useForm,
+  type UseFormSetValue,
+  type UseFormWatch,
+} from "react-hook-form";
+import { toast } from "sonner";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import useAxiosInterceptor from "../../../hooks/useAxiosInterceptor";
+import { useMutation } from "@tanstack/react-query";
+import { INVENTORY_URL, PRODUCT_URL } from "../../../api/request-api";
 import type { AxiosError } from "axios";
-import ProductCategoryLoading from "./components/loading/ProductCategoryLoading";
-import type { CategoryType } from "../../../types/product.types";
 import Button from "../../../components/Button";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
@@ -22,9 +19,21 @@ import {
   inventoryValidation,
   type InventoryValidationType,
 } from "../../../validation/inventory.validation";
+import { lazy, Suspense, useState } from "react";
+import { ErrorBoundary } from "react-error-boundary";
+import { MdEditOff } from "react-icons/md";
+import BoxesLoading from "./components/loading/BoxesLoading";
+import type { FullProductDetailsType } from "../../../types/product.types";
+const LazySelectProduct = lazy(
+  () => import("./components/inventory-page/SelectProduct")
+);
 function AddInventory() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const [selectedProduct, setSelectedProduct] = useState<Pick<
+    FullProductDetailsType,
+    "id" | "product_name" | "sku" | "barcode"
+  > | null>(null);
   const axiosInstance = useAxiosInterceptor();
   const {
     register,
@@ -36,28 +45,17 @@ function AddInventory() {
   } = useForm({
     defaultValues: {
       product_id: null,
-      type: "in",
-      reason: "supplier_delivery",
+      type: "",
+      reason: "",
       stock: 0,
     },
     resolver: zodResolver(inventoryValidation),
-  });
-  const { isOpenAddCategoryForm, toggleCategoryForm } = useModalStore();
-
-  const allCategories: UseQueryResult<CategoryType[], AxiosError> = useQuery({
-    queryKey: ["all-product-categories"],
-    queryFn: async () => {
-      const response = await axiosInstance.get(`${PRODUCT_URL}/all-categories`);
-
-      return response.data.categories;
-    },
-    staleTime: Infinity,
   });
 
   const addInventory = useMutation({
     mutationFn: async (data: InventoryValidationType) => {
       const response = await axiosInstance.post(
-        `${PRODUCT_URL}/create-product`,
+        `${INVENTORY_URL}/add-inventory`,
         data
       );
       return response.data;
@@ -65,8 +63,8 @@ function AddInventory() {
     onSuccess: ({ message }) => {
       toast.success(message);
       reset();
-      navigate("/products");
-      queryClient.invalidateQueries({ queryKey: ["products"] });
+      navigate("/inventory");
+      queryClient.invalidateQueries({ queryKey: ["inventories"] });
     },
     onError: (err: AxiosError<{ message: string }>) => {
       console.log(err);
@@ -75,114 +73,234 @@ function AddInventory() {
   });
 
   return (
-    <div className="pt-3 bg-white/20 rounded-sm border border-zinc-800/15 p-2 w-full h-full relative">
+    <div className="pt-3 bg-white/20 rounded-sm border border-zinc-800/15 p-2 w-full h-auto lg:h-full relative overflow-visible lg:overflow-hidden">
       <form
-        // onSubmit={handleSubmit((data: InventoryValidationType) => {
-        //   addProduct.mutate(data);
-        // })}
-        className=" flex flex-col h-full w-full"
+        onSubmit={handleSubmit((data: InventoryValidationType) => {
+          const payload = {
+            ...data,
+            stock:
+              data.type === "in" ? Math.abs(data.stock) : -Math.abs(data.stock),
+          };
+          addInventory.mutate(payload);
+        })}
+        className="flex flex-col h-full w-full"
       >
-        <div className="flex flex-col space-y-1.5 w-full basis-[40%]">
-          <div className="block">
-            <h1 className="text-primary text-sm poppins-semibold">
-              Select Product Category
-            </h1>
-            {errors.product_id ? (
-              <span className="text-red-500 text-[0.7rem]">
-                {errors.product_id.message}
-              </span>
-            ) : (
-              <span className="text-slate-400 text-[0.7rem]">
-                Select only one <span className="text-red-500">*</span>
-              </span>
-            )}
-          </div>
-          <div className="pb-1 thin-scrollbar w-full">
-            {allCategories.isLoading || !allCategories.data ? (
-              <ProductCategoryLoading />
-            ) : (
-              <div className="flex gap-1.5 overflow-x-auto items-center w-full">
-                {allCategories?.data.map((name, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setValue("product_id", name.id)}
-                    type="button"
-                    className={` custom-border rounded-md p-3  min-h-10 flex items-center justify-center basis-[20%] flex-shrink-0 text-sm relative ${
-                      watch("product_id") === name.id
-                        ? "border-primary text-primary bg-primary/15"
-                        : "text-secondary/75"
-                    }`}
-                  >
-                    {name.category_name}
-                  </button>
-                ))}
-                <button
-                  onClick={() => toggleCategoryForm(true)}
-                  type="button"
-                  className="custom-border rounded-md p-3 text-primary min-h-10 flex items-center justify-center basis-[20%] flex-shrink-0 text-xl cursor-pointer"
-                >
-                  <IoIosAddCircleOutline />
-                </button>
+        <Suspense
+          fallback={
+            <div className=" flex flex-col space-y-2 flex-grow min-h-[200px] max-h-[250px]">
+              <div className="flex items-center justify-between w-full">
+                <div className="flex flex-col space-y-1 w-full">
+                  <div className="rounded-3xl min-h-3 w-[15%] bg-zinc-400 animate-pulse" />
+                  <div className="rounded-3xl min-h-2.5 w-[10%] bg-zinc-400 animate-pulse" />
+                </div>
+                <div className="rounded-3xl min-h-6 w-[40%] bg-zinc-400 animate-pulse" />
               </div>
-            )}
-          </div>
-        </div>
-        <span className="w-full h-[1px] bg-zinc-800/25 my-4"></span>
-        <div className="flex flex-col gap-2 basis-[60%]">
-          <h1 className="text-primary text-sm poppins-semibold">
-            Product Details
-          </h1>
-          <div className="grid grid-cols-1 lg:grid-cols-2 py-2 flex-grow lg:h-1">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 justify-center overflow-y-auto pr-2">
-              <div className="flex w-full flex-col space-y-0.5">
-                <h5 className="text-secondary text-[0.7rem] poppins-bold">
-                  Product Name
-                </h5>
-                <div></div>
-              </div>
-              <InputBox
-                register={register}
-                tabIndex={1}
-                id="type"
-                name="type"
-                label="Discount Rate (%)"
-                type="number"
-                placeholder="Enter Discount Rate"
-                errorMessage={errors.type?.message}
-                isRequired
+              <BoxesLoading
+                totalBoxes={6}
+                className="overflow-y-auto grid-cols-2 lg:grid-cols-4"
+                boxesClassName="min-h-20"
               />
+            </div>
+          }
+        >
+          <ErrorBoundary
+            fallback={
+              <div className="flex flex-col space-y-2 flex-grow min-h-[200px] max-h-[250px]">
+                <div className="flex items-center justify-between w-full">
+                  <div className="flex flex-col space-y-1 w-full">
+                    <div className="rounded-3xl min-h-3 w-[15%] bg-zinc-400 animate-pulse" />
+                    <div className="rounded-3xl min-h-2.5 w-[10%] bg-zinc-400 animate-pulse" />
+                  </div>
+                  <div className="rounded-3xl min-h-6 w-[40%] bg-zinc-400 animate-pulse" />
+                </div>
+                <BoxesLoading
+                  totalBoxes={6}
+                  className="overflow-y-auto grid-cols-2 lg:grid-cols-4"
+                  boxesClassName="min-h-20"
+                />
+              </div>
+            }
+          >
+            <LazySelectProduct
+              setSelectedProduct={setSelectedProduct}
+              watch={watch as UseFormWatch<InventoryValidationType>}
+              setValue={setValue as UseFormSetValue<InventoryValidationType>}
+            />
+          </ErrorBoundary>
+        </Suspense>
+        <span className="w-full h-[1px] bg-zinc-800/25 my-4"></span>
+        <div className="flex flex-col gap-2">
+          <h1 className="text-primary text-sm poppins-semibold">
+            Inventory Details
+          </h1>
+
+          <div className="grid md:grid-cols-2 grid-cols-1 lg:grid-cols-3 gap-2 justify-center overflow-y-auto pr-2 w-full items-center">
+            <div className="flex w-full flex-col space-y-0.5">
+              <label className="text-secondary text-[0.7rem] poppins-bold">
+                Product Name <span className="text-red-400">*</span>
+              </label>
+              <div
+                className={`rounded-sm w-full text-secondary p-2 text-[0.85rem] disabled outline-primary border border-zinc-300 flex justify-between items-center`}
+              >
+                {selectedProduct ? (
+                  <span>{selectedProduct.product_name}</span>
+                ) : (
+                  <span className="text-secondary/60">Product Name Here</span>
+                )}
+                <span className="text-secondary/80 text-lg">
+                  <MdEditOff />
+                </span>
+              </div>
+            </div>
+            <div className="flex w-full flex-col space-y-0.5">
+              <label className="text-secondary text-[0.7rem] poppins-bold">
+                Product Sku <span className="text-red-400">*</span>
+              </label>
+              <div
+                className={`rounded-sm w-full text-secondary p-2 text-[0.85rem] disabled outline-primary border border-zinc-300 flex justify-between items-center`}
+              >
+                {selectedProduct ? (
+                  <span>{selectedProduct.sku}</span>
+                ) : (
+                  <span className="text-secondary/60">Product Sku Here</span>
+                )}
+                <span className="text-secondary/80 text-lg">
+                  <MdEditOff />
+                </span>
+              </div>
+            </div>
+            <div className="flex w-full flex-col space-y-0.5">
+              <label className="text-secondary text-[0.7rem] poppins-bold">
+                Product Barcode <span className="text-red-400">*</span>
+              </label>
+              <div
+                className={`rounded-sm w-full text-secondary p-2 text-[0.85rem] disabled outline-primary border border-zinc-300 flex justify-between items-center`}
+              >
+                {selectedProduct ? (
+                  <span>{selectedProduct.barcode}</span>
+                ) : (
+                  <span className="text-secondary/60">
+                    Product Barcode Here
+                  </span>
+                )}
+                <span className="text-secondary/80 text-lg">
+                  <MdEditOff />
+                </span>
+              </div>
+            </div>
+            <div className="flex w-full flex-col space-y-0.5">
+              <label
+                htmlFor="type"
+                className="text-secondary text-[0.7rem] poppins-bold"
+              >
+                Type <span className="text-red-400">*</span>
+              </label>
+              <select
+                {...register("type")}
+                name="type"
+                id="type"
+                className={`rounded-sm w-full text-secondary p-2 text-[0.85rem] disabled outline-primary  border  ${
+                  errors.type ? "border-red-500/90" : "border-zinc-300"
+                }`}
+              >
+                <option value="" disabled hidden>
+                  Select an option
+                </option>
+                <option value="in" className="p-2">
+                  Stock In
+                </option>
+                <option value="out" className="p-2">
+                  Stock Out
+                </option>
+              </select>
+              {errors.type && (
+                <p className="text-[0.65rem] text-red-500">
+                  {errors.type.message}
+                </p>
+              )}
+            </div>
+            {watch("type") === "" && (
               <InputBox
                 register={register}
                 tabIndex={2}
                 id="stock"
                 name="stock"
-                label="Stock"
+                label="Select type first"
                 type="number"
                 placeholder="₱ 1.00"
                 errorMessage={errors.stock?.message}
+                disabled
                 isRequired
               />
-
+            )}
+            {watch("type") === "in" && (
               <InputBox
                 register={register}
-                tabIndex={5}
-                id="reason"
-                name="reason"
-                label="Tax Rate (%)"
+                tabIndex={2}
+                id="stock"
+                name="stock"
+                label="Total Stock In"
                 type="number"
-                placeholder="Enter Tax Rate"
-                errorMessage={errors.reason?.message}
+                placeholder="Enter the total stock in"
+                errorMessage={errors.stock?.message}
+                disabled={watch("type") !== "in"}
                 isRequired
               />
-              <Button
-                type="submit"
-                disabled={false}
-                label="Upload Product"
-                labelWhileLoading="Uploading..."
-                className="col-span-2 text-[0.8rem]"
+            )}
+            {watch("type") === "out" && (
+              <InputBox
+                register={register}
+                tabIndex={2}
+                id="stock"
+                name="stock"
+                label="Total Stock Out"
+                type="number"
+                placeholder="Enter the total stock out"
+                errorMessage={errors.stock?.message}
+                isRequired
               />
+            )}
+            <div className="flex w-full flex-col space-y-0.5">
+              <label
+                htmlFor="reason"
+                className="text-secondary text-[0.7rem] poppins-bold"
+              >
+                Reason <span className="text-red-400">*</span>
+              </label>
+              <select
+                {...register("reason")}
+                name="reason"
+                id="reason"
+                className={`rounded-sm w-full text-secondary p-2 text-[0.85rem] disabled outline-primary  border border-zinc-300 ${
+                  errors.reason ? "border-red-500/90" : "border-zinc-300"
+                }`}
+              >
+                <option value="" disabled hidden>
+                  Select a reason
+                </option>
+                <option value="supplier_delivery" className="p-2">
+                  Supplier Delivery
+                </option>
+                <option value="customer_sale" className="p-2">
+                  Sold in Customer
+                </option>
+                <option value="damaged_or_spoiled" className="p-2">
+                  Damaged/Spoiled
+                </option>
+              </select>
+              {errors.reason && (
+                <p className="text-[0.65rem] text-red-500">
+                  {errors.reason.message}
+                </p>
+              )}
             </div>
-            <div className="flex flex-col justify-center w-full items-center h-full p-3"></div>
+            <Button
+              type="submit"
+              disabled={false}
+              label="Upload Inventory"
+              labelWhileLoading="Uploading..."
+              className="col-span-full text-[0.8rem]"
+            />
           </div>
         </div>
       </form>

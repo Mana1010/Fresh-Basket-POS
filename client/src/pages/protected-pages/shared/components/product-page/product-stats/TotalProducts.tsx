@@ -20,7 +20,7 @@ function TotalProducts() {
 
   return (
     <RecordBox
-      label="Total Number of Products"
+      label="Total Stock of Products"
       value={formatToFormalNumber(data.stat)}
       Icon={AiOutlineProduct}
     />

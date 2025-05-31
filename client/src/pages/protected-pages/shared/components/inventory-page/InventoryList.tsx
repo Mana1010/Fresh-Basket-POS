@@ -3,12 +3,17 @@ import SelectBox from "../../../components/SelectBox";
 import { AnimatePresence } from "framer-motion";
 import { CgArrowsExchangeAltV } from "react-icons/cg";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
-import { MdOutlineFilterList } from "react-icons/md";
-import { PRODUCT_URL } from "../../../../../api/request-api";
+import { INVENTORY_URL } from "../../../../../api/request-api";
 import useAxiosInterceptor from "../../../../../hooks/useAxiosInterceptor";
 import { useInView } from "react-intersection-observer";
-import type { FullProductDetailsType } from "../../../../../types/product.types";
-import { formatToPhpMoney } from "../../../../../utils/format-to-money";
+import type { FullInventoryDetails } from "../../../../../types/inventory.types";
+import { dateFormat } from "../../../../../helper/dateFormat";
+import { formatFinancialImpactNumber } from "../../../../../helper/formatFinancialImpactNumber";
+import {
+  formatToFormalNumber,
+  formatToPhpMoney,
+} from "../../../../../utils/format-to-money";
+import { IoAdd, IoRemove, IoTrendingDown, IoTrendingUp } from "react-icons/io5";
 
 function InventoryList() {
   const [openFilterProduct, setOpenFilterProduct] = useState(false);
@@ -18,10 +23,10 @@ function InventoryList() {
 
   const { data, hasNextPage, isLoading, fetchNextPage, isFetchingNextPage } =
     useSuspenseInfiniteQuery({
-      queryKey: ["products"],
+      queryKey: ["inventories"],
       queryFn: async ({ pageParam = 1 }) => {
         const response = await axiosInterceptor.get(
-          `${PRODUCT_URL}/list?limit=10&page=${pageParam}`
+          `${INVENTORY_URL}/list?limit=10&page=${pageParam}`
         );
         return response.data.data;
       },
@@ -40,7 +45,8 @@ function InventoryList() {
     });
 
   // Get all products from all pages
-  const allProducts = data?.pages.flatMap((page) => page.data) || [];
+  const allInventories =
+    data?.pages.flatMap((page) => page.data) || ([] as FullInventoryDetails[]);
 
   // Auto-fetch next page when scrolling into view
   useEffect(() => {
@@ -48,6 +54,8 @@ function InventoryList() {
       fetchNextPage();
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  console.log(allInventories);
   return (
     <div className="flex-grow w-full h-1">
       <div className="w-full h-full overflow-y-auto thin-scrollbar pr-1">
@@ -84,60 +92,62 @@ function InventoryList() {
                 </div>
               </td>
               <td>SKU</td>
-              <td>Stock</td>
+              <td>Quantity</td>
               <td>Type</td>
+              <td>Financial Impact</td>
               <td>Reason</td>
-              <td className="relative">
-                <div className="flex items-center justify-center space-x-1">
-                  <span>Price</span>
-                  <button
-                    onClick={() => setOpenFilterPrice((prev) => !prev)}
-                    className={`p-2 ring ring-zinc-200/5 rounded-full cursor-pointer text-lg ${
-                      openFilterPrice &&
-                      "bg-secondary/15 transition-colors duration-150"
-                    }`}
-                  >
-                    <MdOutlineFilterList />
-                  </button>
-                  <AnimatePresence mode="wait">
-                    {openFilterPrice && (
-                      <SelectBox
-                        setOpenFilterProduct={setOpenFilterPrice}
-                        mutate={() => {}}
-                        values={["asc", "desc"]}
-                        options={["Price (With Tax)", "Price (Without Tax)"]}
-                        currentValue={"asc"}
-                        className="top-[85%] right-[-55px] absolute origin-top-left"
-                      />
-                    )}
-                  </AnimatePresence>
-                </div>
-              </td>
               <td>Date</td>
             </tr>
           </thead>
           <tbody className="product-tbody">
-            {allProducts.map((product: FullProductDetailsType, i) => (
+            {allInventories.map((inventory: FullInventoryDetails) => (
               <tr
-                key={`${product.barcode}-${i}`} // Better key using product ID
+                key={`${inventory.id}`} // Better key using product ID
                 className="border-b border-zinc-200 hover:bg-secondary/85 group transition-opacity duration-75 ease-in-out"
               >
-                <td>{product.product_name}</td>
-                <td>{product.barcode.slice(0, 8)}</td>
-                <td>{product.sku}</td>
+                <td>{inventory.product_name}</td>
+                <td>{inventory.sku}</td>
+                <td>{formatToFormalNumber(inventory.stock.toString())}</td>
 
+                <td>{inventory.type}</td>
                 <td>
-                  <span className="px-3 py-0.5 bg-orange-300/35 border border-orange-400 rounded-3xl">
-                    {product.category.category_name}
-                  </span>
+                  <div
+                    className={`px-3 py-0.5 rounded-3xl flex items-center justify-center space-x-1.5  `}
+                  >
+                    <span
+                      className={`${
+                        inventory.reason === "customer_sale" &&
+                        inventory.type === "out"
+                          ? "text-green-500"
+                          : inventory.reason === "supplier_delivery" &&
+                            inventory.type === "in"
+                          ? "text-yellow-500"
+                          : "text-red-500"
+                      } text-xl`}
+                    >
+                      {inventory.reason === "customer_sale" &&
+                      inventory.type === "out" ? (
+                        <IoTrendingUp />
+                      ) : (
+                        <IoTrendingDown />
+                      )}
+                    </span>
+                    <span>
+                      {formatFinancialImpactNumber(
+                        inventory.financial_impact,
+                        inventory.reason
+                      )}
+                    </span>
+                  </div>
                 </td>
-                <td>{25}</td>
                 <td>
-                  <span className="px-3 py-0.5 bg-green-300/35 border border-green-400 rounded-3xl">
-                    {formatToPhpMoney(String(product.price ?? 0))}
-                  </span>
+                  {inventory.reason === "supplier_delivery"
+                    ? "Supplier Delivery"
+                    : inventory.reason === "damaged_or_spoiled"
+                    ? "Damaged/Spoiled"
+                    : "Sold in Customer"}
                 </td>
-                <td>{product.manufacturer}</td>
+                <td>{dateFormat(new Date(inventory.created_at))}</td>
               </tr>
             ))}
           </tbody>
@@ -151,7 +161,7 @@ function InventoryList() {
         )}
 
         {/* End of results indicator */}
-        {!hasNextPage && !isLoading && allProducts.length > 0 && (
+        {!hasNextPage && !isLoading && allInventories.length > 0 && (
           <div className="text-center text-secondary text-[0.8rem] pt-2">
             End Result
           </div>

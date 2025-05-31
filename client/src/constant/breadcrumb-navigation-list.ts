@@ -32,7 +32,7 @@ export const BREADCRUMB_NAVIGATION_LIST = [
     icon: inventory,
   },
   {
-    path: "/add-inventory",
+    path: "inventory/add-inventory",
     breadcrumb: "Add Inventory",
     icon: "",
   },

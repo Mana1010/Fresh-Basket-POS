@@ -20,7 +20,7 @@ import {
 } from "@tanstack/react-query";
 import { PRODUCT_URL } from "../../../api/request-api";
 import type { AxiosError } from "axios";
-import ProductCategoryLoading from "./components/loading/ProductCategoryLoading";
+import BoxesLoading from "./components/loading/BoxesLoading";
 import type { CategoryType } from "../../../types/product.types";
 import Button from "../../../components/Button";
 import { generateBarcode } from "../../../utils/generate-barcode";
@@ -168,7 +168,7 @@ function AddProduct() {
           </div>
           <div className="pb-1 thin-scrollbar w-full">
             {allCategories.isLoading || !allCategories.data ? (
-              <ProductCategoryLoading />
+              <BoxesLoading totalBoxes={3} />
             ) : (
               <div className="flex gap-1.5 overflow-x-auto items-center w-full">
                 {allCategories?.data.map((name, i) => (
@@ -286,7 +286,8 @@ function AddProduct() {
 
               <Button
                 type="submit"
-                disabled={false}
+                disabled={addProduct.isPending}
+                isLoading={addProduct.isPending}
                 label="Upload Product"
                 labelWhileLoading="Uploading..."
                 className="col-span-2 text-[0.8rem]"

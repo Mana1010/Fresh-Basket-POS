@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use Illuminate\Routing\Router;
@@ -25,6 +26,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/create-category', 'create_category');
         Route::post('/create-product', 'create_product');
         Route::post("/upload-thumbnail", "upload_thumbnail");
+    });
+
+    Route::prefix('inventory')->controller(InventoryController::class)->group(function () {
+        Route::get('/list', 'all_inventories');
+        Route::post('/add-inventory', 'add_inventory');
     });
 });
 
