@@ -9,6 +9,7 @@ import type { AxiosError } from "axios";
 import axios from "axios";
 import { AUTH_URL } from "../api/request-api";
 import { useEffect } from "react";
+import ProductDetails from "../pages/protected-pages/shared/components/product-page/ProductDetails";
 function ProtectedLayout() {
   const breadcrumbs = useBreadCrumbs(BREADCRUMB_NAVIGATION_LIST);
   const navigate = useNavigate();
@@ -43,12 +44,13 @@ function ProtectedLayout() {
   }, [checkAuth.isError, checkAuth.error, navigate]);
 
   return (
-    <div className="flex items-center h-screen w-full bg-[#F5F5F5] p-2">
+    <div className="flex items-center h-screen w-full bg-[#F5F5F5] p-2 relative">
+      {true && <ProductDetails />}
       <div className="flex-grow h-full flex flex-col gap-1">
         <Header />
         <div className="flex-grow flex w-full h-1">
           <Sidebar />
-          <div className="h-full w-full flex flex-col p-2 space-y-1 overflow-y-auto">
+          <div className="h-full w-1 flex flex-col p-2 space-y-1 overflow-y-auto flex-grow">
             <div className="flex space-x-1.5">
               {breadcrumbs.map(({ match, breadcrumb }, i) => {
                 return (
@@ -80,6 +82,7 @@ function ProtectedLayout() {
                 );
               })}
             </div>
+
             <Outlet />
           </div>
         </div>

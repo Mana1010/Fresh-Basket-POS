@@ -29,10 +29,13 @@ class InventoryController extends Controller
 
     public function all_inventories(Request $request) {
         $limit = $request->query('limit');
+        $search = $request->query('search');
+
 $inventories = DB::table('inventories')
     ->join('products', 'inventories.product_id', '=', 'products.id')
     ->select('inventories.*', 'products.price', 'products.tax_rate', 'products.product_name', 'products.sku')
     ->selectRaw('(inventories.stock * (products.price * (1 + products.tax_rate / 100))) AS financial_impact')->orderBy('updated_at', 'desc')
+    ->where('products.product_name', 'like', "%$search%")->orWhere('products.sku', 'like', "%$search%")
     ->simplePaginate($limit ?? 10);
         return response()->json(['data' => $inventories], 200);
     }

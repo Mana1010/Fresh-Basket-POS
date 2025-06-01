@@ -23,16 +23,18 @@ function RecordBox({
         className
       )}
     >
-      <h1 className="text-[0.8rem] text-secondary poppins-semibold">{label}</h1>
+      <h1 className="text-[0.7rem] text-secondary poppins-semibold">{label}</h1>
 
       {isLoading ? (
         <div className="h-4 w-24 rounded-3xl bg-secondary/80 animate-pulse"></div>
       ) : (
-        <span className="text-secondary text-2xl relative z-1">{value}</span>
+        <span className="text-secondary text-lg lg:text-2xl relative z-1 poppins-semibold">
+          {value}
+        </span>
       )}
 
       {Icon && (
-        <span className="right-1 absolute bottom-1 text-5xl text-zinc-300">
+        <span className="right-1 absolute bottom-1 text-3xl md:text-5xl text-zinc-300">
           {" "}
           <Icon />
         </span>

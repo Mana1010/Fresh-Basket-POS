@@ -17,6 +17,7 @@ class ProductController extends Controller
 {
     public function all_products (Request $request) {
         $limit = $request->query('limit');
+          $search = $request->query('search');
         // $sort = $request->query('sort');
         // $filter = $request->query('filter');
 
@@ -24,9 +25,10 @@ class ProductController extends Controller
         // if($sort === "default" || !$sort) {
         //  $products = Product::with('product_categories')->simplePaginate($limit);
         // }
-$products = Product::with('category')
+$products = Product::with('category')->where('product_name', 'like', "%$search%")->orWhere('sku', 'like', "%$search%")
+   ->orWhere('manufacturer', 'like', "%$search%")
     ->withSum('inventories', 'stock')
-    // ->orderBy('product_name', 'asc')
+    ->orderBy('created_at', 'desc')
     ->simplePaginate(10);
     return response()->json(['data' => $products], 200);
     }

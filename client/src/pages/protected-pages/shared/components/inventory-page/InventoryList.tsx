@@ -9,24 +9,29 @@ import { useInView } from "react-intersection-observer";
 import type { FullInventoryDetails } from "../../../../../types/inventory.types";
 import { dateFormat } from "../../../../../helper/dateFormat";
 import { formatFinancialImpactNumber } from "../../../../../helper/formatFinancialImpactNumber";
+import { formatToFormalNumber } from "../../../../../utils/format-to-money";
 import {
-  formatToFormalNumber,
-  formatToPhpMoney,
-} from "../../../../../utils/format-to-money";
-import { IoAdd, IoRemove, IoTrendingDown, IoTrendingUp } from "react-icons/io5";
+  IoCaretDown,
+  IoCaretUp,
+  IoTrendingDown,
+  IoTrendingUp,
+} from "react-icons/io5";
+import { LuList } from "react-icons/lu";
 
-function InventoryList() {
+type InventoryListProps = {
+  debouncedSearchResult: string;
+};
+function InventoryList({ debouncedSearchResult }: InventoryListProps) {
   const [openFilterProduct, setOpenFilterProduct] = useState(false);
-  const [openFilterPrice, setOpenFilterPrice] = useState(false);
   const { ref, inView } = useInView();
   const axiosInterceptor = useAxiosInterceptor();
 
   const { data, hasNextPage, isLoading, fetchNextPage, isFetchingNextPage } =
     useSuspenseInfiniteQuery({
-      queryKey: ["inventories"],
+      queryKey: ["inventories", debouncedSearchResult],
       queryFn: async ({ pageParam = 1 }) => {
         const response = await axiosInterceptor.get(
-          `${INVENTORY_URL}/list?limit=10&page=${pageParam}`
+          `${INVENTORY_URL}/list?limit=10&page=${pageParam}&search=${debouncedSearchResult}`
         );
         return response.data.data;
       },
@@ -57,9 +62,9 @@ function InventoryList() {
 
   console.log(allInventories);
   return (
-    <div className="flex-grow w-full h-1">
+    <div className="flex-grow w-auto lg:w-full h-auto lg:h-1 overflow-x-auto">
       <div className="w-full h-full overflow-y-auto thin-scrollbar pr-1">
-        <table className="w-full h-full">
+        <table className="w-full">
           <thead className="product-thead">
             <tr className="divide-x divide-zinc-300/70">
               <td className="relative">
@@ -97,6 +102,7 @@ function InventoryList() {
               <td>Financial Impact</td>
               <td>Reason</td>
               <td>Date</td>
+              <td>Action</td>
             </tr>
           </thead>
           <tbody className="product-tbody">
@@ -107,7 +113,29 @@ function InventoryList() {
               >
                 <td>{inventory.product_name}</td>
                 <td>{inventory.sku}</td>
-                <td>{formatToFormalNumber(inventory.stock.toString())}</td>
+                <td>
+                  <div
+                    className={`px-3 py-0.5 rounded-3xl flex items-center justify-center space-x-1.5 `}
+                  >
+                    <span
+                      className={`${
+                        Number(inventory.stock) > 0
+                          ? "text-green-500"
+                          : "text-red-500"
+                      } text-md`}
+                    >
+                      {Number(inventory.stock) > 0 ? (
+                        <IoCaretUp />
+                      ) : (
+                        <IoCaretDown />
+                      )}
+                    </span>
+                    <span>
+                      {" "}
+                      {formatToFormalNumber(inventory.stock.toString())}
+                    </span>
+                  </div>
+                </td>
 
                 <td>{inventory.type}</td>
                 <td>
@@ -148,6 +176,14 @@ function InventoryList() {
                     : "Sold in Customer"}
                 </td>
                 <td>{dateFormat(new Date(inventory.created_at))}</td>
+                <td className="flex items-center justify-center">
+                  <button className="bg-secondary/90 cursor-pointer py-1.5 px-3 rounded-sm custom-border text-zinc-200 text-[0.7rem] flex space-x-1.5 items-center justify-center">
+                    <span>
+                      <LuList />
+                    </span>
+                    <span>View Details</span>
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -161,7 +197,7 @@ function InventoryList() {
         )}
 
         {/* End of results indicator */}
-        {!hasNextPage && !isLoading && allInventories.length > 0 && (
+        {!hasNextPage && !isLoading && allInventories.length > 5 && (
           <div className="text-center text-secondary text-[0.8rem] pt-2">
             End Result
           </div>

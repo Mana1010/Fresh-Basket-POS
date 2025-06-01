@@ -1,17 +1,22 @@
-import React, { lazy } from "react";
+import React, { lazy, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { MdOutlineManageSearch } from "react-icons/md";
 import ProductGraphLoading from "./components/loading/ProductGraphLoading";
+import useSearchDebounce from "../../../hooks/useSearchDebounce";
+import Title from "../../../components/Title";
 
 const LazyInventoryList = lazy(
   () => import("./components/inventory-page/InventoryList")
 );
 function Inventory() {
   const navigate = useNavigate();
+  const [searchInventory, setSearchInventory] = useState("");
+  const debounceSearchResult = useSearchDebounce(searchInventory);
   return (
     <div className="flex flex-col gap-2 w-full h-auto lg:h-full">
+      <Title title="Inventory" />
       <div className="grid gap-1.5 grid-cols-4 p-2 border border-zinc-200 rounded-sm">
         {/* <ProductStat
           label="Total Number of Products"
@@ -39,6 +44,7 @@ function Inventory() {
               <MdOutlineManageSearch />
             </button>
             <input
+              onChange={(e) => setSearchInventory(e.target.value)}
               type="text"
               className="text-sm bg-transparent flex-grow text-secondary w-full outline-0 px-1"
               placeholder="Search Inventory"
@@ -53,7 +59,7 @@ function Inventory() {
         </div>
         <Suspense fallback={<ProductGraphLoading />}>
           <ErrorBoundary fallback={<ProductGraphLoading />}>
-            <LazyInventoryList />
+            <LazyInventoryList debouncedSearchResult={debounceSearchResult} />
           </ErrorBoundary>
         </Suspense>
       </div>

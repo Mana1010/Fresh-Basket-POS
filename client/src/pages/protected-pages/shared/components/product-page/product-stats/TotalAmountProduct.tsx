@@ -21,7 +21,7 @@ function TotalAmountProduct() {
       label="Total Amount of Products"
       value={formatToPhpMoney(totalAmount.data?.stat)}
       Icon={PiMoneyLight}
-      className="col-span-2"
+      className="lg:col-span-2 col-span-1"
     />
   );
 }

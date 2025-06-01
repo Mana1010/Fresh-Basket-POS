@@ -12,8 +12,12 @@ import {
   formatToFormalNumber,
   formatToPhpMoney,
 } from "../../../../../utils/format-to-money";
+import { LuList } from "react-icons/lu";
 
-function ProductList() {
+type ProductListProps = {
+  debouncedSearchedProduct: string;
+};
+function ProductList({ debouncedSearchedProduct }: ProductListProps) {
   const [openFilterProduct, setOpenFilterProduct] = useState(false);
   const [openFilterPrice, setOpenFilterPrice] = useState(false);
   const { ref, inView } = useInView();
@@ -21,10 +25,10 @@ function ProductList() {
 
   const { data, hasNextPage, isLoading, fetchNextPage, isFetchingNextPage } =
     useSuspenseInfiniteQuery({
-      queryKey: ["products"],
+      queryKey: ["products", debouncedSearchedProduct],
       queryFn: async ({ pageParam = 1 }) => {
         const response = await axiosInterceptor.get(
-          `${PRODUCT_URL}/list?limit=10&page=${pageParam}`
+          `${PRODUCT_URL}/list?limit=10&page=${pageParam}&search=${debouncedSearchedProduct}`
         );
         return response.data.data;
       },
@@ -53,9 +57,9 @@ function ProductList() {
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   return (
-    <div className="flex-grow w-full h-1">
+    <div className="flex-grow w-auto lg:w-full h-auto lg:h-1 overflow-x-auto">
       <div className="w-full h-full overflow-y-auto thin-scrollbar pr-1">
-        <table className="w-full h-full">
+        <table className="w-full">
           <thead className="product-thead">
             <tr className="divide-x divide-zinc-300/70">
               <td className="relative">
@@ -120,6 +124,7 @@ function ProductList() {
               <td>Tax Rate</td>
               <td>Discount Rate</td>
               <td>Manufacturer</td>
+              <td>Action</td>
             </tr>
           </thead>
           <tbody className="product-tbody">
@@ -149,7 +154,15 @@ function ProductList() {
                 </td>
                 <td>{product.tax_rate}</td>
                 <td>{product.discount_rate}</td>
-                <td>{product.manufacturer}</td>
+                <td>{product.manufacturer ? product.manufacturer : "N/A"}</td>
+                <td className="flex items-center justify-center">
+                  <button className="bg-secondary/90 cursor-pointer py-1.5 px-3 rounded-sm custom-border text-zinc-200 text-[0.7rem] flex space-x-1.5 items-center justify-center">
+                    <span>
+                      <LuList />
+                    </span>
+                    <span>View</span>
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -163,7 +176,7 @@ function ProductList() {
         )}
 
         {/* End of results indicator */}
-        {!hasNextPage && !isLoading && allProducts.length > 0 && (
+        {!hasNextPage && !isLoading && allProducts.length > 5 && (
           <div className="text-center text-secondary text-[0.8rem] pt-2">
             End Result
           </div>

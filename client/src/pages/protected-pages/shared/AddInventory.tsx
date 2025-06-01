@@ -10,7 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import useAxiosInterceptor from "../../../hooks/useAxiosInterceptor";
 import { useMutation } from "@tanstack/react-query";
-import { INVENTORY_URL, PRODUCT_URL } from "../../../api/request-api";
+import { INVENTORY_URL } from "../../../api/request-api";
 import type { AxiosError } from "axios";
 import Button from "../../../components/Button";
 import { useNavigate } from "react-router-dom";
@@ -24,16 +24,23 @@ import { ErrorBoundary } from "react-error-boundary";
 import { MdEditOff } from "react-icons/md";
 import BoxesLoading from "./components/loading/BoxesLoading";
 import type { FullProductDetailsType } from "../../../types/product.types";
+import { IoSearch } from "react-icons/io5";
+import useSearchDebounce from "../../../hooks/useSearchDebounce";
 const LazySelectProduct = lazy(
   () => import("./components/inventory-page/SelectProduct")
 );
 function AddInventory() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const [selectedProduct, setSelectedProduct] = useState<Pick<
-    FullProductDetailsType,
-    "id" | "product_name" | "sku" | "barcode"
-  > | null>(null);
+  const [searchProduct, setSearchProduct] = useState("");
+  const debounceSearchedProduct = useSearchDebounce(searchProduct);
+  const [selectedProduct, setSelectedProduct] = useState<
+    | (Pick<
+        FullProductDetailsType,
+        "id" | "product_name" | "sku" | "barcode"
+      > & { stock: number })
+    | null
+  >(null);
   const axiosInstance = useAxiosInterceptor();
   const {
     register,
@@ -49,7 +56,9 @@ function AddInventory() {
       reason: "",
       stock: 0,
     },
-    resolver: zodResolver(inventoryValidation),
+    resolver: zodResolver(
+      inventoryValidation(selectedProduct?.stock as number)
+    ),
   });
 
   const addInventory = useMutation({
@@ -71,7 +80,7 @@ function AddInventory() {
       toast.error(err.response?.data.message);
     },
   });
-
+  console.log(selectedProduct);
   return (
     <div className="pt-3 bg-white/20 rounded-sm border border-zinc-800/15 p-2 w-full h-auto lg:h-full relative overflow-visible lg:overflow-hidden">
       <form
@@ -85,34 +94,31 @@ function AddInventory() {
         })}
         className="flex flex-col h-full w-full"
       >
-        <Suspense
-          fallback={
-            <div className=" flex flex-col space-y-2 flex-grow min-h-[200px] max-h-[250px]">
-              <div className="flex items-center justify-between w-full">
-                <div className="flex flex-col space-y-1 w-full">
-                  <div className="rounded-3xl min-h-3 w-[15%] bg-zinc-400 animate-pulse" />
-                  <div className="rounded-3xl min-h-2.5 w-[10%] bg-zinc-400 animate-pulse" />
-                </div>
-                <div className="rounded-3xl min-h-6 w-[40%] bg-zinc-400 animate-pulse" />
-              </div>
-              <BoxesLoading
-                totalBoxes={6}
-                className="overflow-y-auto grid-cols-2 lg:grid-cols-4"
-                boxesClassName="min-h-20"
+        <div className="flex flex-col space-y-1.5 w-full flex-grow overflow-y-auto thin-scrollbar min-h-[200px] max-h-[250px]">
+          <div className="flex md:justify-between items-center space-x-2 pr-2">
+            <div className="block flex-shrink-0">
+              <h1 className="text-primary text-sm poppins-semibold">
+                Select Product
+              </h1>
+              <span className="text-slate-400 text-[0.7rem]">
+                Select only one <span className="text-red-500">*</span>
+              </span>
+            </div>
+            <div className="custom-border rounded-3xl bg-zinc-100 px-1.5 py-1 flex justify-between items-center flex-grow lg:w-1/3">
+              <label className="text-zinc-100 p-1 rounded-full bg-secondary ">
+                <IoSearch />
+              </label>
+              <input
+                onChange={(e) => setSearchProduct(e.target.value)}
+                type="text"
+                placeholder="Search product"
+                className="text-sm outline-none text-secondary flex-grow bg-transparent px-2 truncate"
               />
             </div>
-          }
-        >
-          <ErrorBoundary
+          </div>
+          <Suspense
             fallback={
-              <div className="flex flex-col space-y-2 flex-grow min-h-[200px] max-h-[250px]">
-                <div className="flex items-center justify-between w-full">
-                  <div className="flex flex-col space-y-1 w-full">
-                    <div className="rounded-3xl min-h-3 w-[15%] bg-zinc-400 animate-pulse" />
-                    <div className="rounded-3xl min-h-2.5 w-[10%] bg-zinc-400 animate-pulse" />
-                  </div>
-                  <div className="rounded-3xl min-h-6 w-[40%] bg-zinc-400 animate-pulse" />
-                </div>
+              <div className="flex-grow min-h-[200px] max-h-[250px]">
                 <BoxesLoading
                   totalBoxes={6}
                   className="overflow-y-auto grid-cols-2 lg:grid-cols-4"
@@ -121,13 +127,26 @@ function AddInventory() {
               </div>
             }
           >
-            <LazySelectProduct
-              setSelectedProduct={setSelectedProduct}
-              watch={watch as UseFormWatch<InventoryValidationType>}
-              setValue={setValue as UseFormSetValue<InventoryValidationType>}
-            />
-          </ErrorBoundary>
-        </Suspense>
+            <ErrorBoundary
+              fallback={
+                <div className="flex-grow min-h-[200px] max-h-[250px]">
+                  <BoxesLoading
+                    totalBoxes={6}
+                    className="overflow-y-auto grid-cols-2 lg:grid-cols-4"
+                    boxesClassName="min-h-20"
+                  />
+                </div>
+              }
+            >
+              <LazySelectProduct
+                setSelectedProduct={setSelectedProduct}
+                watch={watch as UseFormWatch<InventoryValidationType>}
+                setValue={setValue as UseFormSetValue<InventoryValidationType>}
+                debounceSearchedProduct={debounceSearchedProduct}
+              />
+            </ErrorBoundary>
+          </Suspense>
+        </div>
         <span className="w-full h-[1px] bg-zinc-800/25 my-4"></span>
         <div className="flex flex-col gap-2">
           <h1 className="text-primary text-sm poppins-semibold">

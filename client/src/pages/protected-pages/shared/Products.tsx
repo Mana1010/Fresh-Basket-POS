@@ -1,4 +1,4 @@
-import { lazy, Suspense, type ReactNode } from "react";
+import { lazy, Suspense, useState, type ReactNode } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import ProductGraphLoading from "./components/loading/ProductGraphLoading";
 import { useNavigate } from "react-router-dom";
@@ -8,6 +8,8 @@ import { PiMoneyLight } from "react-icons/pi";
 import type { IconType } from "react-icons/lib";
 import { AiOutlineProduct } from "react-icons/ai";
 import { LuShapes } from "react-icons/lu";
+import useSearchDebounce from "../../../hooks/useSearchDebounce";
+import Title from "../../../components/Title";
 const ProductList = lazy(() => import("./components/product-page/ProductList"));
 const LazyTotalAmountProduct = lazy(
   () => import("./components/product-page/product-stats/TotalAmountProduct")
@@ -38,10 +40,12 @@ function ProductStat({ children, ...props }: ProductStatProps) {
 
 function Products() {
   const navigate = useNavigate();
-
+  const [searchProduct, setSearchProduct] = useState("");
+  const debouncedSearchedProduct = useSearchDebounce(searchProduct);
   return (
     <div className="flex flex-col gap-2 w-full h-auto lg:h-full">
-      <div className="grid gap-1.5 grid-cols-4 p-2 border border-zinc-200 rounded-sm">
+      <Title title="Products" />
+      <div className="grid gap-1.5 grid-cols-1 md:grid-cols-3  lg:grid-cols-4 p-2 border border-zinc-200 rounded-sm">
         <ProductStat
           label="Total Number of Products"
           value="25"
@@ -61,13 +65,14 @@ function Products() {
           <LazyTotalProductCategories />
         </ProductStat>
       </div>
-      <div className="w-full flex-grow gap-2 flex flex-col">
+      <div className="w-full flex-grow gap-2 flex flex-col overflow-x-auto">
         <div className="flex space-x-1.5 items-center w-full">
           <div className="flex-grow rounded-sm bg-zinc-200 secondary/15 border border-zinc-400/35 flex items-center justify-center px-1 py-2">
             <button type="button" className="px-1 text-secondary">
               <MdOutlineManageSearch />
             </button>
             <input
+              onChange={(e) => setSearchProduct(e.target.value)}
               type="text"
               className="text-sm bg-transparent flex-grow text-secondary w-full outline-0 px-1"
               placeholder="Search Product (@e g Product Name or Sku)"
@@ -82,7 +87,7 @@ function Products() {
         </div>
         <Suspense fallback={<ProductGraphLoading />}>
           <ErrorBoundary fallback={<ProductGraphLoading />}>
-            <ProductList />
+            <ProductList debouncedSearchedProduct={debouncedSearchedProduct} />
           </ErrorBoundary>
         </Suspense>
       </div>
