@@ -10,9 +10,11 @@ import axios from "axios";
 import { AUTH_URL } from "../api/request-api";
 import { useEffect } from "react";
 import ProductDetails from "../pages/protected-pages/shared/components/product-page/ProductDetails";
+import { useModalStore } from "../store/modal.store";
 function ProtectedLayout() {
   const breadcrumbs = useBreadCrumbs(BREADCRUMB_NAVIGATION_LIST);
   const navigate = useNavigate();
+  const { isOpenProductDetails } = useModalStore();
   const token = localStorage.getItem("session_token");
   const checkAuth: UseQueryResult<
     { message: string },
@@ -45,7 +47,7 @@ function ProtectedLayout() {
 
   return (
     <div className="flex items-center h-screen w-full bg-[#F5F5F5] p-2 relative">
-      {true && <ProductDetails />}
+      {isOpenProductDetails && <ProductDetails />}
       <div className="flex-grow h-full flex flex-col gap-1">
         <Header />
         <div className="flex-grow flex w-full h-1">

@@ -7,9 +7,11 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use Cloudinary\Cloudinary as CloudinaryCloudinary;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use Error;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-
+use Illuminate\Validation\Rule;
 
 use function Laravel\Prompts\select;
 
@@ -109,5 +111,44 @@ $products = Product::with('category')->where('product_name', 'like', "%$search%"
         }
 
     return response()->json(['stat' => $product_stat], 200);
+    }
+
+    public function product_details($product_id) {
+
+        $product = Product::find($product_id);
+        $product_categories = ProductCategory::all();
+
+        return response()->json(['data' => ['product' => $product, 'categories' => $product_categories]], 200);
+    }
+    public function edit_product(Request $request ,$product_id) {
+
+        $validated = $request->validate([
+            'product_name' => 'required|string|max:1000',
+            'price' => 'required|numeric',
+               'barcode' => [
+            'required',
+            'string',
+            'max:8',
+            Rule::unique('products')->ignore($product_id),
+        ],
+        'sku' => [
+            'required',
+            'string',
+            'max:1000',
+            Rule::unique('products')->ignore($product_id),
+        ],
+            'product_category_id' => 'required|exists:product_categories,id',
+            'discount_rate' => 'required|numeric',
+            'tax_rate' => 'required|numeric',
+            'product_thumbnail' => 'nullable|string',
+            'manufacturer' => 'nullable|string|max:1000',
+        ]);
+     $product = Product::findOrFail($product_id);
+        $product->fill($validated);
+        if($product->isDirty()) {
+            $product->save();
+
+        }
+        return response()->json(['message' => 'Successfully updated the product'], 201);
     }
 }

@@ -23,7 +23,7 @@ export const BREADCRUMB_NAVIGATION_LIST = [
   },
   {
     path: "/products/edit-product/:id",
-    breadcrumb: "POS Page",
+    breadcrumb: "",
     icon: "",
   },
   {

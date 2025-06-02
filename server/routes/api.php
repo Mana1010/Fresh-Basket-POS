@@ -23,9 +23,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/list', 'all_products');
         Route::get('/all-categories', 'all_categories');
         Route::get('/stats', 'product_stats');
+        Route::get('/details/{product_id}', 'product_details');
         Route::post('/create-category', 'create_category');
         Route::post('/create-product', 'create_product');
         Route::post("/upload-thumbnail", "upload_thumbnail");
+         Route::patch('/edit-product/{product_id}', 'edit_product');
     });
 
     Route::prefix('inventory')->controller(InventoryController::class)->group(function () {

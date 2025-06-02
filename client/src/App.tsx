@@ -8,7 +8,7 @@ import Reports from "./pages/protected-pages/shared/Reports";
 import Products from "./pages/protected-pages/shared/Products";
 import ProductPageLayout from "./layouts/ProductPageLayout";
 import AddProduct from "./pages/protected-pages/shared/AddProduct";
-import EditProduct from "./pages/protected-pages/shared/components/EditProduct";
+import EditProduct from "./pages/protected-pages/shared/EditProduct";
 import Inventory from "./pages/protected-pages/shared/Inventory";
 import AddInventory from "./pages/protected-pages/shared/AddInventory";
 import InventoryPageLayout from "./layouts/InventoryPageLayout";

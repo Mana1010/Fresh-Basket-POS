@@ -6,7 +6,7 @@ export function formatToPhpMoney(value: string) {
   return format;
 }
 
-export function formatToFormalNumber(value: string) {
+export function formatToFormalNumber(value: string | number) {
   const format = new Intl.NumberFormat().format(Number(value ?? 0));
 
   return format;

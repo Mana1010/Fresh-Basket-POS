@@ -13,6 +13,7 @@ import {
   formatToPhpMoney,
 } from "../../../../../utils/format-to-money";
 import { LuList } from "react-icons/lu";
+import { useModalStore } from "../../../../../store/modal.store";
 
 type ProductListProps = {
   debouncedSearchedProduct: string;
@@ -20,6 +21,7 @@ type ProductListProps = {
 function ProductList({ debouncedSearchedProduct }: ProductListProps) {
   const [openFilterProduct, setOpenFilterProduct] = useState(false);
   const [openFilterPrice, setOpenFilterPrice] = useState(false);
+  const { toggleProductDetails, setProductDetails } = useModalStore();
   const { ref, inView } = useInView();
   const axiosInterceptor = useAxiosInterceptor();
 
@@ -42,8 +44,7 @@ function ProductList({ debouncedSearchedProduct }: ProductListProps) {
         // Return the next page number
         return lastPage.current_page + 1;
       },
-      staleTime: 5 * 60 * 1000,
-      refetchOnMount: false, // Don't refetch if data is still fresh
+      staleTime: 30 * 1000,
     });
 
   // Get all products from all pages
@@ -156,7 +157,14 @@ function ProductList({ debouncedSearchedProduct }: ProductListProps) {
                 <td>{product.discount_rate}</td>
                 <td>{product.manufacturer ? product.manufacturer : "N/A"}</td>
                 <td className="flex items-center justify-center">
-                  <button className="bg-secondary/90 cursor-pointer py-1.5 px-3 rounded-sm custom-border text-zinc-200 text-[0.7rem] flex space-x-1.5 items-center justify-center">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setProductDetails(product);
+                      toggleProductDetails();
+                    }}
+                    className="bg-secondary/90 cursor-pointer py-1.5 px-3 rounded-sm custom-border text-zinc-200 text-[0.7rem] flex space-x-1.5 items-center justify-center"
+                  >
                     <span>
                       <LuList />
                     </span>
