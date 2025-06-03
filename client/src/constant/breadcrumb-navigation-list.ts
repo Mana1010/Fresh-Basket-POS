@@ -1,5 +1,5 @@
 import printer from "../assets/navigation-sticker/printer.svg";
-import profile from "../assets/navigation-sticker/profile.svg";
+import accounts from "../assets/navigation-sticker/profile.svg";
 import reports from "../assets/navigation-sticker/reports.svg";
 // import dashboard from '../assets/navigation-sticker/'
 import inventory from "../assets/navigation-sticker/inventory.svg";
@@ -35,5 +35,10 @@ export const BREADCRUMB_NAVIGATION_LIST = [
     path: "inventory/add-inventory",
     breadcrumb: "Add Inventory",
     icon: "",
+  },
+  {
+    path: "/accounts",
+    breadcrumb: "Accounts",
+    icon: accounts,
   },
 ];

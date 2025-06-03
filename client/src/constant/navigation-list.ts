@@ -44,7 +44,7 @@ export const navigationList = [
   {
     name: "Accounts",
     roles: ["manager", "admin"],
-    link: "/inventory",
+    link: "/accounts",
     path: ["profile"],
     icon: profile,
   },

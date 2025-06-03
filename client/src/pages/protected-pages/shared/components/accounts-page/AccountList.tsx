@@ -3,25 +3,25 @@ import SelectBox from "../../../components/SelectBox";
 import { AnimatePresence } from "framer-motion";
 import { CgArrowsExchangeAltV } from "react-icons/cg";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
-import { MdOutlineFilterList } from "react-icons/md";
-import { PRODUCT_URL } from "../../../../../api/request-api";
+import { ACCOUNT_URL } from "../../../../../api/request-api";
 import useAxiosInterceptor from "../../../../../hooks/useAxiosInterceptor";
 import { useInView } from "react-intersection-observer";
-import type { FullProductDetailsType } from "../../../../../types/product.types";
-import {
-  formatToFormalNumber,
-  formatToPhpMoney,
-} from "../../../../../utils/format-to-money";
+
 import { LuList } from "react-icons/lu";
 import { useModalStore } from "../../../../../store/modal.store";
+import { IoEye, IoEyeOff } from "react-icons/io5";
+import type { FullUserType } from "../../../../../types/user.types";
+import { capitalizeFirstLetter } from "../../../../../utils/capitalize-first-letter";
 
 type ProductListProps = {
   debouncedSearchedProduct: string;
 };
-function ProductList({ debouncedSearchedProduct }: ProductListProps) {
-  const [openFilterProduct, setOpenFilterProduct] = useState(false);
-  const [openFilterPrice, setOpenFilterPrice] = useState(false);
-  const { toggleProductDetails, setProductDetails } = useModalStore();
+function AccountList({ debouncedSearchedProduct }: ProductListProps) {
+  const [openSortEmployee, setOpenSortEmployee] = useState(false);
+  const [selectedToShowPasscode, setSelectedToShowPasscode] = useState<
+    number | null
+  >(null);
+  const { toggleAccountDetails, setAccountDetails } = useModalStore();
   const { ref, inView } = useInView();
   const axiosInterceptor = useAxiosInterceptor();
 
@@ -30,9 +30,9 @@ function ProductList({ debouncedSearchedProduct }: ProductListProps) {
       queryKey: ["products", debouncedSearchedProduct],
       queryFn: async ({ pageParam = 1 }) => {
         const response = await axiosInterceptor.get(
-          `${PRODUCT_URL}/list?limit=10&page=${pageParam}&search=${debouncedSearchedProduct}`
+          `${ACCOUNT_URL}/list?limit=10&page=${pageParam}&search=${""}`
         );
-        return response.data.data;
+        return response.data.accounts;
       },
       initialPageParam: 1,
       getNextPageParam: (lastPage) => {
@@ -48,7 +48,8 @@ function ProductList({ debouncedSearchedProduct }: ProductListProps) {
     });
 
   // Get all products from all pages
-  const allProducts = data?.pages.flatMap((page) => page.data) || [];
+  const allAccounts =
+    data?.pages.flatMap((page) => page.data) || ([] as FullUserType[]);
 
   // Auto-fetch next page when scrolling into view
   useEffect(() => {
@@ -62,28 +63,28 @@ function ProductList({ debouncedSearchedProduct }: ProductListProps) {
       <div className="w-full h-full overflow-y-auto thin-scrollbar pr-1">
         <table className="w-full">
           <thead className="product-thead">
-            <tr className="divide-x divide-zinc-300/70">
+            <tr>
               <td className="relative">
                 <div className="flex items-center justify-center space-x-1">
-                  <span>Product</span>
+                  <span>Employee Name</span>
                   <button
-                    onClick={() => setOpenFilterProduct((prev) => !prev)}
+                    onClick={() => setOpenSortEmployee((prev) => !prev)}
                     className={`p-2 ring ring-zinc-200/5 rounded-full cursor-pointer text-lg ${
-                      openFilterProduct &&
+                      openSortEmployee &&
                       "bg-secondary/15 transition-colors duration-150"
                     }`}
                   >
                     <CgArrowsExchangeAltV />
                   </button>
                   <AnimatePresence mode="wait">
-                    {openFilterProduct && (
+                    {openSortEmployee && (
                       <SelectBox
                         mutate={() => {}}
-                        setOpenFilterProduct={setOpenFilterProduct}
+                        setOpenFilterProduct={setOpenSortEmployee}
                         values={["asc", "desc"]}
                         options={[
-                          "Sort Product Name (A-Z)",
-                          "Sort Product Name (Z-A)",
+                          "Sort Employee Name (A-Z)",
+                          "Sort Employee Name (Z-A)",
                         ]}
                         currentValue={"asc"}
                         className="top-[85%] right-[-55px] absolute origin-top-left"
@@ -92,80 +93,64 @@ function ProductList({ debouncedSearchedProduct }: ProductListProps) {
                   </AnimatePresence>
                 </div>
               </td>
-              <td>Barcode</td>
-              <td>SKU</td>
-              <td>Category</td>
-              <td>Stock</td>
-              <td className="relative">
-                <div className="flex items-center justify-center space-x-1">
-                  <span>Price</span>
-                  <button
-                    onClick={() => setOpenFilterPrice((prev) => !prev)}
-                    className={`p-2 ring ring-zinc-200/5 rounded-full cursor-pointer text-lg ${
-                      openFilterPrice &&
-                      "bg-secondary/15 transition-colors duration-150"
-                    }`}
-                  >
-                    <MdOutlineFilterList />
-                  </button>
-                  <AnimatePresence mode="wait">
-                    {openFilterPrice && (
-                      <SelectBox
-                        setOpenFilterProduct={setOpenFilterPrice}
-                        mutate={() => {}}
-                        values={["asc", "desc"]}
-                        options={["Price (With Tax)", "Price (Without Tax)"]}
-                        currentValue={"asc"}
-                        className="top-[85%] right-[-55px] absolute origin-top-left"
-                      />
-                    )}
-                  </AnimatePresence>
-                </div>
-              </td>
-              <td>Tax Rate</td>
-              <td>Discount Rate</td>
-              <td>Manufacturer</td>
+              <td>Username</td>
+              <td>Passcode</td>
+              <td>Role</td>
+              <td>Status</td>
+
               <td>Action</td>
             </tr>
           </thead>
           <tbody className="product-tbody">
-            {allProducts.map((product: FullProductDetailsType, i) => (
+            {allAccounts.map((account) => (
               <tr
-                key={`${product.barcode}-${i}`} // Better key using product ID
-                className={`border-b border-zinc-200 hover:bg-secondary/85 group transition-opacity duration-75 ease-in-out ${
-                  product.inventories_sum_stock === null && "bg-red-500/35"
-                }`}
+                key={`${account.id}`} // Better key using product ID
+                className={`border-b border-zinc-200 hover:bg-secondary/85 group transition-opacity duration-75 ease-in-out `}
               >
-                <td>{product.product_name}</td>
-                <td>{product.barcode.slice(0, 8)}</td>
-                <td>{product.sku}</td>
+                <td>{account.employer_name}</td>
+                <td>{account.username}</td>
+                <td className="flex items-center justify-center">
+                  <div className="flex items-center space-x-1.5 justify-center">
+                    <input
+                      type={
+                        selectedToShowPasscode === account.id
+                          ? "text"
+                          : "password"
+                      }
+                      value={account.passcode}
+                      disabled
+                      className="transparent text-[0.75rem] text-secondary w-[100px] outline-none group-hover:text-zinc-100"
+                    />
+                    <button
+                      onClick={() =>
+                        setSelectedToShowPasscode((data) => {
+                          return data === account.id ? null : account.id;
+                        })
+                      }
+                      type="button"
+                      className="text-secondary text-sm group-hover:text-zinc-100"
+                    >
+                      {selectedToShowPasscode === account.id ? (
+                        <IoEyeOff />
+                      ) : (
+                        <IoEye />
+                      )}
+                    </button>
+                  </div>
+                </td>
+                <td>{capitalizeFirstLetter(account.role)}</td>
 
                 <td>
                   <span className="px-3 py-0.5 bg-orange-300/35 border border-orange-400 rounded-3xl">
-                    {product.category.category_name}
+                    {account.status}
                   </span>
                 </td>
-                <td>
-                  {product.inventories_sum_stock === null ? (
-                    <span className="text-[0.7rem]">Out of Stock</span>
-                  ) : (
-                    formatToFormalNumber(product.inventories_sum_stock ?? "0")
-                  )}
-                </td>
-                <td>
-                  <span className="px-3 py-0.5 bg-green-300/35 border border-green-400 rounded-3xl">
-                    {formatToPhpMoney(String(product.price ?? 0))}
-                  </span>
-                </td>
-                <td>{product.tax_rate}</td>
-                <td>{product.discount_rate}</td>
-                <td>{product.manufacturer ? product.manufacturer : "N/A"}</td>
                 <td className="flex items-center justify-center">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      setProductDetails(product);
-                      toggleProductDetails();
+                      setAccountDetails(account);
+                      toggleAccountDetails();
                     }}
                     className="bg-secondary/90 cursor-pointer py-1.5 px-3 rounded-sm custom-border text-zinc-200 text-[0.7rem] flex space-x-1.5 items-center justify-center"
                   >
@@ -188,7 +173,7 @@ function ProductList({ debouncedSearchedProduct }: ProductListProps) {
         )}
 
         {/* End of results indicator */}
-        {!hasNextPage && !isLoading && allProducts.length > 5 && (
+        {!hasNextPage && !isLoading && allAccounts.length > 5 && (
           <div className="text-center text-secondary text-[0.8rem] pt-2">
             End Result
           </div>
@@ -198,4 +183,4 @@ function ProductList({ debouncedSearchedProduct }: ProductListProps) {
   );
 }
 
-export default ProductList;
+export default AccountList;

@@ -11,6 +11,7 @@ export type FullUserType = {
   status: UserStatus;
   passcode: string;
   profile_picture: string | null;
+  created_at: Date;
 } & UserType;
 
 export type BasicUserType = {

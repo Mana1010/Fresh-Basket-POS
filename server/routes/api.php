@@ -19,6 +19,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('user')->controller(UserController::class)->group(function () {
         Route::get('/user-information', 'user_information');
     });
+
+       Route::prefix('account')->controller(UserController::class)->group(function () {
+        Route::get('/stats', 'account_stats');
+        Route::get('/list', 'all_accounts');
+    });
       Route::prefix('product')->controller(ProductController::class)->group(function () {
         Route::get('/list', 'all_products');
         Route::get('/all-categories', 'all_categories');

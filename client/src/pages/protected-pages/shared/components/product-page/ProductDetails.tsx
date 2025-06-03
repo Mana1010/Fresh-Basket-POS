@@ -20,6 +20,7 @@ function ProductDetails() {
   const { toggleProductDetails, productDetails, closeProductDetails } =
     useModalStore();
   const navigate = useNavigate();
+  console.log(typeof productDetails?.inventories_sum_stock);
   return (
     <div
       onClick={closeProductDetails}
@@ -151,11 +152,15 @@ function ProductDetails() {
                 <span className="text-lg">
                   <IoCube />
                 </span>
-                <span className="text-[0.8rem] text-secondary/75">
-                  {formatToFormalNumber(
-                    productDetails?.inventories_sum_stock as string
-                  )}
-                </span>
+                {productDetails?.inventories_sum_stock === null ? (
+                  <span className="text-[0.7rem]">Out of Stock</span>
+                ) : (
+                  <span className="text-[0.8rem] text-secondary/75">
+                    {formatToFormalNumber(
+                      productDetails?.inventories_sum_stock ?? "0"
+                    )}
+                  </span>
+                )}
               </h1>
               <button
                 onClick={() => {

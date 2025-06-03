@@ -86,7 +86,7 @@
 
 @layer utilities {
   .product-thead > tr > td {
-    @apply text-primary text-[0.7rem] p-2 text-center bg-primary/10;
+    @apply text-secondary text-[0.7rem] p-2 text-center bg-zinc-400/35 border border-zinc-400/60;
   }
 
   .product-tbody > tr > td {

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
+import { useState, type ChangeEvent } from "react";
 import InputBox from "../../../components/InputBox";
 import { useForm } from "react-hook-form";
 import { IoIosAddCircleOutline } from "react-icons/io";
@@ -9,44 +9,25 @@ import {
 } from "../../../validation/product.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import AddCategoryForm from "./components/product-page/AddCategoryForm";
-import PreviewProductThumbnail from "./components/product-page/PreviewProductThumbnail";
-import { useModalStore } from "../../../store/modal.store";
+import PreviewProductThumbnail from "./product-page/PreviewProductThumbnail";
+import { useModalStore } from "../../../../store/modal.store";
 import { AnimatePresence } from "framer-motion";
-import useAxiosInterceptor from "../../../hooks/useAxiosInterceptor";
+import useAxiosInterceptor from "../../../../hooks/useAxiosInterceptor";
 import {
   useMutation,
   useQuery,
   type UseQueryResult,
 } from "@tanstack/react-query";
-import { PRODUCT_URL } from "../../../api/request-api";
+import { ACCOUNT_URL } from "../../../../api/request-api";
 import type { AxiosError } from "axios";
-import BoxesLoading from "./components/loading/BoxesLoading";
-import type {
-  CategoryType,
-  FullProductDetailsType,
-} from "../../../types/product.types";
-import Button from "../../../components/Button";
+import BoxesLoading from "./loading/BoxesLoading";
+import Button from "../../../../components/Button";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
-const DEFAULT_VALUES = {
-  product_name: "",
-  barcode: "",
-  product_category_id: null,
-  price: "",
-  discount_rate: 0,
-  tax_rate: 0,
-  sku: "",
-  product_thumbnail: null,
-  manufacturer: "",
-};
-function EditProduct() {
+function AddAccount() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { id } = useParams();
-  const PREVIOUS_DATAREF =
-    useRef<Record<keyof typeof DEFAULT_VALUES, unknown>>(DEFAULT_VALUES);
   const axiosInstance = useAxiosInterceptor();
   const {
     register,
@@ -54,47 +35,42 @@ function EditProduct() {
     handleSubmit,
     setValue,
     watch,
-    getValues,
     formState: { errors },
   } = useForm({
-    defaultValues: DEFAULT_VALUES,
+    defaultValues: {
+      product_name: "",
+      barcode: generateBarcode(),
+      product_category_id: null,
+      price: "",
+      discount_rate: 0,
+      tax_rate: 0,
+      sku: "",
+      product_thumbnail: null,
+      manufacturer: "",
+    },
     resolver: zodResolver(productValidation),
   });
   const { isOpenAddCategoryForm, toggleCategoryForm } = useModalStore();
+
   const [previewProductThumbnail, setPreviewProductThumbnail] = useState<
     string | null
   >(null);
   const [uploadProgress, setUploadProgress] = useState(0);
 
-  const productDetails: UseQueryResult<
-    {
-      product: FullProductDetailsType;
-      categories: CategoryType[];
-    },
-    AxiosError
-  > = useQuery({
-    queryKey: ["product-details", id],
+  const allCategories: UseQueryResult<CategoryType[], AxiosError> = useQuery({
+    queryKey: ["all-product-categories"],
     queryFn: async () => {
-      const response = await axiosInstance.get(`${PRODUCT_URL}/details/${id}`);
-      const data = response.data.data as {
-        product: FullProductDetailsType;
-        categories: CategoryType[];
-      };
+      const response = await axiosInstance.get(`${PRODUCT_URL}/all-categories`);
 
-      for (const [key, value] of Object.entries(data.product)) {
-        if (key in DEFAULT_VALUES) {
-          PREVIOUS_DATAREF.current[key as keyof typeof DEFAULT_VALUES] = value;
-          setValue(key as keyof typeof DEFAULT_VALUES, value);
-        }
-      }
-      return data;
+      return response.data.categories;
     },
+    staleTime: Infinity,
   });
 
-  const editProduct = useMutation({
+  const addProduct = useMutation({
     mutationFn: async (data: ProductDetailsType) => {
-      const response = await axiosInstance.patch(
-        `${PRODUCT_URL}/edit-product/${id}`,
+      const response = await axiosInstance.post(
+        `${PRODUCT_URL}/create-product`,
         data
       );
       return response.data;
@@ -107,7 +83,6 @@ function EditProduct() {
     },
     onError: (err: AxiosError<{ message: string }>) => {
       console.log(err);
-
       toast.error(err.response?.data.message);
     },
   });
@@ -140,10 +115,6 @@ function EditProduct() {
     },
   });
 
-  const values = watch();
-  const isChanged = useMemo(() => {
-    return JSON.stringify(values) === JSON.stringify(getValues());
-  }, [getValues, values]);
   function handleUploadProductThumbnail(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     const reader = new FileReader();
@@ -167,14 +138,14 @@ function EditProduct() {
         {" "}
         {isOpenAddCategoryForm && (
           <AddCategoryForm
-            allCategories={productDetails.data?.categories ?? []}
+            allCategories={allCategories.data ?? []}
             axiosInstance={axiosInstance}
           />
         )}
       </AnimatePresence>
       <form
         onSubmit={handleSubmit((data: ProductDetailsType) => {
-          editProduct.mutate(data);
+          addProduct.mutate(data);
         })}
         className=" flex flex-col h-full w-full"
       >
@@ -194,11 +165,11 @@ function EditProduct() {
             )}
           </div>
           <div className="pb-1 thin-scrollbar w-full">
-            {productDetails.isLoading || !productDetails.data ? (
+            {allCategories.isLoading || !allCategories.data ? (
               <BoxesLoading totalBoxes={3} />
             ) : (
               <div className="flex gap-1.5 overflow-x-auto items-center w-full">
-                {productDetails?.data?.categories.map((name, i) => (
+                {allCategories?.data.map((name, i) => (
                   <button
                     key={i}
                     onClick={() => setValue("product_category_id", name.id)}
@@ -237,7 +208,6 @@ function EditProduct() {
                 name="product_name"
                 label="Product Name"
                 type="text"
-                disabled={productDetails.isLoading}
                 placeholder="Enter Product Name"
                 errorMessage={errors.product_name?.message}
                 isRequired
@@ -250,9 +220,9 @@ function EditProduct() {
                 name="barcode"
                 label="Barcode"
                 type="text"
-                disabled={productDetails.isLoading}
                 placeholder="Enter Product Barcode"
                 errorMessage={errors.barcode?.message}
+                disabled
                 isRequired
               />
               <InputBox
@@ -314,12 +284,11 @@ function EditProduct() {
 
               <Button
                 type="submit"
-                disabled={editProduct.isPending}
-                isLoading={editProduct.isPending}
+                disabled={addProduct.isPending}
+                isLoading={addProduct.isPending}
                 label="Upload Product"
                 labelWhileLoading="Uploading..."
-                className="col-span-2 text-[0.8rem] disabled"
-                spinnerClassName="border-white border-t-transparent border"
+                className="col-span-2 text-[0.8rem]"
               />
             </div>
             <div className="flex flex-col justify-center w-full items-center h-full p-3">
@@ -346,4 +315,4 @@ function EditProduct() {
   );
 }
 
-export default EditProduct;
+export default AddAccount;
