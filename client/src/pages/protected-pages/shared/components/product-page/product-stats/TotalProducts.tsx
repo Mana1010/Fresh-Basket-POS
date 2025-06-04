@@ -1,10 +1,10 @@
-import React from "react";
 import RecordBox from "../../../../components/RecordBox";
-import { AiOutlineProduct } from "react-icons/ai";
+
 import useAxiosInterceptor from "../../../../../../hooks/useAxiosInterceptor";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { PRODUCT_URL } from "../../../../../../api/request-api";
 import { formatToFormalNumber } from "../../../../../../utils/format-to-money";
+import { IoCubeOutline } from "react-icons/io5";
 function TotalProducts() {
   const axiosInstance = useAxiosInterceptor();
   const { data } = useSuspenseQuery({
@@ -22,7 +22,7 @@ function TotalProducts() {
     <RecordBox
       label="Total Stock of Products"
       value={formatToFormalNumber(data.stat)}
-      Icon={AiOutlineProduct}
+      Icon={IoCubeOutline}
     />
   );
 }

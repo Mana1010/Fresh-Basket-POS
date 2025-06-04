@@ -17,6 +17,7 @@ function ProtectedLayout() {
   const navigate = useNavigate();
   const { isOpenProductDetails, isOpenAccountDetails } = useModalStore();
   const token = localStorage.getItem("session_token");
+  console.log(token);
   const checkAuth: UseQueryResult<
     { message: string },
     AxiosError<{ message: string }>
@@ -31,10 +32,12 @@ function ProtectedLayout() {
       return response.data;
     },
   });
+
   useEffect(() => {
     if (checkAuth.isError) {
       const errStatus = checkAuth.error.response?.status;
       if (errStatus === 401) {
+        alert("Running");
         localStorage.removeItem("session_token");
         navigate("/", { replace: true });
       } else {

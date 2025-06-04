@@ -1,24 +1,39 @@
 import { useState, type ChangeEvent } from "react";
-import InputBox from "../../../../components/InputBox";
+import InputBox from "../../../components/InputBox";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import {
-  createAccountValidation,
+  editAccountValidation,
   type AccountType,
-} from "../../../../validation/auth.validation";
+} from "../../../validation/auth.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import useAxiosInterceptor from "../../../../hooks/useAxiosInterceptor";
-import { useMutation } from "@tanstack/react-query";
-import { ACCOUNT_URL } from "../../../../api/request-api";
+import useAxiosInterceptor from "../../../hooks/useAxiosInterceptor";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { ACCOUNT_URL } from "../../../api/request-api";
 import type { AxiosError } from "axios";
-import Button from "../../../../components/Button";
+import Button from "../../../components/Button";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import { generateCode } from "../../../../utils/generate-code";
-import { capitalizeFirstLetter } from "../../../../utils/capitalize-first-letter";
-import PreviewAccountProfile from "./accounts-page/PreviewAccountProfile";
-function AddAccount() {
+import { capitalizeFirstLetter } from "../../../utils/capitalize-first-letter";
+import PreviewAccountProfile from "./components/accounts-page/PreviewAccountProfile";
+import { useParams } from "react-router-dom";
+import type { FullUserType } from "../../../types/user.types";
+import BoxesLoading from "./components/loading/BoxesLoading";
+import { useAuthStore } from "../../../store/auth.store";
+
+const DEFAULT_VALUES = {
+  employer_name: "",
+  username: "",
+  role: "cashier" as "cashier" | "admin" | "manager",
+  profile_picture: null,
+  passcode: "",
+  password: "",
+  password_confirmation: "",
+};
+function EditAccount() {
+  const { user, setUser } = useAuthStore();
+  const { id } = useParams();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const axiosInstance = useAxiosInterceptor();
@@ -30,17 +45,9 @@ function AddAccount() {
     setError,
     watch,
     formState: { errors },
-  } = useForm({
-    defaultValues: {
-      employer_name: "",
-      username: "",
-      role: "cashier",
-      profile_picture: null,
-      passcode: generateCode().slice(0, 6),
-      password: "",
-      password_confirmation: "",
-    },
-    resolver: zodResolver(createAccountValidation),
+  } = useForm<AccountType>({
+    defaultValues: DEFAULT_VALUES,
+    resolver: zodResolver(editAccountValidation),
   });
 
   const [previewProductThumbnail, setPreviewProductThumbnail] = useState<
@@ -48,19 +55,43 @@ function AddAccount() {
   >(null);
   const [uploadProgress, setUploadProgress] = useState(0);
 
-  const registerAccount = useMutation({
-    mutationFn: async (data: AccountType) => {
-      const response = await axiosInstance.post(
-        `${ACCOUNT_URL}/create-account`,
+  const accountDetails = useQuery({
+    queryKey: ["account-details", id],
+    queryFn: async () => {
+      const response = await axiosInstance.get(
+        `${ACCOUNT_URL}/account-details/${id}`
+      );
+      const data = response.data.data as FullUserType;
+
+      for (const [key, value] of Object.entries(data)) {
+        if (key in DEFAULT_VALUES) {
+          setValue(key as keyof typeof DEFAULT_VALUES, value as string | null);
+        }
+      }
+    },
+  });
+  const editAccount = useMutation({
+    mutationFn: async (
+      data: Omit<AccountType, "password" | "password_confirmation"> & {
+        password: string | null;
+        password_confirmation: string | null;
+      }
+    ) => {
+      const response = await axiosInstance.patch(
+        `${ACCOUNT_URL}/edit-account/${id}`,
         data
       );
       return response.data;
     },
-    onSuccess: ({ message }) => {
+    onSuccess: ({ message, user_details }) => {
+      if (user?.id == id) {
+        setUser(user_details);
+      }
       toast.success(message);
       reset();
       navigate("/accounts");
       queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      queryClient.invalidateQueries({ queryKey: ["user-information"] });
     },
     onError: (
       err: AxiosError<{ message: string; field: "username" | "passcode" }>
@@ -124,12 +155,25 @@ function AddAccount() {
 
     reader.readAsDataURL(file);
   }
-
   return (
     <div className="pt-3 bg-white/20 rounded-sm border border-zinc-800/15 p-2 w-full h-full relative">
       <form
         onSubmit={handleSubmit((data: AccountType) => {
-          registerAccount.mutate(data);
+          const payload = { ...data } as Omit<
+            AccountType,
+            "password" | "password_confirmation"
+          > & {
+            password: string | null;
+            password_confirmation: string | null;
+          };
+
+          if (data.password === "") {
+            payload.password = null;
+          }
+          if (data.password_confirmation === "") {
+            payload.password_confirmation = null;
+          }
+          editAccount.mutate(payload);
         })}
         className=" flex flex-col h-full w-full"
       >
@@ -144,29 +188,43 @@ function AddAccount() {
               </span>
             ) : (
               <span className="text-slate-400 text-[0.7rem]">
-                Select only one <span className="text-red-500">*</span>
+                {user?.id == id
+                  ? "You can't change your own role"
+                  : "Select only one"}{" "}
+                <span className="text-red-500">*</span>
               </span>
             )}
           </div>
           <div className="pb-1 thin-scrollbar w-full">
-            <div className="flex gap-1.5 overflow-x-auto items-center w-full">
-              {["cashier", "admin", "manager"].map((name, i) => (
-                <button
-                  key={i}
-                  onClick={() =>
-                    setValue("role", name as "cashier" | "admin" | "admin")
-                  }
-                  type="button"
-                  className={` custom-border rounded-md p-3  min-h-10 flex items-center justify-center basis-[20%] flex-shrink-0 text-sm relative ${
-                    watch("role") === name
-                      ? "border-primary text-primary bg-primary/15"
-                      : "text-secondary/75"
-                  }`}
-                >
-                  {capitalizeFirstLetter(name)}
-                </button>
-              ))}
-            </div>
+            {accountDetails.isLoading ? (
+              <BoxesLoading totalBoxes={3} />
+            ) : (
+              <div className="flex gap-1.5 overflow-x-auto items-center w-full">
+                {["cashier", "admin", "manager"].map((name, i) => (
+                  <button
+                    key={i}
+                    onClick={() => {
+                      if (user?.id != id) {
+                        setValue(
+                          "role",
+                          name as "cashier" | "admin" | "manager"
+                        );
+                      }
+                      return;
+                    }}
+                    disabled={user?.id === id}
+                    type="button"
+                    className={` custom-border rounded-md p-3  min-h-10 flex items-center justify-center basis-[20%] flex-shrink-0 text-sm relative disabled:bg-secondary cursor-pointer ${
+                      watch("role") === name
+                        ? "border-primary text-primary bg-primary/15"
+                        : "text-secondary/75"
+                    }`}
+                  >
+                    {capitalizeFirstLetter(name)}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
         <span className="w-full h-[1px] bg-zinc-800/25 my-4"></span>
@@ -185,6 +243,7 @@ function AddAccount() {
                   label="Employee Name"
                   type="text"
                   placeholder="Enter Product Name"
+                  disabled={accountDetails.isLoading || editAccount.isPending}
                   errorMessage={errors.employer_name?.message}
                   isRequired
                 />
@@ -198,6 +257,7 @@ function AddAccount() {
                   label="Account Username"
                   type="text"
                   placeholder="Enter Account Username"
+                  disabled={accountDetails.isLoading || editAccount.isPending}
                   errorMessage={errors.username?.message}
                   isRequired
                 />
@@ -207,22 +267,22 @@ function AddAccount() {
                 tabIndex={3}
                 id="password"
                 name="password"
-                label="Account Password"
+                label="New Account Password"
                 type="password"
-                placeholder="Enter Account Password"
+                placeholder="Enter New Account Password"
+                disabled={editAccount.isPending}
                 errorMessage={errors.password?.message}
-                isRequired
               />
               <InputBox
                 register={register}
                 tabIndex={4}
                 id="password_confirmation"
                 name="password_confirmation"
-                label="Confirm Password"
+                label="Confirm New Password"
                 type="password"
                 placeholder="Enter Confirm Password"
+                disabled={editAccount.isPending}
                 errorMessage={errors.password_confirmation?.message}
-                isRequired
               />
               <div className="col-span-full">
                 <InputBox
@@ -233,14 +293,15 @@ function AddAccount() {
                   label="Account Passcode"
                   type="password"
                   placeholder="Enter Account Passcode"
+                  disabled={accountDetails.isLoading || editAccount.isPending}
                   errorMessage={errors.passcode?.message}
                   isRequired
                 />
               </div>
               <Button
                 type="submit"
-                disabled={registerAccount.isPending}
-                isLoading={registerAccount.isPending}
+                disabled={editAccount.isPending || accountDetails.isLoading}
+                isLoading={editAccount.isPending}
                 label="Register Account"
                 labelWhileLoading="Registering..."
                 spinnerClassName="border-white size-5 border-t-transparent"
@@ -271,4 +332,4 @@ function AddAccount() {
   );
 }
 
-export default AddAccount;
+export default EditAccount;

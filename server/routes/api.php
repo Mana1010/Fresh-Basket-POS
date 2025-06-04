@@ -4,16 +4,15 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
-use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 
 
 Route::post('/auth/login', [AuthController::class, 'login'])->middleware(['throttle:10,1']);
-
+ Route::get('/auth/check-auth', [AuthController::class, 'check_auth']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('auth')->controller(AuthController::class)->group(function () {
         Route::get('/user', 'user');
-        Route::get('/check-auth', 'check_auth');
+        // Route::get('/check-auth', 'check_auth');
         Route::post('/logout', 'logout');
     });
         Route::prefix('user')->controller(UserController::class)->group(function () {
@@ -23,6 +22,10 @@ Route::middleware('auth:sanctum')->group(function () {
        Route::prefix('account')->controller(UserController::class)->group(function () {
         Route::get('/stats', 'account_stats');
         Route::get('/list', 'all_accounts');
+        Route::get('/account-details/{account_id}', 'account_details');
+        Route::post('/create-account', 'add_account');
+         Route::patch('/edit-account/{account_id}', 'edit_account');
+
     });
       Route::prefix('product')->controller(ProductController::class)->group(function () {
         Route::get('/list', 'all_products');

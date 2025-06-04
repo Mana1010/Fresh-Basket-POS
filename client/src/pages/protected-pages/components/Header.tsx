@@ -25,9 +25,13 @@ function Header() {
         />
         <div className="flex poppins-semibold text-sm text-secondary space-x-1 flex-col">
           <h1 className="poppins-semibold">{getTimeOfDay()},</h1>{" "}
-          <span className="text-primary">
-            {capitalizeFirstLetter(user?.role as string)}
-          </span>
+          {user?.role ? (
+            <span className="text-primary">
+              {capitalizeFirstLetter(user?.role as string)}
+            </span>
+          ) : (
+            <span className="w-[70px] bg-zinc-400 rounded-3xl py-1 animate-pulse mt-1" />
+          )}
         </div>
       </div>
       {/* <div className="flex items-center space-x-0.5">

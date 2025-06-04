@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class UserController extends Controller
 {
@@ -30,10 +31,10 @@ class UserController extends Controller
 
     public function all_accounts (Request $request) {
         $limit = $request->query('limit');
-        $search = $request->query('search') ?? "";
+        $search = $request->query('search');
 
         $all_accounts = User::where('status', '!=', 'deleted')
-        // ->where('employer_name', 'like', "%$search%")
+        ->where('employer_name', 'like', "%$search%")->orWhere('username', 'like', "%$search%")
         ->orderBy('created_at', 'desc')->simplePaginate($limit ?? 10);
         return response()->json(['accounts' => $all_accounts], 200);
     }
@@ -45,5 +46,92 @@ class UserController extends Controller
             $stats = User::count();
         }
     return response()->json(['stats' => $stats], 200);
+    }
+
+    public function add_account(Request $request) {
+
+    try {
+        $validated = $request->validate([
+            'employer_name' => ['required', 'string', 'min:1', 'max:255', 'regex:/^[A-Z0-9\s.]+$/i'],
+            'username' => ['required', 'string', 'min:5', 'max:20', 'regex:/^[A-Z0-9]+$/i'],
+            'role' => ['required', 'string', 'in:admin,manager,cashier'],
+            'password' => ['required', 'string', 'min:8', 'max:72', 'regex:/([!@#$%^&*()_+\-=\[\]{};\'":|,.<>\/?]){2,}/'],
+            'password_confirmation' => ['required', 'string', 'same:password'],
+            'passcode' => ['required', 'string', 'size:6'],
+            'profile_picture' => ['string', 'nullable'],
+        ]);
+
+    $check_username = User::where('username', $validated['username'])->exists();
+    $check_passcode = User::where('passcode', $validated['passcode'])->exists();
+
+    if($check_username) {
+        return response()->json(['message' => 'Username already taken', 'field' => 'username'], 409);
+    }
+    if ($check_passcode) {
+        return response()->json(['message' => 'Passcode already taken', 'field' => 'passcode'], 409);
+    }
+
+    User::create([
+        'employer_name' => $validated['employer_name'],
+        'username' => $validated['username'],
+        'role' => $validated['role'],
+        'password' => bcrypt($validated['password']),
+        'passcode' => $validated['passcode'],
+        'profile_picture' => $validated['profile_picture'],
+        'status' => 'active',
+    ]);
+    return response()->json(['message' => 'Account created successfully.'], 201);
+    }
+    catch(ValidationException $e) {
+         return response()->json(['message' => $e->getMessage()], 422);
+    }
+    }
+public function account_details($account_id) {
+    $account_details = User::findOrFail($account_id);
+    if(!$account_details) {
+        return response()->json(['message', 'User not found'], 404);
+    }
+    return response()->json(['data' => $account_details], 200);
+}
+    public function edit_account(Request $request, $account_id) {
+    try {
+
+
+            $validated = $request->validate([
+            'employer_name' => ['required', 'string', 'min:1', 'max:255', 'regex:/^[A-Z0-9\s.]+$/i'],
+            'username' => ['required', 'string', 'min:5', 'max:20', 'regex:/^[A-Z0-9]+$/i'],
+            'role' => ['required', 'string', 'in:admin,manager,cashier'],
+            'password' => ['nullable', 'string', 'min:8', 'max:72', 'regex:/([!@#$%^&*()_+\-=\[\]{};\'":|,.<>\/?]){2,}/'],
+            'password_confirmation' => ['nullable', 'string', 'same:password'],
+            'passcode' => ['required', 'string', 'size:6'],
+            'profile_picture' => ['string', 'nullable'],
+        ]);
+
+$validated['password'] = $validated['password'] ?? '';
+$validated['password_confirmation'] = $validated['password_confirmation'] ?? '';
+
+        $account = User::findOrFail($account_id);
+        if(!$account) {
+            return response()->json(['message' => 'Account not found'], 404);
+        }
+
+     $check_username = User::where('username', $validated['username'])->where('id', "!=", $account_id)->exists(); //this check if the username (not the current one) already exist
+    $check_passcode = User::where('passcode', $validated['passcode'])->where('id', "!=", $account_id)->exists(); //this check if the passcode (not the current one) already exist
+     if($check_username) {
+        return response()->json(['message' => 'Username already taken', 'field' => 'username'], 409);
+    }
+    if ($check_passcode) {
+        return response()->json(['message' => 'Passcode already taken', 'field' => 'passcode'], 409);
+    }
+    $account->fill($validated);
+        if($account->isDirty()) {
+            $account->save();
+        }
+    $user_details = User::select('id', 'role', 'username')->find($account_id);
+        return response()->json(['message' => 'Successfully updated the account', 'user_details' => $user_details], 201);
+    }
+    catch(ValidationException $err) {
+        return response()->json(['message' => $err->getMessage()], 422);
+    };
     }
 }

@@ -137,7 +137,7 @@ function ProductList({ debouncedSearchedProduct }: ProductListProps) {
                 }`}
               >
                 <td>{product.product_name}</td>
-                <td>{product.barcode.slice(0, 8)}</td>
+                <td>{product.barcode}</td>
                 <td>{product.sku}</td>
 
                 <td>

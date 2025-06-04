@@ -7,16 +7,16 @@ type SelectBoxProps = {
   values: string[];
   options: string[];
   currentValue: string;
-  mutate: (params: string) => void;
   setOpenFilterProduct: Dispatch<SetStateAction<boolean>>;
+  handleAction: (value: string) => void;
 };
 function SelectBox({
   className,
   values,
   options,
   currentValue,
-  mutate,
   setOpenFilterProduct,
+  handleAction,
 }: SelectBoxProps) {
   return (
     <motion.div
@@ -33,6 +33,7 @@ function SelectBox({
         {options.map((option, i) => (
           <li
             onClick={() => {
+              handleAction(option);
               setOpenFilterProduct(currentValue === values[i]);
             }}
             key={i}

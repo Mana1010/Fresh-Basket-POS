@@ -23,7 +23,7 @@ function PasswordInputBox<T extends Record<string, unknown>>({
   name,
   errorMessage,
   ...props
-}: Omit<InputBoxProps<T>, "label" | "error">) {
+}: Omit<InputBoxProps<T>, "label">) {
   const [togglePassword, setTogglePassword] = useState(false);
   return (
     <div className="block space-y-0.5">
@@ -54,7 +54,7 @@ function TextInputBox<T extends Record<string, unknown>>({
   name,
   errorMessage,
   ...props
-}: Omit<InputBoxProps<T>, "label" | "error">) {
+}: Omit<InputBoxProps<T>, "label">) {
   return (
     <div className="block space-y-0.5">
       <input {...register(name)} className={className} {...props} />

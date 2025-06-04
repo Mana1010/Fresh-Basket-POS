@@ -39,7 +39,7 @@ function Inventory() {
       </div>
       <div className="w-full flex-grow gap-2 flex flex-col">
         <div className="flex space-x-1.5 items-center w-full">
-          <div className="flex-grow rounded-sm bg-zinc-200 secondary/15 border border-zinc-400/35 flex items-center justify-center px-1 py-2">
+          <div className="flex-grow rounded-sm bg-zinc-100 secondary/15 border border-zinc-400/35 flex items-center justify-center px-1 py-2">
             <button type="button" className="px-1 text-secondary">
               <MdOutlineManageSearch />
             </button>

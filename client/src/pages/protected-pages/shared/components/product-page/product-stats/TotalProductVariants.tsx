@@ -1,31 +1,29 @@
 import { PiMoneyLight } from "react-icons/pi";
 import RecordBox from "../../../../components/RecordBox";
 import useAxiosInterceptor from "../../../../../../hooks/useAxiosInterceptor";
-import { ACCOUNT_URL } from "../../../../../../api/request-api";
+import { PRODUCT_URL } from "../../../../../../api/request-api";
 import { formatToFormalNumber } from "../../../../../../utils/format-to-money";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { IoKey } from "react-icons/io5";
-function TotalAccounts() {
+import { AiOutlineProduct } from "react-icons/ai";
+function TotalProductVariants() {
   const axiosInstance = useAxiosInterceptor();
-  const totalAccounts = useSuspenseQuery({
-    queryKey: ["account-stat", "total_accounts"],
+  const totalAmount = useSuspenseQuery({
+    queryKey: ["product-stat", "total_product_variants"],
     queryFn: async () => {
       const response = await axiosInstance.get(
-        `${ACCOUNT_URL}/stats?type=total_accounts`
+        `${PRODUCT_URL}/stats?type=total_product_variants`
       );
       return response.data;
     },
-    staleTime: 5 * 10000,
+    refetchInterval: 10000,
   });
-
-  console.log(totalAccounts.data);
   return (
     <RecordBox
-      label="Total Accounts Created"
-      value={formatToFormalNumber(totalAccounts.data?.stats)}
-      Icon={IoKey}
+      label="Total Product Variants"
+      value={formatToFormalNumber(totalAmount.data?.stat)}
+      Icon={AiOutlineProduct}
     />
   );
 }
 
-export default TotalAccounts;
+export default TotalProductVariants;

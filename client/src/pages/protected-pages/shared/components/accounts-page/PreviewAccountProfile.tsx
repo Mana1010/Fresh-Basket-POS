@@ -33,7 +33,7 @@ function PreviewAccountProfile({
         </div>
       ) : (
         <div className="flex flex-col space-y-2 items-center justify-center w-full">
-          <div className="w-[60%] aspect-square relative bg-zinc-300 max-h-[230px] rounded-md flex items-center justify-center border border-zinc-300">
+          <div className="w-[50%] aspect-square relative bg-zinc-300 max-h-[230px] rounded-md flex items-center justify-center border border-zinc-300">
             <img
               src={previewProductThumbnail}
               alt="product-thumbnail"

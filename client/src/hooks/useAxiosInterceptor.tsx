@@ -54,7 +54,7 @@ function useAxiosInterceptor() {
             return;
           }
         }
-        return Promise.reject("Something went wrong");
+        return Promise.reject(err);
       }
     );
 

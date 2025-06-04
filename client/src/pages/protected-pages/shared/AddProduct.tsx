@@ -23,7 +23,7 @@ import type { AxiosError } from "axios";
 import BoxesLoading from "./components/loading/BoxesLoading";
 import type { CategoryType } from "../../../types/product.types";
 import Button from "../../../components/Button";
-import { generateBarcode } from "../../../utils/generate-barcode";
+import { generateCode } from "../../../utils/generate-code";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
@@ -41,7 +41,7 @@ function AddProduct() {
   } = useForm({
     defaultValues: {
       product_name: "",
-      barcode: generateBarcode(),
+      barcode: generateCode(),
       product_category_id: null,
       price: "",
       discount_rate: 0,

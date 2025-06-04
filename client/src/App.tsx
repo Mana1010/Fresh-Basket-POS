@@ -1,6 +1,5 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import About from "./pages/About";
-import Login from "./pages/Login";
 import "./App.css";
 import ProtectedLayout from "./layouts/ProtectedLayout";
 import Pos from "./pages/protected-pages/cashier/Pos";
@@ -15,11 +14,13 @@ import InventoryPageLayout from "./layouts/InventoryPageLayout";
 import Accounts from "./pages/protected-pages/shared/Accounts";
 import AccountPageLayout from "./layouts/AccountPageLayout";
 import AddAccount from "./pages/protected-pages/shared/components/AddAccount";
+import EditAccount from "./pages/protected-pages/shared/EditAccount";
+import Home from "./pages/unprotected-pages/Home";
 function App() {
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <Login />,
+      element: <Home />,
     },
     {
       path: "/about",
@@ -71,6 +72,10 @@ function App() {
             {
               path: "add-account",
               element: <AddAccount />,
+            },
+            {
+              path: "edit-account/:id",
+              element: <EditAccount />,
             },
           ],
         },

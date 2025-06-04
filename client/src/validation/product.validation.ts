@@ -21,8 +21,8 @@ export const productValidation = z.object({
   product_name: z.string().min(1, "Product Name is required").max(1000),
   barcode: z
     .string()
-    .min(8, "Barcode must be 8 characters long")
-    .max(8, "Barcode must be 8 characters long"),
+    .min(1, "Barcode is required.")
+    .length(8, "Barcode must be exactly 8 characters."),
   sku: z.string().min(1, "Product Sku is required").max(1000),
   product_category_id: z
     .number()

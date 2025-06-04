@@ -85,7 +85,6 @@ $products = Product::with('category')->where('product_name', 'like', "%$search%"
             'product_thumbnail' => $validated['product_thumbnail'],
         ]);
          return response()->json(['message' => 'Successfully added your new product'], 201);
-
     }
 
     public function all_categories() {
@@ -104,7 +103,9 @@ $products = Product::with('category')->where('product_name', 'like', "%$search%"
        ->join('inventories', 'products.id', '=', 'inventories.product_id')
        ->selectRaw('SUM(products.price * inventories.stock) as total_amount')
        ->value('total_amount');
-
+        }
+        else if ($type === "total_product_variants") {
+            $product_stat = Product::count();
         }
         else {
             $product_stat = ProductCategory::count();
@@ -147,7 +148,6 @@ $products = Product::with('category')->where('product_name', 'like', "%$search%"
         $product->fill($validated);
         if($product->isDirty()) {
             $product->save();
-
         }
         return response()->json(['message' => 'Successfully updated the product'], 201);
     }

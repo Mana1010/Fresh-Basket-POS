@@ -10,7 +10,7 @@ function useUserDetails(type: "basic" | "full") {
     data,
     isLoading,
   }: UseQueryResult<{ data: BasicUserType }, AxiosError> = useQuery({
-    queryKey: ["user-information"],
+    queryKey: ["user-information", type],
     queryFn: async () => {
       const response = await axiosInterceptor?.get(
         `${USER_URL}/user-information?type=${type}`

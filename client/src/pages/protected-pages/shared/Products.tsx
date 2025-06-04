@@ -10,9 +10,14 @@ import { AiOutlineProduct } from "react-icons/ai";
 import { LuShapes } from "react-icons/lu";
 import useSearchDebounce from "../../../hooks/useSearchDebounce";
 import Title from "../../../components/Title";
+import { IoCubeOutline } from "react-icons/io5";
 const ProductList = lazy(() => import("./components/product-page/ProductList"));
 const LazyTotalAmountProduct = lazy(
   () => import("./components/product-page/product-stats/TotalAmountProduct")
+);
+
+const LazyTotalProductVariants = lazy(
+  () => import("./components/product-page/product-stats/TotalProductVariants")
 );
 const LazyTotalProduct = lazy(
   () => import("./components/product-page/product-stats/TotalProducts")
@@ -47,17 +52,23 @@ function Products() {
       <Title title="Products" />
       <div className="grid gap-1.5 grid-cols-1 md:grid-cols-3  lg:grid-cols-4 p-2 border border-zinc-200 rounded-sm">
         <ProductStat
-          label="Total Number of Products"
-          value="25"
-          Icon={AiOutlineProduct}
+          label="Total Stock of Products"
+          value=""
+          Icon={IoCubeOutline}
         >
           <LazyTotalProduct />
         </ProductStat>
         <ProductStat
+          label="Total Product Variants"
+          value=""
+          Icon={AiOutlineProduct}
+        >
+          <LazyTotalProductVariants />
+        </ProductStat>
+        <ProductStat
           label="Total Amount of Products"
-          value="₱ 25.00"
+          value=""
           Icon={PiMoneyLight}
-          className="col-span-2"
         >
           <LazyTotalAmountProduct />
         </ProductStat>
@@ -67,7 +78,7 @@ function Products() {
       </div>
       <div className="w-full flex-grow gap-2 flex flex-col overflow-x-auto">
         <div className="flex space-x-1.5 items-center w-full">
-          <div className="flex-grow rounded-sm bg-zinc-200 secondary/15 border border-zinc-400/35 flex items-center justify-center px-1 py-2">
+          <div className="flex-grow rounded-sm bg-zinc-100 secondary/15 border border-zinc-400/35 flex items-center justify-center px-1 py-2">
             <button type="button" className="px-1 text-secondary">
               <MdOutlineManageSearch />
             </button>
@@ -75,7 +86,7 @@ function Products() {
               onChange={(e) => setSearchProduct(e.target.value)}
               type="text"
               className="text-sm bg-transparent flex-grow text-secondary w-full outline-0 px-1"
-              placeholder="Search Product (@e g Product Name or Sku)"
+              placeholder="Search products (e.g., Name, SKU, or Manufacturer)"
             />
           </div>
           <button

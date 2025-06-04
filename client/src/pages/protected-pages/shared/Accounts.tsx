@@ -37,8 +37,8 @@ function ProductStat({ children, ...props }: ProductStatProps) {
 
 function Accounts() {
   const navigate = useNavigate();
-  const [searchProduct, setSearchProduct] = useState("");
-  const debouncedSearchedProduct = useSearchDebounce(searchProduct);
+  const [searchAccount, setSearchAccount] = useState("");
+  const debouncedSearchedAccount = useSearchDebounce(searchAccount);
   return (
     <div className="flex flex-col lg:flex-row-reverse items-center justify-center gap-2 w-full h-auto lg:h-full">
       <Title title="Products" />
@@ -64,14 +64,14 @@ function Accounts() {
               <MdOutlineManageSearch />
             </button>
             <input
-              onChange={(e) => setSearchProduct(e.target.value)}
+              onChange={(e) => setSearchAccount(e.target.value)}
               type="text"
               className="text-sm bg-transparent flex-grow text-secondary w-full outline-0 px-1"
               placeholder="Search Accounts"
             />
           </div>
           <button
-            onClick={() => navigate("add-product")}
+            onClick={() => navigate("add-account")}
             className="bg-primary text-white py-2 px-5 text-[0.8rem] rounded-sm cursor-pointer"
           >
             Add Account
@@ -80,7 +80,7 @@ function Accounts() {
         <Suspense fallback={<ProductGraphLoading />}>
           <ErrorBoundary fallback={<ProductGraphLoading />}>
             <LazyAccountList
-              debouncedSearchedProduct={debouncedSearchedProduct}
+              debouncedSearchedAccount={debouncedSearchedAccount}
             />
           </ErrorBoundary>
         </Suspense>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\PersonalAccessToken;
 
@@ -63,15 +64,15 @@ class AuthController extends Controller
     }
 
     public function check_auth(Request $request) {
-        $token_payload = $request->bearerToken();
+        // $token_payload = $request->bearerToken();
 
-        if(!$token_payload) {
+        if(!Auth::check()) {
             return response()->json(['message' => 'You are unauthorized to use this, please try logging in again'], 401);
         }
-       $token = PersonalAccessToken::findToken($token_payload);
-        if(!$token) {
-            return response()->json(['message' => 'You are unauthorized to use this, please try logging in again'], 401);
-        }
+    //    $token = PersonalAccessToken::findToken($token_payload);
+    //     if(!$token) {
+    //         return response()->json(['message' => $token_payload], 401);
+    //     }
         return response()->json(['message' => 'You are authorized to use this'], 200);
     }
 

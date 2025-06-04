@@ -13,11 +13,12 @@ import { IoEye, IoEyeOff } from "react-icons/io5";
 import type { FullUserType } from "../../../../../types/user.types";
 import { capitalizeFirstLetter } from "../../../../../utils/capitalize-first-letter";
 
-type ProductListProps = {
-  debouncedSearchedProduct: string;
+type AccountListProps = {
+  debouncedSearchedAccount: string;
 };
-function AccountList({ debouncedSearchedProduct }: ProductListProps) {
+function AccountList({ debouncedSearchedAccount }: AccountListProps) {
   const [openSortEmployee, setOpenSortEmployee] = useState(false);
+  const [sortByEmployeeName, setSortByEmployeeName] = useState("");
   const [selectedToShowPasscode, setSelectedToShowPasscode] = useState<
     number | null
   >(null);
@@ -27,10 +28,10 @@ function AccountList({ debouncedSearchedProduct }: ProductListProps) {
 
   const { data, hasNextPage, isLoading, fetchNextPage, isFetchingNextPage } =
     useSuspenseInfiniteQuery({
-      queryKey: ["products", debouncedSearchedProduct],
+      queryKey: ["accounts", sortByEmployeeName, debouncedSearchedAccount],
       queryFn: async ({ pageParam = 1 }) => {
         const response = await axiosInterceptor.get(
-          `${ACCOUNT_URL}/list?limit=10&page=${pageParam}&search=${""}`
+          `${ACCOUNT_URL}/list?limit=10&page=${pageParam}&search=${debouncedSearchedAccount}`
         );
         return response.data.accounts;
       },
@@ -58,6 +59,9 @@ function AccountList({ debouncedSearchedProduct }: ProductListProps) {
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
+  function handleSorting(value: string) {
+    setSortByEmployeeName(value);
+  }
   return (
     <div className="flex-grow w-auto lg:w-full h-auto lg:h-1 overflow-x-auto">
       <div className="w-full h-full overflow-y-auto thin-scrollbar pr-1">
@@ -79,14 +83,14 @@ function AccountList({ debouncedSearchedProduct }: ProductListProps) {
                   <AnimatePresence mode="wait">
                     {openSortEmployee && (
                       <SelectBox
-                        mutate={() => {}}
+                        handleAction={handleSorting}
                         setOpenFilterProduct={setOpenSortEmployee}
                         values={["asc", "desc"]}
                         options={[
                           "Sort Employee Name (A-Z)",
                           "Sort Employee Name (Z-A)",
                         ]}
-                        currentValue={"asc"}
+                        currentValue={sortByEmployeeName}
                         className="top-[85%] right-[-55px] absolute origin-top-left"
                       />
                     )}
