@@ -1,14 +1,14 @@
 import { BREADCRUMB_NAVIGATION_LIST } from "../constant/breadcrumb-navigation-list";
 import Header from "../pages/protected-pages/components/Header";
 import Sidebar from "../pages/protected-pages/components/Sidebar";
-import { Outlet } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import useBreadCrumbs from "use-react-router-breadcrumbs";
 import { useNavigate } from "react-router-dom";
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import axios from "axios";
 import { AUTH_URL } from "../api/request-api";
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import ProductDetails from "../pages/protected-pages/shared/components/product-page/ProductDetails";
 import { useModalStore } from "../store/modal.store";
 import AccountDetails from "../pages/protected-pages/shared/components/accounts-page/AccountDetails";
@@ -18,6 +18,7 @@ function ProtectedLayout() {
   const { isOpenProductDetails, isOpenAccountDetails } = useModalStore();
   const token = localStorage.getItem("session_token");
   console.log(token);
+
   const checkAuth: UseQueryResult<
     { message: string },
     AxiosError<{ message: string }>
@@ -29,17 +30,18 @@ function ProtectedLayout() {
           Authorization: `Bearer ${token}`,
         },
       });
+
       return response.data;
     },
+    enabled: !!token,
   });
 
   useEffect(() => {
     if (checkAuth.isError) {
       const errStatus = checkAuth.error.response?.status;
       if (errStatus === 401) {
-        alert("Running");
         localStorage.removeItem("session_token");
-        navigate("/", { replace: true });
+        navigate("/", { replace: true }); // Add this line
       } else {
         console.log(
           "An error occurred while checking authentication:",
@@ -47,8 +49,11 @@ function ProtectedLayout() {
         );
       }
     }
-  }, [checkAuth.isError, checkAuth.error, navigate]);
+  }, [checkAuth.isError, checkAuth.error, navigate, token]);
 
+  if (!token) {
+    return <Navigate to="/" replace />;
+  }
   return (
     <div className="flex items-center h-screen w-full bg-[#F5F5F5] p-2 relative">
       {isOpenProductDetails && <ProductDetails />}

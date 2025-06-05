@@ -44,6 +44,7 @@ class AuthController extends Controller
               $user_details = $user;
             $token = $user->createToken('session_token')->plainTextToken;
         }
+        PersonalAccessToken::where('created_at', '<', now()->subDays(7))->delete();
 
            return response()->json(['message' => 'Successfully logged in', 'token' => $token, 'role' => $user_role, 'user' => $user_details]);
     }
@@ -64,15 +65,15 @@ class AuthController extends Controller
     }
 
     public function check_auth(Request $request) {
-        // $token_payload = $request->bearerToken();
+        $token_payload = $request->bearerToken();
 
-        if(!Auth::check()) {
+        if(!$token_payload) {
             return response()->json(['message' => 'You are unauthorized to use this, please try logging in again'], 401);
         }
-    //    $token = PersonalAccessToken::findToken($token_payload);
-    //     if(!$token) {
-    //         return response()->json(['message' => $token_payload], 401);
-    //     }
+       $token = PersonalAccessToken::findToken($token_payload);
+        if(!$token) {
+            return response()->json(['message' => $token_payload], 401);
+        }
         return response()->json(['message' => 'You are authorized to use this'], 200);
     }
 

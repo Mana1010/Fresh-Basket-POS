@@ -1,65 +1,78 @@
-import printer from "../assets/navigation-sticker/printer.svg";
-import profile from "../assets/navigation-sticker/profile.svg";
-import reports from "../assets/navigation-sticker/reports.svg";
-// import dashboard from '../assets/navigation-sticker/'
-import inventory from "../assets/navigation-sticker/inventory.svg";
-import products from "../assets/navigation-sticker/product.svg";
-import chats from "../assets/navigation-sticker/chats.svg";
+import {
+  IoAnalytics,
+  IoBarChart,
+  IoChatbubble,
+  IoChatbubbles,
+  IoClipboard,
+  IoCube,
+  IoGrid,
+  IoPeopleCircle,
+  IoPersonCircle,
+  IoPrint,
+  IoReceipt,
+} from "react-icons/io5";
 export const navigationList = [
   {
     name: "Reports",
     roles: ["cashier", "manager", "admin"],
     link: "/reports",
     path: ["reports"],
-    icon: reports,
+    icon: IoBarChart,
   },
   {
     name: "Pos",
     roles: ["cashier"],
     link: "/pos",
     path: ["pos"],
-    icon: printer,
+    icon: IoPrint,
   },
   {
     name: "Profile",
     roles: ["cashier", "manager", "admin"],
     link: "/profile",
     path: ["profile"],
-    icon: profile,
+    icon: IoPersonCircle,
   },
   {
     name: "Products",
     roles: ["manager", "admin"],
     link: "/products",
     path: ["product"],
-    icon: products,
+    icon: IoCube,
   },
   {
     name: "Inventory",
     roles: ["manager", "admin"],
     link: "/inventory",
     path: ["inventory"],
-    icon: inventory,
+    icon: IoClipboard,
+  },
+  {
+    name: "Receipts",
+    roles: ["manager", "admin"],
+    link: "/receipts",
+    path: ["receipt"],
+    icon: IoReceipt,
   },
   {
     name: "Accounts",
     roles: ["manager", "admin"],
     link: "/accounts",
     path: ["profile"],
-    icon: profile,
+    icon: IoPeopleCircle,
   },
   {
     name: "My Performance",
     roles: ["cashier"],
     link: "/reports",
     path: ["reports"],
-    icon: reports,
+    icon: IoAnalytics,
   },
   {
     name: "Chats",
     roles: ["cashier", "manager", "admin"],
     link: "/chats",
     path: "chats",
-    icon: chats,
+    icon: IoChatbubbles,
   },
 ];
