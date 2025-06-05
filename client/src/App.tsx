@@ -16,6 +16,7 @@ import AccountPageLayout from "./layouts/AccountPageLayout";
 import AddAccount from "./pages/protected-pages/shared/components/AddAccount";
 import EditAccount from "./pages/protected-pages/shared/EditAccount";
 import Home from "./pages/unprotected-pages/Home";
+import Profile from "./pages/protected-pages/shared/Profile";
 function App() {
   const router = createBrowserRouter([
     {
@@ -32,6 +33,7 @@ function App() {
       children: [
         { path: "reports", element: <Reports /> },
         { path: "pos", element: <Pos /> },
+        { path: "profile", element: <Profile /> },
         {
           path: "products",
           element: <ProductPageLayout />,

@@ -7,6 +7,11 @@
   font-weight: 500;
   font-style: normal;
 }
+.poppins-normal {
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+}
 
 /* .poppins-medium {
   font-family: "Poppins", sans-serif;
@@ -87,6 +92,9 @@
 @layer utilities {
   .product-thead > tr > td {
     @apply text-secondary text-[0.7rem] p-2 text-center bg-zinc-400/35 border border-zinc-400/60;
+  }
+  .product-thead-orderlist > tr > td {
+    @apply text-zinc-100 text-[0.7rem] p-0.5 bg-secondary/95 text-center;
   }
 
   .product-tbody > tr > td {

@@ -20,6 +20,7 @@ class ProductController extends Controller
     public function all_products (Request $request) {
         $limit = $request->query('limit');
           $search = $request->query('search');
+          $type = $request->query('type');
         // $sort = $request->query('sort');
         // $filter = $request->query('filter');
 
@@ -27,6 +28,11 @@ class ProductController extends Controller
         // if($sort === "default" || !$sort) {
         //  $products = Product::with('product_categories')->simplePaginate($limit);
         // }
+    if($type === "pos_page") {
+        $products = Product::with(['category:id,category_name'])->withSum('inventories', 'stock')->select('id', 'barcode', 'product_name', 'sku', 'price', 'discount_rate', 'tax_rate', 'product_category_id')->get();
+       return response()->json(['data' => $products], 200);
+    }
+    else if($type === "products_page") {
 $products = Product::with('category')->where('product_name', 'like', "%$search%")->orWhere('sku', 'like', "%$search%")
    ->orWhere('manufacturer', 'like', "%$search%")
     ->withSum('inventories', 'stock')
@@ -34,6 +40,8 @@ $products = Product::with('category')->where('product_name', 'like', "%$search%"
     ->simplePaginate(10);
     return response()->json(['data' => $products], 200);
     }
+    }
+
 
     public function create_category(Request $request) {
         $request->validate([

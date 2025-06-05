@@ -1,11 +1,9 @@
 import {
   IoAnalytics,
   IoBarChart,
-  IoChatbubble,
   IoChatbubbles,
   IoClipboard,
   IoCube,
-  IoGrid,
   IoPeopleCircle,
   IoPersonCircle,
   IoPrint,
@@ -14,7 +12,7 @@ import {
 export const navigationList = [
   {
     name: "Reports",
-    roles: ["cashier", "manager", "admin"],
+    roles: ["manager", "admin"],
     link: "/reports",
     path: ["reports"],
     icon: IoBarChart,
@@ -56,7 +54,7 @@ export const navigationList = [
   },
   {
     name: "Accounts",
-    roles: ["manager", "admin"],
+    roles: ["admin"],
     link: "/accounts",
     path: ["profile"],
     icon: IoPeopleCircle,

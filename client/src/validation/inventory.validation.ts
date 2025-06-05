@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const requiredValidation = (message: string) => {
+export const requiredValidation = (message: string) => {
   return z
     .preprocess((value) => {
       return value === "" ? undefined : Number(value);

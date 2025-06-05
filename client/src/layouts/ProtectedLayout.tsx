@@ -8,12 +8,14 @@ import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import axios from "axios";
 import { AUTH_URL } from "../api/request-api";
-import { useEffect, useLayoutEffect } from "react";
+import { useEffect } from "react";
 import ProductDetails from "../pages/protected-pages/shared/components/product-page/ProductDetails";
 import { useModalStore } from "../store/modal.store";
 import AccountDetails from "../pages/protected-pages/shared/components/accounts-page/AccountDetails";
 function ProtectedLayout() {
-  const breadcrumbs = useBreadCrumbs(BREADCRUMB_NAVIGATION_LIST);
+  const breadcrumbs = useBreadCrumbs(
+    BREADCRUMB_NAVIGATION_LIST as Record<string, unknown>[]
+  );
   const navigate = useNavigate();
   const { isOpenProductDetails, isOpenAccountDetails } = useModalStore();
   const token = localStorage.getItem("session_token");
@@ -81,12 +83,9 @@ function ProtectedLayout() {
                       }`}
                     >
                       {i === 1 && match?.route?.icon && (
-                        <img
-                          src={match?.route?.icon as string}
-                          alt="icon"
-                          width={20}
-                          height={20}
-                        />
+                        <span className="text-lg">
+                          <match.route.icon />
+                        </span>
                       )}
                       <span>{breadcrumb}</span>
                     </button>{" "}

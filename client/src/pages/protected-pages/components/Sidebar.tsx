@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import type { UserRole } from "../../../types/user.types";
 import brandLogo from "../../../assets/brand-logo.png";
 import useLogout from "../../../hooks/useLogout";
+import { IoLogOut } from "react-icons/io5";
+import SidebarLoading from "./loading/SidebarLoading";
 function Sidebar() {
   const { logout } = useLogout();
   const navigate = useNavigate();
@@ -19,37 +21,47 @@ function Sidebar() {
           <small className="text-primary text-[0.6rem] text-center poppins-extrabold">
             MENUS
           </small>
-          <ul className=" flex flex-col w-full">
-            {navigationList.map((navigation) => {
-              return (
-                <button
-                  key={navigation.name}
-                  onClick={() => navigate(navigation.link)}
-                  className={`${
-                    navigation.roles.includes(role as UserRole)
-                      ? "block"
-                      : "hidden"
-                  } p-1.5 hover:bg-primary/10 rounded-md group border-b-2 border-b-transparent hover:border-b-primary cursor-pointer`}
-                >
-                  <li className="text-center flex space-y-1.5 items-center text-[#F5F4F3] poppins-medium flex-col">
-                    <span className="text-secondary text-xl">
-                      <navigation.icon />
-                    </span>
-                    <span className="text-[0.65rem] text-secondary poppins-semibold">
-                      {navigation.name}
-                    </span>
-                  </li>
-                </button>
-              );
-            })}
-          </ul>
+          {role ? (
+            <ul className=" flex flex-col w-full">
+              {navigationList.map((navigation) => {
+                return (
+                  <button
+                    key={navigation.name}
+                    onClick={() => navigate(navigation.link)}
+                    className={`${
+                      navigation.roles.includes(role as UserRole)
+                        ? "block"
+                        : "hidden"
+                    } p-1.5 rounded-md group border-b-2 border-b-transparent group cursor-pointer transition-colors duration-100 ease-in`}
+                  >
+                    <li
+                      className={`text-center ${
+                        location.pathname.startsWith(navigation.link)
+                          ? "text-primary"
+                          : "text-secondary"
+                      } flex space-y-1 items-center group-hover:text-primary poppins-medium flex-col`}
+                    >
+                      <span className=" text-lg">
+                        <navigation.icon />
+                      </span>
+                      <span className="text-[0.6rem] poppins-semibold">
+                        {navigation.name}
+                      </span>
+                    </li>
+                  </button>
+                );
+              })}
+            </ul>
+          ) : (
+            <SidebarLoading />
+          )}
         </div>
       </div>{" "}
       <button
         onClick={() => logout()}
-        className="p-2 bg-secondary text-sm rounded-sm cursor-pointer"
+        className="text-2xl cursor-pointer text-secondary"
       >
-        <img src={logoutSticker} width={20} height={20} alt="logout" />
+        <IoLogOut />
       </button>
     </motion.header>
   );

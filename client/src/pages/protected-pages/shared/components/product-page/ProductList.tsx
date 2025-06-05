@@ -27,10 +27,10 @@ function ProductList({ debouncedSearchedProduct }: ProductListProps) {
 
   const { data, hasNextPage, isLoading, fetchNextPage, isFetchingNextPage } =
     useSuspenseInfiniteQuery({
-      queryKey: ["products", debouncedSearchedProduct],
+      queryKey: ["products", "products_page", debouncedSearchedProduct],
       queryFn: async ({ pageParam = 1 }) => {
         const response = await axiosInterceptor.get(
-          `${PRODUCT_URL}/list?limit=10&page=${pageParam}&search=${debouncedSearchedProduct}`
+          `${PRODUCT_URL}/list?limit=10&page=${pageParam}&search=${debouncedSearchedProduct}&type=products_page`
         );
         return response.data.data;
       },
@@ -78,7 +78,7 @@ function ProductList({ debouncedSearchedProduct }: ProductListProps) {
                   <AnimatePresence mode="wait">
                     {openFilterProduct && (
                       <SelectBox
-                        mutate={() => {}}
+                        handleAction={() => {}}
                         setOpenFilterProduct={setOpenFilterProduct}
                         values={["asc", "desc"]}
                         options={[
@@ -111,8 +111,8 @@ function ProductList({ debouncedSearchedProduct }: ProductListProps) {
                   <AnimatePresence mode="wait">
                     {openFilterPrice && (
                       <SelectBox
+                        handleAction={() => {}}
                         setOpenFilterProduct={setOpenFilterPrice}
-                        mutate={() => {}}
                         values={["asc", "desc"]}
                         options={["Price (With Tax)", "Price (Without Tax)"]}
                         currentValue={"asc"}

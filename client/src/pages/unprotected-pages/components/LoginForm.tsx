@@ -53,7 +53,7 @@ function LoginForm() {
       localStorage.setItem("session_token", token);
       toast.success(message);
       if (role === "cashier") {
-        navigate("/checkout");
+        navigate("/pos");
       } else {
         navigate("/reports");
       }

@@ -1,20 +1,24 @@
-import printer from "../assets/navigation-sticker/printer.svg";
-import accounts from "../assets/navigation-sticker/profile.svg";
-import reports from "../assets/navigation-sticker/reports.svg";
-// import dashboard from '../assets/navigation-sticker/'
-import inventory from "../assets/navigation-sticker/inventory.svg";
-import products from "../assets/navigation-sticker/product.svg";
-import chats from "../assets/navigation-sticker/chats.svg";
+import {
+  IoAnalytics,
+  IoBarChart,
+  IoChatbubbles,
+  IoClipboard,
+  IoCube,
+  IoPeopleCircle,
+  IoPersonCircle,
+  IoPrint,
+  IoReceipt,
+} from "react-icons/io5";
 export const BREADCRUMB_NAVIGATION_LIST = [
   {
     path: "/pos",
     breadcrumb: "Pos",
-    icon: printer,
+    icon: IoPrint,
   },
   {
     path: "/products",
     breadcrumb: "Products",
-    icon: products,
+    icon: IoCube,
   },
   {
     path: "/products/add-product",
@@ -29,7 +33,7 @@ export const BREADCRUMB_NAVIGATION_LIST = [
   {
     path: "/inventory",
     breadcrumb: "Inventory",
-    icon: inventory,
+    icon: IoClipboard,
   },
   {
     path: "inventory/add-inventory",
@@ -39,6 +43,11 @@ export const BREADCRUMB_NAVIGATION_LIST = [
   {
     path: "/accounts",
     breadcrumb: "Accounts",
-    icon: accounts,
+    icon: IoPeopleCircle,
+  },
+  {
+    path: "/accounts/add-account",
+    breadcrumb: "Add Account",
+    icon: "",
   },
 ];
