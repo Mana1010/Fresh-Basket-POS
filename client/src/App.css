@@ -18,13 +18,13 @@
   font-weight: 500;
   font-style: normal;
 } */
-.poppins-semibold {
+.poppins-bold {
   font-family: "Poppins", sans-serif;
   font-weight: 600;
   font-style: normal;
 }
 
-.poppins-bold {
+.poppins-semibold {
   font-family: "Poppins", sans-serif;
   font-weight: 700;
   font-style: normal;
@@ -94,7 +94,7 @@
     @apply text-secondary text-[0.7rem] p-2 text-center bg-zinc-400/35 border border-zinc-400/60;
   }
   .product-thead-orderlist > tr > td {
-    @apply text-zinc-100 text-[0.7rem] p-0.5 bg-secondary/95 text-center;
+    @apply text-zinc-100 text-[0.7rem] p-2.5 bg-secondary/95 text-center border-r border-zinc-300/25;
   }
 
   .product-tbody > tr > td {

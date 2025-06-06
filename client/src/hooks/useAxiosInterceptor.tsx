@@ -21,7 +21,7 @@ function useAxiosInterceptor() {
         const session_token = localStorage.getItem("session_token");
         if (!session_token) {
           //Back to log in
-          navigate("/");
+          navigate("/", { replace: true });
           clearUser();
           return Promise.reject("No token available");
         }
@@ -48,7 +48,7 @@ function useAxiosInterceptor() {
       (err) => {
         if (isAxiosError(err) && err.response) {
           if (err.response?.status === 401) {
-            navigate("/");
+            navigate("/", { replace: true });
             clearUser();
             localStorage.removeItem("session_token");
             return;

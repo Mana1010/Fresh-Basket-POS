@@ -19,7 +19,7 @@ export const navigationList = [
   },
   {
     name: "Pos",
-    roles: ["cashier"],
+    roles: ["cashier", "admin"],
     link: "/pos",
     path: ["pos"],
     icon: IoPrint,
@@ -46,10 +46,10 @@ export const navigationList = [
     icon: IoClipboard,
   },
   {
-    name: "Receipts",
+    name: "Invoices",
     roles: ["manager", "admin"],
-    link: "/receipts",
-    path: ["receipt"],
+    link: "/invoices",
+    path: ["invoices"],
     icon: IoReceipt,
   },
   {

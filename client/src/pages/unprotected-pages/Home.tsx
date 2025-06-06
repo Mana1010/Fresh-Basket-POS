@@ -9,32 +9,25 @@ import axios, { AxiosError } from "axios";
 import { AUTH_URL } from "../../api/request-api";
 import { useNavigate } from "react-router-dom";
 import useLogout from "../../hooks/useLogout";
+import useAxiosInterceptor from "../../hooks/useAxiosInterceptor";
 
 function Home() {
   const navigate = useNavigate();
   const { logout } = useLogout();
+  const axiosInstance = useAxiosInterceptor();
   const [roleIndex, setRoleIndex] = useState(0);
   const roles = ["Admin", "Manager", "Cashier"];
   const sessionToken = localStorage.getItem("session_token");
   const checkAuth: UseQueryResult<{ message: string }, AxiosError> = useQuery({
     queryKey: ["check-auth-home"],
     queryFn: async () => {
-      const response = await axios.get(`${AUTH_URL}/check-auth`, {
-        headers: {
-          Authorization: `Bearer ${sessionToken}`,
-        },
-      });
+      const response = await axiosInstance.get(`${AUTH_URL}/check-auth`);
       return response.data;
     },
     enabled: !!sessionToken,
     refetchOnMount: true,
   });
 
-  useEffect(() => {
-    if (checkAuth.isError && checkAuth.error.response?.status === 401) {
-      localStorage.removeItem("session_token");
-    }
-  }, [checkAuth?.error?.response?.status, checkAuth.isError]);
   useEffect(() => {
     const interval = setInterval(() => {
       setRoleIndex((prev) => (prev + 1) % roles.length);

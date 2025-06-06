@@ -1,4 +1,4 @@
-import type { ReasonType, StockType } from "../types/inventory.types";
+import type { ReasonType } from "../types/inventory.types";
 import { formatToPhpMoney } from "../utils/format-to-money";
 export function formatFinancialImpactNumber(value: string, reason: ReasonType) {
   const isNegative = value.startsWith("-");

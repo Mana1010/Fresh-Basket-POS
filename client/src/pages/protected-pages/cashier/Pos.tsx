@@ -6,23 +6,27 @@ import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { PRODUCT_URL } from "../../../api/request-api";
 import useAxiosInterceptor from "../../../hooks/useAxiosInterceptor";
-import type { FullProductDetailsType } from "../../../types/product.types";
+import type {
+  FullProductDetailsType,
+  FullProductDetailsTypePos,
+} from "../../../types/product.types";
 
 import OrderTotalRecords from "./components/pos-page/pos-stats/OrderTotalRecords";
 import Spinner from "../../../components/Spinner";
 import OrderList from "./components/pos-page/OrderList";
 import { ErrorBoundary } from "react-error-boundary";
 import BoxesLoading from "../shared/components/loading/BoxesLoading";
+import { useProductStore } from "../../../store/product.store";
+import LastScannedItem from "./components/pos-page/LastScannedItem";
+import { IoCart } from "react-icons/io5";
 
 const LazyOrderCategories = lazy(
   () => import("./components/pos-page/pos-stats/OrderCategories")
 );
 function Pos() {
-  const [currentOrderProduct, setCurrentOrderProduct] = useState("");
+  const { productsMap } = useProductStore();
   const axiosInstance = useAxiosInterceptor();
-  const productMap = useMemo(() => {
-    return new Map();
-  }, []);
+
   const products: UseQueryResult<FullProductDetailsType[], AxiosError> =
     useQuery({
       queryKey: ["products", "pos_page"],
@@ -35,24 +39,30 @@ function Pos() {
     });
 
   useEffect(() => {
+    console.log(products.data);
     if (products.isSuccess) {
       for (let i = 0; i < products.data.length; i++) {
         const { category, ...data } = products.data[i]; //extract first the data that will be using
-        productMap.set(products.data[i].barcode, {
+        productsMap.set(products.data[i].barcode, {
           ...data,
           category_name: products.data[i].category.category_name,
         });
       }
       // setProductMap(allProducts);
     }
-  }, [productMap, products.data, products.isSuccess]);
+  }, [productsMap, products.data, products.isSuccess]);
   return (
     <div className="w-full flex-grow lg:grid-cols-3 grid-cols-1 gap-2 grid justify-center items-center p-2 h-full bg-white rounded-xl border border-zinc-200">
       <div className="h-full w-full col-span-full lg:col-span-2 flex flex-col gap-2">
         <div className="justify-between flex items-center">
-          <h1 className="text-md">
-            <span className="text-secondary poppins-extrabold">Your</span>{" "}
-            <span className="text-primary poppins-extrabold">Orders</span>
+          <h1 className=" text-primary flex items-center space-x-1">
+            <span className="text-lg">
+              <IoCart />
+            </span>
+            <span className="text-sm poppins-semibold">
+              {" "}
+              Order Details Section
+            </span>
           </h1>
 
           {products.isFetching && (
@@ -88,14 +98,7 @@ function Pos() {
         <OrderList />
       </div>
       <div className="flex lg:flex-col w-full h-full gap-2 px-2 border-l border-zinc-200">
-        <div className="w-full h-full basis-[20%] border border-zinc-200 p-2 flex flex-col shrink-0 rounded-smy">
-          <h1 className="text-sm text-secondary poppins-extrabold">
-            Last Scanned Item{" "}
-          </h1>
-          <div className="flex-grow flex justify-center flex-col">
-            <span className="text-secondary">No Item Yet</span>
-          </div>
-        </div>
+        <LastScannedItem />
         <Transaction />
         <Invoice />
       </div>

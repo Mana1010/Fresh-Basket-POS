@@ -34,7 +34,7 @@ function RecordBox({
       ) : (
         <span
           className={cn(
-            "text-secondary text-lg lg:text-xl relative z-1 poppins-semibold",
+            "text-secondary text-lg lg:text-xl relative z-1 poppins-bold",
             textClassName
           )}
         >

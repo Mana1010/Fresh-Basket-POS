@@ -12,7 +12,6 @@ export function calculateTotalPrice({
   const discountRate = Number(discount_rate) / 100;
   const taxRate = Number(tax_rate) / 100;
   const price = Number(orig_price);
-  const calculateDiscountRate = price * (1 - discountRate);
-  console.log(calculateDiscountRate);
-  return calculateDiscountRate * (1 + taxRate);
+  const discountedPrice = price * (1 - discountRate);
+  return discountedPrice * (1 + taxRate);
 }

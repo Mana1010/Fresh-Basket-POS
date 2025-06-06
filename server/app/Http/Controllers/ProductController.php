@@ -29,7 +29,7 @@ class ProductController extends Controller
         //  $products = Product::with('product_categories')->simplePaginate($limit);
         // }
     if($type === "pos_page") {
-        $products = Product::with(['category:id,category_name'])->withSum('inventories', 'stock')->select('id', 'barcode', 'product_name', 'sku', 'price', 'discount_rate', 'tax_rate', 'product_category_id')->get();
+        $products = Product::with(['category:id,category_name'])->withSum('inventories', 'stock')->addSelect('id', 'barcode', 'product_name', 'sku', 'price', 'discount_rate', 'tax_rate', 'product_category_id')->get();
        return response()->json(['data' => $products], 200);
     }
     else if($type === "products_page") {

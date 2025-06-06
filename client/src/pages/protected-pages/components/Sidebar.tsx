@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import { navigationList } from "../../../constant/navigation-list";
-import logoutSticker from "../../../assets/navigation-sticker/logout.svg";
 import { useAuthStore } from "../../../store/auth.store";
 import { useNavigate } from "react-router-dom";
 import type { UserRole } from "../../../types/user.types";

@@ -21,7 +21,6 @@ type LoginMutationType = {
 function LoginForm() {
   const { setUser } = useAuthStore();
   const navigate = useNavigate();
-
   const [passcode, setPasscode] = useState(["", "", "", "", "", ""]);
   const [passcodeIndex, setPasscodeIndex] = useState(0);
   const [typeForm, setTypeForm] = useState<
