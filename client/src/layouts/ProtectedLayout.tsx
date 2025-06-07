@@ -10,13 +10,15 @@ import ProductDetails from "../pages/protected-pages/shared/components/product-p
 import { useModalStore } from "../store/modal.store";
 import AccountDetails from "../pages/protected-pages/shared/components/accounts-page/AccountDetails";
 import useAxiosInterceptor from "../hooks/useAxiosInterceptor";
+import InventoryDetails from "../pages/protected-pages/shared/components/product-page/InventoryDetails";
 function ProtectedLayout() {
   const breadcrumbs = useBreadCrumbs(
     BREADCRUMB_NAVIGATION_LIST as Record<string, unknown>[]
   );
   const axiosInstance = useAxiosInterceptor();
   const navigate = useNavigate();
-  const { isOpenProductDetails, isOpenAccountDetails } = useModalStore();
+  const { isOpenProductDetails, isOpenAccountDetails, isOpenInventoryDetails } =
+    useModalStore();
   const token = localStorage.getItem("session_token");
 
   useQuery({
@@ -36,6 +38,7 @@ function ProtectedLayout() {
     <div className="flex items-center h-screen w-full bg-[#F5F5F5] p-2 relative">
       {isOpenProductDetails && <ProductDetails />}
       {isOpenAccountDetails && <AccountDetails />}
+      {isOpenInventoryDetails && <InventoryDetails />}
       <div className="flex-grow h-full flex flex-col gap-1">
         <Header />
         <div className="flex-grow flex w-full h-1">

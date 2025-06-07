@@ -1,7 +1,8 @@
 import React from "react";
-import { useProductStore } from "../../../../../store/product.store";
-import { formatToPhpMoney } from "../../../../../utils/format-to-money";
-import { calculateTotalPrice } from "../../../../../utils/total-price";
+import { useProductStore } from "../../../../../../store/product.store";
+import { formatToPhpMoney } from "../../../../../../utils/format-to-money";
+import { calculateTotalPrice } from "../../../../../../utils/total-price";
+import { IoScan } from "react-icons/io5";
 
 function LastScannedItem() {
   const { lastScannedItem } = useProductStore();
@@ -29,7 +30,15 @@ function LastScannedItem() {
       </h1>
       <div className="flex-grow flex items-center">
         {!lastScannedItem ? (
-          <span className="text-secondary">No Item Yet</span>
+          <div className="flex-grow justify-center items-center flex-col w-full flex gap-2">
+            <span className="text-primary text-xl">
+              <IoScan />
+            </span>
+            <span className="text-zinc-800/60 text-sm poppins-semibold">
+              {" "}
+              Scan a product to see its details here.
+            </span>
+          </div>
         ) : (
           <div className="flex justify-between items-center w-full">
             <div className="flex flex-col">

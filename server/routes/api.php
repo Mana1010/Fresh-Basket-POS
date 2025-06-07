@@ -40,7 +40,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::prefix('inventory')->controller(InventoryController::class)->group(function () {
         Route::get('/list', 'all_inventories');
+         Route::get('/inventory-details/{inventory_id}', 'inventory_details');
         Route::post('/add-inventory', 'add_inventory');
+         Route::patch('/edit-inventory/{inventory_id}', 'edit_inventory');
     });
 });
 

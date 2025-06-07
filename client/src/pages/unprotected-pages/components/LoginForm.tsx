@@ -58,6 +58,7 @@ function LoginForm() {
       }
     },
     onError: (err: AxiosError<{ message: string }>) => {
+      console.log(err.response?.data);
       if (err.response?.status === 429) {
         toast.error("You’ve made too many requests. Try again in 1 minute.");
         return;

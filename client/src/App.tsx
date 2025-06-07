@@ -17,6 +17,7 @@ import AddAccount from "./pages/protected-pages/shared/components/AddAccount";
 import EditAccount from "./pages/protected-pages/shared/EditAccount";
 import Home from "./pages/unprotected-pages/Home";
 import Profile from "./pages/protected-pages/shared/Profile";
+import EditInventory from "./pages/protected-pages/shared/EditInventory";
 function App() {
   const router = createBrowserRouter([
     {
@@ -63,6 +64,10 @@ function App() {
             {
               path: "add-inventory",
               element: <AddInventory />,
+            },
+            {
+              path: "edit-inventory/:id",
+              element: <EditInventory />,
             },
           ],
         },

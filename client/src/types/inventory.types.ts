@@ -6,7 +6,10 @@ export type ReasonType =
   | "damaged_or_spoiled"
   | "customer_sale";
 export interface FullInventoryDetails
-  extends Pick<FullProductDetailsType, "id" | "product_name" | "sku"> {
+  extends Pick<
+    FullProductDetailsType,
+    "id" | "product_name" | "sku" | "product_thumbnail" | "manufacturer"
+  > {
   id: number;
   product_id: number;
   stock: number;
@@ -16,4 +19,19 @@ export interface FullInventoryDetails
   is_deleted: number;
   created_at: Date;
   updated_at: Date;
+}
+export interface EditInventoryDetailsType
+  extends Omit<
+    FullProductDetailsType,
+    "id" | "product_name" | "sku" | "product_thumbnail" | "manufacturer"
+  > {
+  product: Pick<
+    FullProductDetailsType,
+    | "id"
+    | "product_name"
+    | "sku"
+    | "product_thumbnail"
+    | "manufacturer"
+    | "barcode"
+  >;
 }

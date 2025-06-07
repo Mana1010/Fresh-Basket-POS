@@ -33,11 +33,40 @@ class InventoryController extends Controller
 
 $inventories = DB::table('inventories')
     ->join('products', 'inventories.product_id', '=', 'products.id')
-    ->select('inventories.*', 'products.price', 'products.tax_rate', 'products.product_name', 'products.sku')
+    ->select('inventories.*', 'products.price', 'products.tax_rate', 'products.product_name', 'products.sku', 'products.product_thumbnail')
     ->selectRaw('(inventories.stock * (products.price * (1 + products.tax_rate / 100))) AS financial_impact')->orderBy('updated_at', 'desc')
     ->where('products.product_name', 'like', "%$search%")->orWhere('products.sku', 'like', "%$search%")
     ->simplePaginate($limit ?? 10);
         return response()->json(['data' => $inventories], 200);
+    }
+
+    public function inventory_details($inventory_id) {
+        $inventory = Inventory::with(['product:id,product_name,barcode,sku'])->find($inventory_id);
+        $product_stock = Product::withSum('inventories', 'stock')->get();
+        $stock = 0;
+
+        foreach ($product_stock as $product) {
+                $stock = $product->inventories_sum_stock;
+        };
+        if (!$inventory) {
+            return response()->json(['message' => 'Inventory not found'], 404);
+        }
+
+        return response()->json(['data' => $inventory, 'product_stock' => $stock], 200);
+    }
+        public function edit_inventory(Request $request ,$inventory_id) {
+         $validated = $request->validate([
+           'product_id' => 'required|exists:products,id',
+           'type' => 'required|in:in,out',
+           'reason' => 'required|in:customer_sale,supplier_delivery,damaged_or_spoiled',
+           'stock' => 'required|numeric',
+        ]);
+     $inventory = Inventory::findOrFail($inventory_id);
+        $inventory->fill($validated);
+        if($inventory->isDirty()) {
+            $inventory->save();
+        }
+        return response()->json(['message' => 'Successfully updated the inventory'], 201);
     }
 
 }

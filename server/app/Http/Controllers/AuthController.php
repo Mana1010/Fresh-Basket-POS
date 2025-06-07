@@ -16,14 +16,16 @@ class AuthController extends Controller
         $token = ''; //This is where the session token store;
         $user_role = '';
         $user_details = [];
-
+   if($type !== "credential-based" && $type !== "passcode-based") {
+            return response()->json(['message' => 'Invalid login type'], 400);
+    }
         if($type === "credential-based") {
         $validated = $request->validate([
             'username' => 'required|string|max:20',
             'password' => 'required|string|max:128'
         ]);
-        $user = User::where('username', $validated["username"])->select('role', 'id', 'username')->first();
-        if(!$user || Hash::check($validated["password"], $user->password)) {
+        $user = User::where('username', $validated["username"])->select('role', 'id', 'username', 'password')->first();
+        if(!$user || !Hash::check($validated["password"], $user->password)) {
             return response()->json(['message' => 'Wrong credentials'], 401);
         }
            $user_role = $user->role;

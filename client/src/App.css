@@ -91,14 +91,14 @@
 
 @layer utilities {
   .product-thead > tr > td {
-    @apply text-secondary text-[0.7rem] p-2 text-center bg-zinc-400/35 border border-zinc-400/60;
+    @apply text-secondary text-[0.7rem] p-1.5 text-center bg-zinc-200/70 border border-zinc-400/20;
   }
   .product-thead-orderlist > tr > td {
     @apply text-zinc-100 text-[0.7rem] p-2.5 bg-secondary/95 text-center border-r border-zinc-300/25;
   }
 
   .product-tbody > tr > td {
-    @apply text-[0.75rem] text-secondary p-3 text-center group-hover:text-zinc-100 transition-colors ease-in-out duration-75;
+    @apply text-[0.75rem] text-secondary p-2.5 text-center group-hover:text-zinc-100 transition-colors ease-in-out duration-75;
   }
   /* .product-tfoot > tr {
     @apply p-3;

@@ -14,6 +14,7 @@ import {
 } from "../../../../../utils/format-to-money";
 import { LuList } from "react-icons/lu";
 import { useModalStore } from "../../../../../store/modal.store";
+import { IoCube } from "react-icons/io5";
 
 type ProductListProps = {
   debouncedSearchedProduct: string;
@@ -57,6 +58,19 @@ function ProductList({ debouncedSearchedProduct }: ProductListProps) {
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
+  if (allProducts.length === 0) {
+    return (
+      <div className="flex-grow justify-center items-center flex-col w-full flex gap-2">
+        <span className="text-primary text-5xl">
+          <IoCube />
+        </span>
+        <span className="text-zinc-800/60 text-xl poppins-semibold">
+          {" "}
+          No products to display
+        </span>
+      </div>
+    );
+  }
   return (
     <div className="flex-grow w-auto lg:w-full h-auto lg:h-1 overflow-x-auto">
       <div className="w-full h-full overflow-y-auto thin-scrollbar pr-1">

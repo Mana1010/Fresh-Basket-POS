@@ -1,9 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { IoBarcode, IoCube } from "react-icons/io5";
-import { transactionPanelValidation } from "../../../../../validation/order.validation";
-import { useProductStore } from "../../../../../store/product.store";
-import type { FullProductDetailsTypePos } from "../../../../../types/product.types";
+import { transactionPanelValidation } from "../../../../../../validation/order.validation";
+import { useProductStore } from "../../../../../../store/product.store";
+import type { FullProductDetailsTypePos } from "../../../../../../types/product.types";
 function Transaction() {
   const {
     register,
@@ -25,7 +25,6 @@ function Transaction() {
     orderProducts,
     updateOrderProduct,
   } = useProductStore();
-
   return (
     <div className="w-full h-full basis-[35%] border border-zinc-200 p-2 flex flex-col shrink-0 rounded-sm">
       <h1 className="text-[0.7rem] text-secondary poppins-extrabold">
@@ -131,7 +130,6 @@ function Transaction() {
             )}
           </div>
         </div>
-        <button></button>
         <button
           type="submit"
           className="self-end px-2 py-1.5 text-sm bg-primary text-white rounded-sm w-1/2 cursor-pointer"

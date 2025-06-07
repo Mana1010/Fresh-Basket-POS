@@ -10,3 +10,17 @@ export const transactionPanelValidation = z.object({
     "Product Quantity cannot be zero or negative."
   ),
 });
+
+export const customerInfoValidation = z.object({
+  name: z
+    .string()
+    .max(255, "Customer name must be no longer than 255 characters."),
+  email: z
+    .string()
+    .min(1, "Email is required.")
+    .email("Invalid email format.")
+    .max(255, "Email must be no longer than 255 characters."),
+  customer_paid: z.string().refine((data) => {
+    return Number(data) > 0;
+  }, "Amount tendered must be greater than zero."),
+});

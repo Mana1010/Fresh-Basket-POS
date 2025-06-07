@@ -40,7 +40,7 @@ function SelectProduct({
       queryKey: ["products", "select-product", debounceSearchedProduct],
       queryFn: async ({ pageParam = 1 }) => {
         const response = await axiosInstance.get(
-          `${PRODUCT_URL}/list?limit=10&page=${pageParam}&search=${debounceSearchedProduct}`
+          `${PRODUCT_URL}/list?limit=10&page=${pageParam}&search=${debounceSearchedProduct}&type=select_product`
         );
         return response.data.data;
       },
@@ -64,7 +64,6 @@ function SelectProduct({
       fetchNextPage();
     }
   }, [fetchNextPage, hasNextPage, inView, isFetchingNextPage]);
-
   return (
     <div className="pb-1  w-full flex-grow">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1.5 items-center w-full">
@@ -79,7 +78,9 @@ function SelectProduct({
                 barcode: product.barcode,
                 id: product.id,
                 sku: product.sku,
-                stock: parseInt(product.inventories_sum_stock ?? 0), //Convert the stock to number
+                stock: parseInt(
+                  product.inventories_sum_stock ?? ("0" as string)
+                ), //Cnvert the stock to number
               });
             }}
             className={` custom-border rounded-md p-2 flex items-center text-sm relative gap-1.5 cursor-pointer ${
@@ -118,7 +119,9 @@ function SelectProduct({
               <div className="flex items-center space-x-1 rounded-3xl bg-secondary/5 py-0.5 text-secondary px-2 custom-border ">
                 <IoCube size={11} />
                 <span className="text-[0.7rem] leading-none">
-                  {formatToFormalNumber(product.inventories_sum_stock)}
+                  {formatToFormalNumber(
+                    String(product.inventories_sum_stock ?? 0)
+                  )}
                 </span>
               </div>
             </div>

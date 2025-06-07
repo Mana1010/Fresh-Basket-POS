@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('invoice_ratings', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
+            $table->foreignId('customer_id')->nullable()->constrained('customers')->onDelete('set null');
             $table->foreignUuid('invoice_id')->constrained('invoices')->onDelete('cascade');
             $table->integer('rating')->default(0);
         });

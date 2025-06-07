@@ -13,7 +13,7 @@ function OrderList() {
             <td className=" rounded-l-sm">Product</td>
             <td>Category</td>
             <td>Quantity</td>
-            <td>Price</td>
+            <td>Price Per Unit</td>
             <td>Total Price</td>
             <td className="rounded-r-sm">Action</td>
           </tr>
@@ -62,7 +62,7 @@ function OrderList() {
           </span>
           <span className="text-zinc-800/60 text-md poppins-semibold">
             {" "}
-            No orders have been made.
+            Start scanning products to add them here.
           </span>
         </div>
       )}

@@ -1,15 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
-import Invoice from "./components/pos-page/Invoice";
-import Transaction from "./components/pos-page/Transaction";
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { PRODUCT_URL } from "../../../api/request-api";
 import useAxiosInterceptor from "../../../hooks/useAxiosInterceptor";
-import type {
-  FullProductDetailsType,
-  FullProductDetailsTypePos,
-} from "../../../types/product.types";
+import type { FullProductDetailsType } from "../../../types/product.types";
 
 import OrderTotalRecords from "./components/pos-page/pos-stats/OrderTotalRecords";
 import Spinner from "../../../components/Spinner";
@@ -17,16 +12,18 @@ import OrderList from "./components/pos-page/OrderList";
 import { ErrorBoundary } from "react-error-boundary";
 import BoxesLoading from "../shared/components/loading/BoxesLoading";
 import { useProductStore } from "../../../store/product.store";
-import LastScannedItem from "./components/pos-page/LastScannedItem";
 import { IoCart } from "react-icons/io5";
+import FirstPage from "./components/pos-page/FirstPage";
+import SecondPage from "./components/pos-page/SecondPage";
+import { useModalStore } from "../../../store/modal.store";
 
 const LazyOrderCategories = lazy(
   () => import("./components/pos-page/pos-stats/OrderCategories")
 );
 function Pos() {
   const { productsMap } = useProductStore();
+  const { currentPage } = useModalStore();
   const axiosInstance = useAxiosInterceptor();
-
   const products: UseQueryResult<FullProductDetailsType[], AxiosError> =
     useQuery({
       queryKey: ["products", "pos_page"],
@@ -97,11 +94,7 @@ function Pos() {
         </div>
         <OrderList />
       </div>
-      <div className="flex lg:flex-col w-full h-full gap-2 px-2 border-l border-zinc-200">
-        <LastScannedItem />
-        <Transaction />
-        <Invoice />
-      </div>
+      {currentPage === "pos_page" ? <FirstPage /> : <SecondPage />}
     </div>
   );
 }

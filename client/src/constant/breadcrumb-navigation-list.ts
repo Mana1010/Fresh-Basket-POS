@@ -36,8 +36,13 @@ export const BREADCRUMB_NAVIGATION_LIST = [
     icon: IoClipboard,
   },
   {
-    path: "inventory/add-inventory",
+    path: "/inventory/add-inventory",
     breadcrumb: "Add Inventory",
+    icon: "",
+  },
+  {
+    path: "/inventory/edit-inventory/:id",
+    breadcrumb: "Edit Inventory",
     icon: "",
   },
   {

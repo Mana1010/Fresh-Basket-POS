@@ -32,9 +32,9 @@ class ProductController extends Controller
         $products = Product::with(['category:id,category_name'])->withSum('inventories', 'stock')->addSelect('id', 'barcode', 'product_name', 'sku', 'price', 'discount_rate', 'tax_rate', 'product_category_id')->get();
        return response()->json(['data' => $products], 200);
     }
-    else if($type === "products_page") {
+    else if($type === "products_page" || $type === "select_product") {
 $products = Product::with('category')->where('product_name', 'like', "%$search%")->orWhere('sku', 'like', "%$search%")
-   ->orWhere('manufacturer', 'like', "%$search%")
+   ->orWhere('manufacturer', 'like', "%$search%")->orWhere('barcode', 'like', "%$search%")
     ->withSum('inventories', 'stock')
     ->orderBy('created_at', 'desc')
     ->simplePaginate(10);

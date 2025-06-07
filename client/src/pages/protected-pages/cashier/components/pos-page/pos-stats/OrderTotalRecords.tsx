@@ -6,6 +6,7 @@ import {
 import { useProductStore } from "../../../../../../store/product.store";
 import { useMemo } from "react";
 import { calculateTotalPrice } from "../../../../../../utils/total-price";
+import { IoCash } from "react-icons/io5";
 function OrderTotalRecords() {
   const { orderProducts } = useProductStore();
 
@@ -79,14 +80,15 @@ function OrderTotalRecords() {
       <RecordBox
         label="Total Tax"
         value={formatToPhpMoney(String(orderStats.total_tax))}
-        textClassName="text-red-500"
+        textClassName="text-red-400"
         className="bg-transparent rounded-sm w-full truncate"
       />
 
       <RecordBox
         label="Grand Total"
         value={formatToPhpMoney(String(orderStats.grand_total))}
-        textClassName="text-green-500"
+        textClassName="text-green-400"
+        Icon={IoCash}
         className="bg-transparent rounded-sm w-full truncate col-span-2"
       />
 

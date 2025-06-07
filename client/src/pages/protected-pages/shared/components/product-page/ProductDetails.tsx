@@ -20,7 +20,6 @@ function ProductDetails() {
   const { toggleProductDetails, productDetails, closeProductDetails } =
     useModalStore();
   const navigate = useNavigate();
-  console.log(typeof productDetails?.inventories_sum_stock);
   return (
     <div
       onClick={closeProductDetails}
