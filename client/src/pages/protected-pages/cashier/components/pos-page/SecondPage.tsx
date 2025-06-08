@@ -9,14 +9,21 @@ import { useProductStore } from "../../../../../store/product.store";
 import { calculateTotalPrice } from "../../../../../utils/total-price";
 import { useMemo } from "react";
 import { useModalStore } from "../../../../../store/modal.store";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import useAxiosInterceptor from "../../../../../hooks/useAxiosInterceptor";
+import { INVOICE_URL } from "../../../../../api/request-api";
+import { useAuthStore } from "../../../../../store/auth.store";
 function CustomerInformation() {
   const { orderProducts } = useProductStore();
   const { setCurrentPage } = useModalStore();
+  const { user } = useAuthStore();
+  const axiosInstance = useAxiosInterceptor();
   const {
     register,
     reset,
     watch,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -44,11 +51,46 @@ function CustomerInformation() {
       0
     );
   }, [orderProducts]);
+
+  const printReceipt = useMutation({
+    mutationFn: async (data) => {
+      const response = await axiosInstance.post(
+        `${INVOICE_URL}/print-receipt`,
+        {
+          orders: orderProducts,
+          customer_name: "",
+          customer_email: "",
+          sub_total: 0,
+          discount_rate: 0,
+          tax_rate: 0,
+          total_amount: grand_total,
+          customer_change: formatToPhpMoney(
+            String(Number(watch("customer_paid")) - grand_total)
+          ),
+          customer_paid: 0,
+          cashier_id: user?.id,
+        }
+      );
+      return response.data;
+    },
+    onSuccess: ({ message }) => {
+      reset();
+    },
+  });
   return (
     <div className="w-full h-full basis-[40%] border border-zinc-200 p-2 flex flex-col shrink-0 rounded-sm">
       <form
-        onSubmit={handleSubmit(() => {
-          reset();
+        onSubmit={handleSubmit((data) => {
+          console.log(grand_total);
+          if (Number(data.customer_paid) < grand_total) {
+            alert("Running hehe");
+            setError("customer_paid", {
+              message: `The customer is required to pay ${formatToPhpMoney(
+                String(grand_total)
+              )}.`,
+            });
+            return;
+          }
         })}
         className="flex flex-col pt-2 px-1.5 space-y-2 h-full"
       >

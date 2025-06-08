@@ -12,12 +12,13 @@ import Inventory from "./pages/protected-pages/shared/Inventory";
 import AddInventory from "./pages/protected-pages/shared/AddInventory";
 import InventoryPageLayout from "./layouts/InventoryPageLayout";
 import Accounts from "./pages/protected-pages/shared/Accounts";
-import AccountPageLayout from "./layouts/AccountPageLayout";
 import AddAccount from "./pages/protected-pages/shared/components/AddAccount";
 import EditAccount from "./pages/protected-pages/shared/EditAccount";
 import Home from "./pages/unprotected-pages/Home";
 import Profile from "./pages/protected-pages/shared/Profile";
 import EditInventory from "./pages/protected-pages/shared/EditInventory";
+import RoleAccessCheckPoint from "./pages/protected-pages/components/RoleAccessCheckPoint";
+import AccountPageLayout from "./layouts/AccountPageLayout";
 function App() {
   const router = createBrowserRouter([
     {
@@ -33,11 +34,28 @@ function App() {
       element: <ProtectedLayout />,
       children: [
         { path: "reports", element: <Reports /> },
-        { path: "pos", element: <Pos /> },
+        {
+          path: "pos",
+          element: (
+            <RoleAccessCheckPoint
+              allowedRoles={["cashier"]}
+              navigateTo="/reports"
+            >
+              <Pos />
+            </RoleAccessCheckPoint>
+          ),
+        },
         { path: "profile", element: <Profile /> },
         {
           path: "products",
-          element: <ProductPageLayout />,
+          element: (
+            <RoleAccessCheckPoint
+              allowedRoles={["admin", "manager"]}
+              navigateTo="/pos"
+            >
+              <ProductPageLayout />
+            </RoleAccessCheckPoint>
+          ),
           children: [
             {
               index: true,
@@ -55,7 +73,14 @@ function App() {
         },
         {
           path: "inventory",
-          element: <InventoryPageLayout />,
+          element: (
+            <RoleAccessCheckPoint
+              allowedRoles={["admin", "manager"]}
+              navigateTo="/pos"
+            >
+              <InventoryPageLayout />
+            </RoleAccessCheckPoint>
+          ),
           children: [
             {
               index: true,
@@ -73,7 +98,11 @@ function App() {
         },
         {
           path: "accounts",
-          element: <AccountPageLayout />,
+          element: (
+            <RoleAccessCheckPoint allowedRoles={["admin"]} navigateTo="/">
+              <AccountPageLayout />
+            </RoleAccessCheckPoint>
+          ),
           children: [
             { index: true, element: <Accounts /> },
             {
@@ -86,8 +115,6 @@ function App() {
             },
           ],
         },
-        { path: "pos", element: <Pos /> },
-        { path: "transaction", element: <Pos /> },
       ],
     },
   ]);

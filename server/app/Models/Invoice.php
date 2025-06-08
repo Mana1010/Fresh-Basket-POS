@@ -10,6 +10,9 @@ class Invoice extends Model
         return $this->belongsTo(Customer::class, 'customer_id');
     }
 
+    public function orders () {
+        return $this->hasMany(Order::class, 'invoice_id');
+    }
     public function invoice_rating () {
         return $this->hasOne(Invoice_Rating::class, 'invoice_id');
     }

@@ -61,7 +61,7 @@ export const productValidation = z.object({
       }
     }, "Tax rate must be a whole number"),
   product_thumbnail: z.instanceof(File).nullable(),
-  manufacturer: z.string().max(1000),
+  manufacturer: z.string().nullable(),
 });
 
 export function productCategoryValidation(

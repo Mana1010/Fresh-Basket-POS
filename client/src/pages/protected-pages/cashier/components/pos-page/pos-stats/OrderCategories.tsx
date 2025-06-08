@@ -11,6 +11,7 @@ import { useProductStore } from "../../../../../../store/product.store";
 function OrderCategories() {
   const axiosInstance = useAxiosInterceptor();
   const { orderProducts } = useProductStore();
+  console.log(orderProducts);
   const allCategories: UseSuspenseQueryResult<CategoryType[], AxiosError> =
     useSuspenseQuery({
       queryKey: ["all-product-categories"],

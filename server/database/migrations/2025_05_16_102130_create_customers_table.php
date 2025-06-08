@@ -16,7 +16,6 @@ return new class extends Migration
             $table->timestamps();
             $table->string('name')->nullable();
             $table->string('email')->unique();
-            $table->decimal('total_spent', 10, 2)->default(0);
         });
     }
 

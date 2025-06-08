@@ -43,7 +43,8 @@ function Pos() {
         const { category, ...data } = products.data[i]; //extract first the data that will be using
         productsMap.set(products.data[i].barcode, {
           ...data,
-          category_name: products.data[i].category.category_name,
+          category_name:
+            products.data[i].category?.category_name ?? "Uncategorized",
         });
       }
       // setProductMap(allProducts);

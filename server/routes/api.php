@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -46,6 +47,10 @@ Route::middleware('auth:sanctum')->group(function () {
          Route::get('/inventory-details/{inventory_id}', 'inventory_details');
         Route::post('/add-inventory', 'add_inventory');
          Route::patch('/edit-inventory/{inventory_id}', 'edit_inventory');
+
+    });
+        Route::prefix('invoice')->controller(InvoiceController::class)->group(function () {
+            Route::post('/print-receipt', 'print_receipt');
 
     });
 });

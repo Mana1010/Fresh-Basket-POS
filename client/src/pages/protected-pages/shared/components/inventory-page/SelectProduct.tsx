@@ -113,7 +113,7 @@ function SelectProduct({
               <div className="flex items-center space-x-1 rounded-3xl bg-primary/35 py-0.5 text-secondary px-2 border border-orange-200 ">
                 <IoShapes size={11} />
                 <span className="text-[0.7rem] leading-none">
-                  {product.category.category_name}
+                  {product.category?.category_name ?? "Uncategorized"}
                 </span>
               </div>
               <div className="flex items-center space-x-1 rounded-3xl bg-secondary/5 py-0.5 text-secondary px-2 custom-border ">
