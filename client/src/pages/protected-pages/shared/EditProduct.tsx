@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
+import { useMemo, useRef, useState, type ChangeEvent } from "react";
 import InputBox from "../../../components/InputBox";
 import { useForm } from "react-hook-form";
 import { IoIosAddCircleOutline } from "react-icons/io";
@@ -30,6 +30,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
+import EditCategoryForm from "./components/product-page/EditCategoryForm";
+import { IoCreate, IoTrash } from "react-icons/io5";
 const DEFAULT_VALUES = {
   product_name: "",
   barcode: "",
@@ -45,6 +47,8 @@ function EditProduct() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { id } = useParams();
+  const [selectedCategoryToEdit, setSelectedCategoryToEdit] =
+    useState<string>("");
   const PREVIOUS_DATAREF =
     useRef<Record<keyof typeof DEFAULT_VALUES, unknown>>(DEFAULT_VALUES);
   const axiosInstance = useAxiosInterceptor();
@@ -60,7 +64,8 @@ function EditProduct() {
     defaultValues: DEFAULT_VALUES,
     resolver: zodResolver(productValidation),
   });
-  const { isOpenAddCategoryForm, toggleCategoryForm } = useModalStore();
+  const { isOpenAddCategoryForm, toggleCategoryForm, setCategoryToRemove } =
+    useModalStore();
   const [previewProductThumbnail, setPreviewProductThumbnail] = useState<
     string | null
   >(null);
@@ -172,6 +177,16 @@ function EditProduct() {
           />
         )}
       </AnimatePresence>
+      <AnimatePresence mode="wait">
+        {selectedCategoryToEdit && (
+          <EditCategoryForm
+            selectedCategoryToEdit={selectedCategoryToEdit}
+            setSelectedCategoryToEdit={setSelectedCategoryToEdit}
+            allCategories={productDetails.data?.categories ?? []}
+            axiosInstance={axiosInstance}
+          />
+        )}
+      </AnimatePresence>
       <form
         onSubmit={handleSubmit((data: ProductDetailsType) => {
           editProduct.mutate(data);
@@ -203,13 +218,35 @@ function EditProduct() {
                     key={i}
                     onClick={() => setValue("product_category_id", name.id)}
                     type="button"
-                    className={` custom-border rounded-md p-3  min-h-10 flex items-center justify-center basis-[20%] flex-shrink-0 text-sm relative ${
+                    className={` custom-border rounded-md p-3  min-h-10 flex items-center group justify-center basis-[50%] lg:basis-[30%] xl:basis-[20%] flex-shrink-0 text-sm relative ${
                       watch("product_category_id") === name.id
                         ? "border-primary text-primary bg-primary/15"
                         : "text-secondary/75"
                     }`}
                   >
-                    {name.category_name}
+                    <span>{name.category_name}</span>
+                    <div className="group-hover:flex hidden absolute gap-2 items-center right-2 ">
+                      <span
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedCategoryToEdit(name.category_name);
+                        }}
+                        className="text-xl"
+                      >
+                        <IoCreate />
+                      </span>
+                      {watch("product_category_id") !== name.id && (
+                        <span
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCategoryToRemove(name.category_name);
+                          }}
+                          className="text-xl"
+                        >
+                          <IoTrash />
+                        </span>
+                      )}
+                    </div>
                   </button>
                 ))}
                 <button

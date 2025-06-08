@@ -27,18 +27,34 @@ class InventoryController extends Controller
     return response()->json(['message' => 'Successfully added new inventory'], 201);
     }
 
-    public function all_inventories(Request $request) {
-        $limit = $request->query('limit');
-        $search = $request->query('search');
+public function all_inventories(Request $request) {
+    $limit = $request->query('limit', 10);
+    $search = $request->query('search');
+    $reason = $request->query('reason');
 
-$inventories = DB::table('inventories')
-    ->join('products', 'inventories.product_id', '=', 'products.id')
-    ->select('inventories.*', 'products.price', 'products.tax_rate', 'products.product_name', 'products.sku', 'products.product_thumbnail')
-    ->selectRaw('(inventories.stock * (products.price * (1 + products.tax_rate / 100))) AS financial_impact')->orderBy('updated_at', 'desc')
-    ->where('products.product_name', 'like', "%$search%")->orWhere('products.sku', 'like', "%$search%")
-    ->simplePaginate($limit ?? 10);
-        return response()->json(['data' => $inventories], 200);
+    $query = DB::table('inventories')
+        ->join('products', 'inventories.product_id', '=', 'products.id')
+        ->select('inventories.*', 'products.price', 'products.tax_rate', 'products.product_name', 'products.sku', 'products.product_thumbnail')
+        ->selectRaw('(inventories.stock * (products.price * (1 + products.tax_rate / 100))) AS financial_impact')
+        ->orderBy('inventories.updated_at', 'desc');
+
+    // Add search filter if exists
+    if ($search) {
+        $query->where(function ($q) use ($search) {
+            $q->where('products.product_name', 'like', "%{$search}%")
+              ->orWhere('products.sku', 'like', "%{$search}%");
+        });
     }
+    // Add reason filter if exists
+    if ($reason) {
+        $query->where('reason', $reason);
+    }
+
+    $inventories = $query->simplePaginate($limit);
+
+    return response()->json(['data' => $inventories], 200);
+}
+
 
     public function inventory_details($inventory_id) {
         $inventory = Inventory::with(['product:id,product_name,barcode,sku'])->find($inventory_id);

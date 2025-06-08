@@ -27,6 +27,8 @@ import { generateCode } from "../../../utils/generate-code";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
+import { IoCreate, IoTrash } from "react-icons/io5";
+import EditCategoryForm from "./components/product-page/EditCategoryForm";
 function AddProduct() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -52,8 +54,10 @@ function AddProduct() {
     },
     resolver: zodResolver(productValidation),
   });
-  const { isOpenAddCategoryForm, toggleCategoryForm } = useModalStore();
-
+  const { isOpenAddCategoryForm, toggleCategoryForm, setCategoryToRemove } =
+    useModalStore();
+  const [selectedCategoryToEdit, setSelectedCategoryToEdit] =
+    useState<string>("");
   const [previewProductThumbnail, setPreviewProductThumbnail] = useState<
     string | null
   >(null);
@@ -63,7 +67,6 @@ function AddProduct() {
     queryKey: ["all-product-categories"],
     queryFn: async () => {
       const response = await axiosInstance.get(`${PRODUCT_URL}/all-categories`);
-
       return response.data.categories;
     },
     staleTime: Infinity,
@@ -145,6 +148,17 @@ function AddProduct() {
           />
         )}
       </AnimatePresence>
+      <AnimatePresence mode="wait">
+        {" "}
+        {selectedCategoryToEdit && (
+          <EditCategoryForm
+            selectedCategoryToEdit={selectedCategoryToEdit}
+            setSelectedCategoryToEdit={setSelectedCategoryToEdit}
+            allCategories={allCategories.data ?? []}
+            axiosInstance={axiosInstance}
+          />
+        )}
+      </AnimatePresence>
       <form
         onSubmit={handleSubmit((data: ProductDetailsType) => {
           addProduct.mutate(data);
@@ -176,13 +190,35 @@ function AddProduct() {
                     key={i}
                     onClick={() => setValue("product_category_id", name.id)}
                     type="button"
-                    className={` custom-border rounded-md p-3  min-h-10 flex items-center justify-center basis-[20%] flex-shrink-0 text-sm relative ${
+                    className={` custom-border rounded-md p-3  min-h-10 flex items-center group justify-center basis-[50%] lg:basis-[30%] xl:basis-[20%] flex-shrink-0 text-sm relative ${
                       watch("product_category_id") === name.id
                         ? "border-primary text-primary bg-primary/15"
                         : "text-secondary/75"
                     }`}
                   >
-                    {name.category_name}
+                    <span>{name.category_name}</span>
+                    <div className="group-hover:flex hidden absolute gap-2 items-center right-2 ">
+                      <span
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedCategoryToEdit(name.category_name);
+                        }}
+                        className="text-xl"
+                      >
+                        <IoCreate />
+                      </span>
+                      {watch("product_category_id") !== name.id && (
+                        <span
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCategoryToRemove(name.category_name);
+                          }}
+                          className="text-xl"
+                        >
+                          <IoTrash />
+                        </span>
+                      )}
+                    </div>
                   </button>
                 ))}
                 <button

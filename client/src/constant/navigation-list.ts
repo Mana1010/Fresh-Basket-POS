@@ -19,7 +19,7 @@ export const navigationList = [
   },
   {
     name: "Pos",
-    roles: ["cashier", "admin"],
+    roles: ["cashier"],
     link: "/pos",
     path: ["pos"],
     icon: IoPrint,
@@ -67,10 +67,17 @@ export const navigationList = [
     icon: IoAnalytics,
   },
   {
-    name: "Chats",
-    roles: ["cashier", "manager", "admin"],
-    link: "/chats",
-    path: "chats",
-    icon: IoChatbubbles,
+    name: "Cashier Metrics",
+    roles: ["manager", "admin"],
+    link: "/cashier-metrics",
+    path: ["cashier-metrics"],
+    icon: IoAnalytics,
   },
+  // {
+  //   name: "Chats",
+  //   roles: ["cashier", "manager", "admin"],
+  //   link: "/chats",
+  //   path: "chats",
+  //   icon: IoChatbubbles,
+  // },
 ];

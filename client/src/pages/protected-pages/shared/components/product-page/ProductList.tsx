@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import SelectBox from "../../../components/SelectBox";
 import { AnimatePresence } from "framer-motion";
 import { CgArrowsExchangeAltV } from "react-icons/cg";
-import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
-import { MdOutlineFilterList } from "react-icons/md";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { PRODUCT_URL } from "../../../../../api/request-api";
 import useAxiosInterceptor from "../../../../../hooks/useAxiosInterceptor";
 import { useInView } from "react-intersection-observer";
@@ -14,12 +13,19 @@ import {
 } from "../../../../../utils/format-to-money";
 import { LuList } from "react-icons/lu";
 import { useModalStore } from "../../../../../store/modal.store";
-import { IoCube } from "react-icons/io5";
+import { IoCube, IoFilter } from "react-icons/io5";
+import TableLoading from "../loading/TableLoading";
 
 type ProductListProps = {
   debouncedSearchedProduct: string;
+  sortProduct: "asc" | "desc" | "";
+  setSortProduct: Dispatch<SetStateAction<"asc" | "desc" | "">>;
 };
-function ProductList({ debouncedSearchedProduct }: ProductListProps) {
+function ProductList({
+  debouncedSearchedProduct,
+  sortProduct,
+  setSortProduct,
+}: ProductListProps) {
   const [openFilterProduct, setOpenFilterProduct] = useState(false);
   const [openFilterPrice, setOpenFilterPrice] = useState(false);
   const { toggleProductDetails, setProductDetails } = useModalStore();
@@ -27,11 +33,16 @@ function ProductList({ debouncedSearchedProduct }: ProductListProps) {
   const axiosInterceptor = useAxiosInterceptor();
 
   const { data, hasNextPage, isLoading, fetchNextPage, isFetchingNextPage } =
-    useSuspenseInfiniteQuery({
-      queryKey: ["products", "products_page", debouncedSearchedProduct],
+    useInfiniteQuery({
+      queryKey: [
+        "products",
+        "products_page",
+        sortProduct,
+        debouncedSearchedProduct,
+      ],
       queryFn: async ({ pageParam = 1 }) => {
         const response = await axiosInterceptor.get(
-          `${PRODUCT_URL}/list?limit=10&page=${pageParam}&search=${debouncedSearchedProduct}&type=products_page`
+          `${PRODUCT_URL}/list?limit=10&page=${pageParam}&search=${debouncedSearchedProduct}&type=products_page&sort=${sortProduct}`
         );
         return response.data.data;
       },
@@ -58,23 +69,14 @@ function ProductList({ debouncedSearchedProduct }: ProductListProps) {
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  if (allProducts.length === 0) {
-    return (
-      <div className="flex-grow justify-center items-center flex-col w-full flex gap-2">
-        <span className="text-primary text-5xl">
-          <IoCube />
-        </span>
-        <span className="text-zinc-800/60 text-xl poppins-semibold">
-          {" "}
-          No products to display
-        </span>
-      </div>
-    );
+  function handleSortProduct(value: string) {
+    setSortProduct(value as "asc" | "desc" | "");
+    setOpenFilterProduct(false);
   }
   return (
     <div className="flex-grow w-auto lg:w-full h-auto lg:h-1 overflow-x-auto">
-      <div className="w-full h-full overflow-y-auto thin-scrollbar pr-1">
-        <table className="w-full">
+      <div className="w-full h-full overflow-y-auto thin-scrollbar pr-1 flex flex-col">
+        <table className="w-full table-fixed">
           <thead className="product-thead">
             <tr className="divide-x divide-zinc-300/70">
               <td className="relative">
@@ -92,14 +94,14 @@ function ProductList({ debouncedSearchedProduct }: ProductListProps) {
                   <AnimatePresence mode="wait">
                     {openFilterProduct && (
                       <SelectBox
-                        handleAction={() => {}}
+                        handleAction={handleSortProduct}
                         setOpenFilterProduct={setOpenFilterProduct}
                         values={["asc", "desc"]}
                         options={[
                           "Sort Product Name (A-Z)",
                           "Sort Product Name (Z-A)",
                         ]}
-                        currentValue={"asc"}
+                        currentValue={sortProduct}
                         className="top-[85%] right-[-55px] absolute origin-top-left"
                       />
                     )}
@@ -120,7 +122,7 @@ function ProductList({ debouncedSearchedProduct }: ProductListProps) {
                       "bg-secondary/15 transition-colors duration-150"
                     }`}
                   >
-                    <MdOutlineFilterList />
+                    <IoFilter />
                   </button>
                   <AnimatePresence mode="wait">
                     {openFilterPrice && (
@@ -156,7 +158,7 @@ function ProductList({ debouncedSearchedProduct }: ProductListProps) {
 
                 <td>
                   <span className="px-3 py-0.5 bg-orange-300/35 border border-orange-400 rounded-3xl">
-                    {product.category.category_name}
+                    {product.category?.category_name ?? "Uncategorized"}
                   </span>
                 </td>
                 <td>
@@ -193,7 +195,24 @@ function ProductList({ debouncedSearchedProduct }: ProductListProps) {
             ))}
           </tbody>
         </table>
-
+        {isLoading && (
+          <TableLoading
+            totalBoxes={30}
+            boxesClassName="min-h-10"
+            className="grid-cols-10"
+          />
+        )}
+        {allProducts.length === 0 && !isLoading && (
+          <div className="flex-grow justify-center items-center flex-col w-full flex gap-2">
+            <span className="text-primary text-5xl">
+              <IoCube />
+            </span>
+            <span className="text-zinc-800/60 text-xl poppins-semibold">
+              {" "}
+              No products to display
+            </span>
+          </div>
+        )}
         {/* Loading indicator */}
         {hasNextPage && (
           <div ref={ref} className="text-center py-4">

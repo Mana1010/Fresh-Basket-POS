@@ -1,6 +1,5 @@
 import { lazy, Suspense, useState, type ReactNode } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import ProductGraphLoading from "./components/loading/ProductGraphLoading";
 import { useNavigate } from "react-router-dom";
 import { MdOutlineManageSearch } from "react-icons/md";
 import RecordBox from "../components/RecordBox";
@@ -8,11 +7,15 @@ import type { IconType } from "react-icons/lib";
 import { LuKey, LuShapes } from "react-icons/lu";
 import useSearchDebounce from "../../../hooks/useSearchDebounce";
 import Title from "../../../components/Title";
-const LazyAccountList = lazy(
-  () => import("./components/accounts-page/AccountList")
-);
+import { IoRemoveCircle } from "react-icons/io5";
+import TableLoading from "./components/loading/TableLoading";
+import AccountList from "./components/accounts-page/AccountList";
+
 const LazyTotalAccounts = lazy(
   () => import("./components/accounts-page/accounts-stats/TotalAccounts")
+);
+const LazyTotalAccountsBlocked = lazy(
+  () => import("./components/accounts-page/accounts-stats/TotalAccountsBlocked")
 );
 const LazyTotalProductCategories = lazy(
   () => import("./components/product-page/product-stats/TotalProductCategories")
@@ -38,6 +41,9 @@ function ProductStat({ children, ...props }: ProductStatProps) {
 function Accounts() {
   const navigate = useNavigate();
   const [searchAccount, setSearchAccount] = useState("");
+  const [sortByEmployeeName, setSortByEmployeeName] = useState<
+    "asc" | "desc" | ""
+  >("");
   const debouncedSearchedAccount = useSearchDebounce(searchAccount);
   return (
     <div className="flex flex-col lg:flex-row-reverse items-center justify-center gap-2 w-full h-auto lg:h-full">
@@ -47,11 +53,11 @@ function Accounts() {
           <LazyTotalAccounts />
         </ProductStat>
         <ProductStat
-          label="Total Amount of Products"
-          value="₱ 25.00"
-          Icon={LuKey}
+          label="Total Accounts Blocked"
+          value=""
+          Icon={IoRemoveCircle}
         >
-          <LazyTotalAccounts />
+          <LazyTotalAccountsBlocked />
         </ProductStat>
         <ProductStat label="Total Categories" value="5" Icon={LuShapes}>
           <LazyTotalProductCategories />
@@ -77,13 +83,14 @@ function Accounts() {
             Add Account
           </button>
         </div>
-        <Suspense fallback={<ProductGraphLoading />}>
-          <ErrorBoundary fallback={<ProductGraphLoading />}>
-            <LazyAccountList
-              debouncedSearchedAccount={debouncedSearchedAccount}
-            />
-          </ErrorBoundary>
-        </Suspense>
+
+        <ErrorBoundary fallback={<TableLoading />}>
+          <AccountList
+            sortByEmployeeName={sortByEmployeeName}
+            setSortByEmployeeName={setSortByEmployeeName}
+            debouncedSearchedAccount={debouncedSearchedAccount}
+          />
+        </ErrorBoundary>
       </div>
     </div>
   );

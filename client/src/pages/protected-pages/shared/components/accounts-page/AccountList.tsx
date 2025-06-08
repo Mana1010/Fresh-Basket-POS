@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import SelectBox from "../../../components/SelectBox";
 import { AnimatePresence } from "framer-motion";
 import { CgArrowsExchangeAltV } from "react-icons/cg";
-import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { ACCOUNT_URL } from "../../../../../api/request-api";
 import useAxiosInterceptor from "../../../../../hooks/useAxiosInterceptor";
 import { useInView } from "react-intersection-observer";
@@ -12,13 +12,21 @@ import { useModalStore } from "../../../../../store/modal.store";
 import { IoEye, IoEyeOff } from "react-icons/io5";
 import type { FullUserType } from "../../../../../types/user.types";
 import { capitalizeFirstLetter } from "../../../../../utils/capitalize-first-letter";
+import TableLoading from "../loading/TableLoading";
 
 type AccountListProps = {
   debouncedSearchedAccount: string;
+  sortByEmployeeName: "asc" | "desc" | "";
+  setSortByEmployeeName: React.Dispatch<
+    React.SetStateAction<"asc" | "desc" | "">
+  >;
 };
-function AccountList({ debouncedSearchedAccount }: AccountListProps) {
+function AccountList({
+  debouncedSearchedAccount,
+  sortByEmployeeName,
+  setSortByEmployeeName,
+}: AccountListProps) {
   const [openSortEmployee, setOpenSortEmployee] = useState(false);
-  const [sortByEmployeeName, setSortByEmployeeName] = useState("");
   const [selectedToShowPasscode, setSelectedToShowPasscode] = useState<
     number | null
   >(null);
@@ -27,11 +35,11 @@ function AccountList({ debouncedSearchedAccount }: AccountListProps) {
   const axiosInterceptor = useAxiosInterceptor();
 
   const { data, hasNextPage, isLoading, fetchNextPage, isFetchingNextPage } =
-    useSuspenseInfiniteQuery({
+    useInfiniteQuery({
       queryKey: ["accounts", sortByEmployeeName, debouncedSearchedAccount],
       queryFn: async ({ pageParam = 1 }) => {
         const response = await axiosInterceptor.get(
-          `${ACCOUNT_URL}/list?limit=10&page=${pageParam}&search=${debouncedSearchedAccount}`
+          `${ACCOUNT_URL}/list?limit=10&page=${pageParam}&search=${debouncedSearchedAccount}&sort=${sortByEmployeeName}`
         );
         return response.data.accounts;
       },
@@ -45,7 +53,6 @@ function AccountList({ debouncedSearchedAccount }: AccountListProps) {
         // Return the next page number
         return lastPage.current_page + 1;
       },
-      staleTime: 30 * 1000,
     });
 
   // Get all products from all pages
@@ -60,12 +67,13 @@ function AccountList({ debouncedSearchedAccount }: AccountListProps) {
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   function handleSorting(value: string) {
-    setSortByEmployeeName(value);
+    setSortByEmployeeName(value as "asc" | "desc" | "");
+    setOpenSortEmployee(false);
   }
   return (
     <div className="flex-grow w-auto lg:w-full h-auto lg:h-1 overflow-x-auto">
-      <div className="w-full h-full overflow-y-auto thin-scrollbar pr-1">
-        <table className="w-full">
+      <div className="w-full h-full overflow-y-auto thin-scrollbar pr-1 flex flex-col">
+        <table className="w-full table-fixed">
           <thead className="product-thead">
             <tr>
               <td className="relative">
@@ -145,8 +153,14 @@ function AccountList({ debouncedSearchedAccount }: AccountListProps) {
                 <td>{capitalizeFirstLetter(account.role)}</td>
 
                 <td>
-                  <span className="px-3 py-0.5 bg-orange-300/35 border border-orange-400 rounded-3xl">
-                    {account.status}
+                  <span
+                    className={`px-3 py-0.5 border ${
+                      account.status === "active"
+                        ? "bg-green-300/35 border-green-400"
+                        : "bg-red-300/35 border-red-400"
+                    } rounded-3xl`}
+                  >
+                    {capitalizeFirstLetter(account.status)}
                   </span>
                 </td>
                 <td className="flex items-center justify-center">
@@ -168,7 +182,23 @@ function AccountList({ debouncedSearchedAccount }: AccountListProps) {
             ))}
           </tbody>
         </table>
+        {
+          /* If no accounts are found, show a message */
+          allAccounts.length === 0 && !isLoading && (
+            <div className="text-center text-secondary py-4">
+              No accounts found.
+            </div>
+          )
+        }
 
+        {/* If loading, show a loading indicator */}
+        {isLoading && (
+          <TableLoading
+            totalBoxes={12}
+            boxesClassName="min-h-8"
+            className="grid-cols-6"
+          />
+        )}
         {/* Loading indicator */}
         {hasNextPage && (
           <div ref={ref} className="text-center py-4">

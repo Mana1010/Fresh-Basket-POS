@@ -1,6 +1,5 @@
 import { lazy, Suspense, useState, type ReactNode } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import ProductGraphLoading from "./components/loading/ProductGraphLoading";
 import { useNavigate } from "react-router-dom";
 import { MdOutlineManageSearch } from "react-icons/md";
 import RecordBox from "../components/RecordBox";
@@ -11,7 +10,8 @@ import { LuShapes } from "react-icons/lu";
 import useSearchDebounce from "../../../hooks/useSearchDebounce";
 import Title from "../../../components/Title";
 import { IoCubeOutline } from "react-icons/io5";
-const ProductList = lazy(() => import("./components/product-page/ProductList"));
+import ProductList from "./components/product-page/ProductList";
+import TableLoading from "./components/loading/TableLoading";
 const LazyTotalAmountProduct = lazy(
   () => import("./components/product-page/product-stats/TotalAmountProduct")
 );
@@ -46,6 +46,8 @@ function ProductStat({ children, ...props }: ProductStatProps) {
 function Products() {
   const navigate = useNavigate();
   const [searchProduct, setSearchProduct] = useState("");
+  const [sortProduct, setSortProduct] = useState<"asc" | "desc" | "">("");
+  const [filterProductPrice, setFilterProductPrice] = useState("");
   const debouncedSearchedProduct = useSearchDebounce(searchProduct);
   return (
     <div className="flex flex-col gap-2 w-full h-auto lg:h-full">
@@ -96,11 +98,14 @@ function Products() {
             Add Product
           </button>
         </div>
-        <Suspense fallback={<ProductGraphLoading />}>
-          <ErrorBoundary fallback={<ProductGraphLoading />}>
-            <ProductList debouncedSearchedProduct={debouncedSearchedProduct} />
-          </ErrorBoundary>
-        </Suspense>
+
+        <ErrorBoundary fallback={<TableLoading />}>
+          <ProductList
+            debouncedSearchedProduct={debouncedSearchedProduct}
+            sortProduct={sortProduct}
+            setSortProduct={setSortProduct}
+          />
+        </ErrorBoundary>
       </div>
     </div>
   );

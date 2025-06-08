@@ -98,7 +98,7 @@
   }
 
   .product-tbody > tr > td {
-    @apply text-[0.75rem] text-secondary p-2.5 text-center group-hover:text-zinc-100 transition-colors ease-in-out duration-75;
+    @apply text-[0.7rem] text-secondary p-2 text-center group-hover:text-zinc-100 transition-colors ease-in-out duration-75;
   }
   /* .product-tfoot > tr {
     @apply p-3;

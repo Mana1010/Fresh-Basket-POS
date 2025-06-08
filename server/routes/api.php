@@ -25,6 +25,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/account-details/{account_id}', 'account_details');
         Route::post('/create-account', 'add_account');
          Route::patch('/edit-account/{account_id}', 'edit_account');
+            Route::patch('toggle-status-account/{account_id}', 'toggle_status_account');
 
     });
       Route::prefix('product')->controller(ProductController::class)->group(function () {
@@ -33,9 +34,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/stats', 'product_stats');
         Route::get('/details/{product_id}', 'product_details');
         Route::post('/create-category', 'create_category');
+          Route::patch('/edit-category/{category_name}', 'edit_category');
         Route::post('/create-product', 'create_product');
         Route::post("/upload-thumbnail", "upload_thumbnail");
          Route::patch('/edit-product/{product_id}', 'edit_product');
+         Route::delete('/delete-category/{category_name}', 'delete_category');
     });
 
     Route::prefix('inventory')->controller(InventoryController::class)->group(function () {
@@ -43,6 +46,7 @@ Route::middleware('auth:sanctum')->group(function () {
          Route::get('/inventory-details/{inventory_id}', 'inventory_details');
         Route::post('/add-inventory', 'add_inventory');
          Route::patch('/edit-inventory/{inventory_id}', 'edit_inventory');
+
     });
 });
 

@@ -4,6 +4,7 @@ import { cn } from "../../../utils/cn";
 
 export type RecordBoxProps = {
   label: string;
+
   value: string;
   className?: string;
   textClassName?: string;

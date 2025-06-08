@@ -33,7 +33,7 @@ function SelectBox({
         {options.map((option, i) => (
           <li
             onClick={() => {
-              handleAction(option);
+              handleAction(values[i]);
               setOpenFilterProduct(currentValue === values[i]);
             }}
             key={i}

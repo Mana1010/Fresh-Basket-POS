@@ -24,9 +24,13 @@ class AuthController extends Controller
             'username' => 'required|string|max:20',
             'password' => 'required|string|max:128'
         ]);
-        $user = User::where('username', $validated["username"])->select('role', 'id', 'username', 'password')->first();
+        $user = User::where('username', $validated["username"])->select('role', 'id', 'username', 'password', 'status')->first();
         if(!$user || !Hash::check($validated["password"], $user->password)) {
+
             return response()->json(['message' => 'Wrong credentials'], 401);
+        }
+        if($user->status === "blocked") {
+            return response()->json(['message' => 'Your account has been blocked, please contact the administrator'], 403);
         }
            $user_role = $user->role;
                $user_details = $user;
@@ -38,10 +42,13 @@ class AuthController extends Controller
          $validated = $request->validate([
             'passcode' => 'required|string|max:6',
         ]);
-            $user = User::where('passcode', $validated['passcode'])->select('role', 'id', 'username')->first();
+            $user = User::where('passcode', $validated['passcode'])->select('role', 'id', 'username', 'status')->first();
             if(!$user) {
                 return response()->json(['message' => 'Invalid passcode'], 401);
             }
+          if($user->status === "blocked") {
+            return response()->json(['message' => 'Your account has been blocked, please contact the administrator'], 403);
+        }
               $user_role = $user->role;
               $user_details = $user;
             $token = $user->createToken('session_token')->plainTextToken;

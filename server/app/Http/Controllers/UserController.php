@@ -32,11 +32,20 @@ class UserController extends Controller
     public function all_accounts (Request $request) {
         $limit = $request->query('limit');
         $search = $request->query('search');
+        $sort = $request->query('sort');
 
         $all_accounts = User::where('status', '!=', 'deleted')
-        ->where('employer_name', 'like', "%$search%")->orWhere('username', 'like', "%$search%")
-        ->orderBy('created_at', 'desc')->simplePaginate($limit ?? 10);
-        return response()->json(['accounts' => $all_accounts], 200);
+        ->where('employer_name', 'like', "%$search%")->orWhere('username', 'like', "%$search%");
+
+    if($sort === "asc" || $sort === "desc") {
+            $all_accounts->orderBy('employer_name', $sort);
+        }
+    else {
+         $all_accounts->orderBy('created_at', 'desc');
+        }
+
+        $data = $all_accounts->simplePaginate($limit ?? 10);
+        return response()->json(['accounts' => $data], 200);
     }
     public function account_stats (Request $request) {
         $type = $request->query('type');
@@ -44,6 +53,9 @@ class UserController extends Controller
         $stats = [];
         if($type === "total_accounts") {
             $stats = User::count();
+        }
+        else if ($type === "total_accounts_blocked") {
+            $stats = User::where('status', 'blocked')->count();
         }
     return response()->json(['stats' => $stats], 200);
     }
@@ -133,5 +145,19 @@ $validated['password_confirmation'] = $validated['password_confirmation'] ?? '';
     catch(ValidationException $err) {
         return response()->json(['message' => $err->getMessage()], 422);
     };
+    }
+
+    public function toggle_status_account($account_id) {
+        $validated = request()->validate([
+            'status' => ['required', 'string', 'in:active,blocked,inactive'],
+        ]);
+
+         $account = User::findOrFail($account_id);
+           if(!$account) {
+            return response()->json(['message' => 'Account not found'], 404);
+        }
+        $account->status = $validated['status'];
+        $account->save();
+        return response()->json(['message' => 'Account status updated successfully', 'status' => $account->status], 201);
     }
 }

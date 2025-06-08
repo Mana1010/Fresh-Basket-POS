@@ -12,10 +12,40 @@ import { useModalStore } from "../../../../../store/modal.store";
 import { dateFormat } from "../../../../../helper/dateFormat";
 import { capitalizeFirstLetter } from "../../../../../utils/capitalize-first-letter";
 import type { UserRole } from "../../../../../types/user.types";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import useAxiosInterceptor from "../../../../../hooks/useAxiosInterceptor";
+import { ACCOUNT_URL } from "../../../../../api/request-api";
+import { toast } from "sonner";
+import { useAuthStore } from "../../../../../store/auth.store";
+import type { AxiosError } from "axios";
+
 function AccountDetails() {
   const { toggleAccountDetails, accountDetails, closeAccountDetails } =
     useModalStore();
+  const { user } = useAuthStore();
+  const axiosInstance = useAxiosInterceptor();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const toggleStatusAccount = useMutation({
+    mutationFn: async (status: "blocked" | "active" | "inactive") => {
+      const response = await axiosInstance.patch(
+        `${ACCOUNT_URL}/toggle-status-account/${accountDetails?.id}`,
+        { status }
+      );
+      return response.data;
+    },
+    onSuccess: ({ message }) => {
+      toast.success(message);
+      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      queryClient.invalidateQueries({
+        queryKey: ["account-stat", "total_accounts_blocked"],
+      });
+      closeAccountDetails();
+    },
+    onError: (err: AxiosError<{ message: string }>) => {
+      toast.error(err.response?.data.message || "An error occurred");
+    },
+  });
   return (
     <div
       onClick={closeAccountDetails}
@@ -100,9 +130,20 @@ function AccountDetails() {
               >
                 Edit Account
               </button>
-              <button className="text-[0.7rem] bg-red-500 text-white custom-border rounded-md py-1.5 px-4 cursor-pointer">
-                Delete Account
-              </button>
+              {user?.id !== accountDetails?.id && (
+                <button
+                  onClick={() =>
+                    toggleStatusAccount.mutate(
+                      accountDetails?.status === "active" ? "blocked" : "active"
+                    )
+                  }
+                  className="text-[0.7rem] bg-red-500 text-white custom-border rounded-md py-1.5 px-4 cursor-pointer"
+                >
+                  {accountDetails?.status === "active"
+                    ? "Block Account"
+                    : "Unblock Account"}
+                </button>
+              )}
             </div>
           </div>
         </div>

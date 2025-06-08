@@ -16,6 +16,7 @@ import { IoCart } from "react-icons/io5";
 import FirstPage from "./components/pos-page/FirstPage";
 import SecondPage from "./components/pos-page/SecondPage";
 import { useModalStore } from "../../../store/modal.store";
+import Title from "../../../components/Title";
 
 const LazyOrderCategories = lazy(
   () => import("./components/pos-page/pos-stats/OrderCategories")
@@ -50,6 +51,7 @@ function Pos() {
   }, [productsMap, products.data, products.isSuccess]);
   return (
     <div className="w-full flex-grow lg:grid-cols-3 grid-cols-1 gap-2 grid justify-center items-center p-2 h-full bg-white rounded-xl border border-zinc-200">
+      <Title title="Point of Sale" />
       <div className="h-full w-full col-span-full lg:col-span-2 flex flex-col gap-2">
         <div className="justify-between flex items-center">
           <h1 className=" text-primary flex items-center space-x-1">

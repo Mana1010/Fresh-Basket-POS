@@ -57,7 +57,7 @@ function ProductDetails() {
                     <IoShapes />
                   </span>
                   <span className="text-[0.7rem] text-secondary/75">
-                    {productDetails?.category.category_name}
+                    {productDetails?.category?.category_name ?? "Uncategorized"}
                   </span>
                 </h1>
                 <h1 className="text-secondary poppins-semibold flex space-x-1.5 items-center">

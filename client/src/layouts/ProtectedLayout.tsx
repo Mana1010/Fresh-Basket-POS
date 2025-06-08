@@ -11,14 +11,19 @@ import { useModalStore } from "../store/modal.store";
 import AccountDetails from "../pages/protected-pages/shared/components/accounts-page/AccountDetails";
 import useAxiosInterceptor from "../hooks/useAxiosInterceptor";
 import InventoryDetails from "../pages/protected-pages/shared/components/product-page/InventoryDetails";
+import RemoveCategoryConfirmation from "../pages/protected-pages/shared/components/product-page/RemoveCategoryConfirmation";
 function ProtectedLayout() {
   const breadcrumbs = useBreadCrumbs(
     BREADCRUMB_NAVIGATION_LIST as Record<string, unknown>[]
   );
   const axiosInstance = useAxiosInterceptor();
   const navigate = useNavigate();
-  const { isOpenProductDetails, isOpenAccountDetails, isOpenInventoryDetails } =
-    useModalStore();
+  const {
+    isOpenProductDetails,
+    isOpenAccountDetails,
+    isOpenInventoryDetails,
+    categoryToRemove,
+  } = useModalStore();
   const token = localStorage.getItem("session_token");
 
   useQuery({
@@ -39,6 +44,7 @@ function ProtectedLayout() {
       {isOpenProductDetails && <ProductDetails />}
       {isOpenAccountDetails && <AccountDetails />}
       {isOpenInventoryDetails && <InventoryDetails />}
+      {categoryToRemove && <RemoveCategoryConfirmation />}
       <div className="flex-grow h-full flex flex-col gap-1">
         <Header />
         <div className="flex-grow flex w-full h-1">

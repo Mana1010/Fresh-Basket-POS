@@ -11,6 +11,7 @@ type State = {
   isOpenAccountDetails: boolean;
   isOpenInventoryDetails: boolean;
   accountDetails: FullUserType | null;
+  categoryToRemove: string | null;
   inventoryDetails: FullInventoryDetails | null;
   currentPage: "pos_page" | "proceed_to_payment";
   reasonType: "";
@@ -29,6 +30,7 @@ type Action = {
   closeInventoryDetails: () => void;
   setAccountDetails: (data: FullUserType | null) => void;
   setInventoryDetails: (data: FullInventoryDetails | null) => void;
+  setCategoryToRemove: (category: string | null) => void;
 };
 const store: (
   set: StoreApi<State & Action>["setState"],
@@ -39,6 +41,7 @@ const store: (
   isOpenProductDetails: false,
   isOpenAccountDetails: false,
   isOpenInventoryDetails: false,
+  categoryToRemove: null, //Not modal
   productDetails: null,
   accountDetails: null,
   inventoryDetails: null,
@@ -61,9 +64,10 @@ const store: (
   closeInventoryDetails: () => set({ isOpenInventoryDetails: false }),
   setInventoryDetails: (data: FullInventoryDetails | null) =>
     set({ inventoryDetails: data }),
-
   setCurrentPage: (page: "pos_page" | "proceed_to_payment") =>
     set({ currentPage: page }),
+  setCategoryToRemove: (category: string | null) =>
+    set({ categoryToRemove: category }),
 });
 
 export const useModalStore = create<State & Action>(store);

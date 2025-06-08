@@ -21,6 +21,7 @@ class ProductController extends Controller
         $limit = $request->query('limit');
           $search = $request->query('search');
           $type = $request->query('type');
+          $sort = $request->query('sort');
         // $sort = $request->query('sort');
         // $filter = $request->query('filter');
 
@@ -32,14 +33,22 @@ class ProductController extends Controller
         $products = Product::with(['category:id,category_name'])->withSum('inventories', 'stock')->addSelect('id', 'barcode', 'product_name', 'sku', 'price', 'discount_rate', 'tax_rate', 'product_category_id')->get();
        return response()->json(['data' => $products], 200);
     }
-    else if($type === "products_page" || $type === "select_product") {
-$products = Product::with('category')->where('product_name', 'like', "%$search%")->orWhere('sku', 'like', "%$search%")
-   ->orWhere('manufacturer', 'like', "%$search%")->orWhere('barcode', 'like', "%$search%")
-    ->withSum('inventories', 'stock')
-    ->orderBy('created_at', 'desc')
-    ->simplePaginate(10);
-    return response()->json(['data' => $products], 200);
-    }
+$products = Product::with('category')
+    ->where('product_name', 'like', "%$search%")
+    ->orWhere('sku', 'like', "%$search%")
+    ->orWhere('manufacturer', 'like', "%$search%")
+    ->orWhere('barcode', 'like', "%$search%")
+    ->withSum('inventories', 'stock');
+
+if ($sort === "asc" || $sort === "desc") {
+    $products->orderBy('price', $sort);
+} else {
+    $products->orderBy('created_at', 'desc');
+}
+
+$data = $products->simplePaginate(10);
+
+return response()->json(['data' => $data], 200);
     }
 
 
@@ -53,6 +62,23 @@ $products = Product::with('category')->where('product_name', 'like', "%$search%"
         ]);
 
         return response()->json(['message' => 'Successfully added new category'], 201);
+    }
+
+    public function edit_category (Request $request, $category_name) {
+        $validated = $request->validate([
+            'category_name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('product_categories', 'category_name')->ignore($category_name, 'category_name'),
+            ],
+
+        ]);
+
+        $category = ProductCategory::where('category_name', $category_name)->firstOrFail();
+        $category->update(['category_name' => $validated['category_name']]);
+
+        return response()->json(['message' => 'Successfully updated the category'], 201);
     }
 
     public function upload_thumbnail(Request $request) {
@@ -109,7 +135,9 @@ $products = Product::with('category')->where('product_name', 'like', "%$search%"
         else if ($type === "total_amount") {
           $product_stat = DB::table('products')
        ->join('inventories', 'products.id', '=', 'inventories.product_id')
-       ->selectRaw('SUM(products.price * inventories.stock) as total_amount')
+       ->selectRaw('SUM((products.price - (products.price * (products.discount_rate / 100)))
+            * (1 + products.tax_rate / 100)
+            * inventories.stock) as total_amount')
        ->value('total_amount');
         }
         else if ($type === "total_product_variants") {
@@ -158,5 +186,11 @@ $products = Product::with('category')->where('product_name', 'like', "%$search%"
             $product->save();
         }
         return response()->json(['message' => 'Successfully updated the product'], 201);
+    }
+    public function delete_category($category_name) {
+
+        ProductCategory::where('category_name', $category_name)->delete();
+
+        return response()->json(['message' => 'Successfully deleted the category'], 201);
     }
 }
