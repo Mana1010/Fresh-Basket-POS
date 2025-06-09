@@ -30,13 +30,15 @@ function RoleAccessCheckPoint({
       return response.data.user;
     },
   });
-  if (isLoading)
+  if (isLoading) {
     return (
       <div className="flex w-full h-screen items-center justify-center flex-col space-y-1.5">
         <Spinner className="size-12 border-2 border-t-transparent" />
         <span className="text-xl text-secondary"> Checking permissions...</span>
       </div>
     );
+  }
+
   if (!data || !allowedRoles.includes(data?.role as UserRole)) {
     return <Navigate to={navigateTo} replace />;
   }

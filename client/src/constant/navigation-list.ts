@@ -46,10 +46,10 @@ export const navigationList = [
     icon: IoClipboard,
   },
   {
-    name: "Invoices",
+    name: "Receipts",
     roles: ["manager", "admin"],
-    link: "/invoices",
-    path: ["invoices"],
+    link: "/receipts",
+    path: ["receipts"],
     icon: IoReceipt,
   },
   {

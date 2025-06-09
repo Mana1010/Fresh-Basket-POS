@@ -56,7 +56,6 @@ function ProductList({
         // Return the next page number
         return lastPage.current_page + 1;
       },
-      staleTime: 30 * 1000,
     });
 
   // Get all products from all pages

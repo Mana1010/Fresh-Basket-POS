@@ -50,12 +50,15 @@ class UserController extends Controller
     public function account_stats (Request $request) {
         $type = $request->query('type');
 
-        $stats = [];
+        $stats = 0;
         if($type === "total_accounts") {
             $stats = User::count();
         }
         else if ($type === "total_accounts_blocked") {
             $stats = User::where('status', 'blocked')->count();
+        }
+        else if ($type === "total_active_accounts") {
+        $stats = User::where('status', 'active')->count();
         }
     return response()->json(['stats' => $stats], 200);
     }

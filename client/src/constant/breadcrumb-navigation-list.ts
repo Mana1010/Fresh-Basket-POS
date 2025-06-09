@@ -55,4 +55,9 @@ export const BREADCRUMB_NAVIGATION_LIST = [
     breadcrumb: "Add Account",
     icon: "",
   },
+  {
+    path: "/receipts",
+    breadcrumb: "Receipts",
+    icon: IoReceipt,
+  },
 ];

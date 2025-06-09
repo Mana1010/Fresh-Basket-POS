@@ -21,6 +21,10 @@ return new class extends Migration
             $table->foreignId('product_category_id')->nullable()->constrained('product_categories')->onDelete('set null');
             $table->decimal('price', 10, 2);
             $table->string('sku')->unique();
+            $table->boolean('is_deleted')->default(false);
+            $table->string('manufacturer')->nullable();
+            $table->integer('discount_rate')->default(0);
+            $table->integer('tax_rate')->default(0);
             $table->string('product_thumbnail')->nullable();
 
         });

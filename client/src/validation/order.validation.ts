@@ -24,3 +24,5 @@ export const customerInfoValidation = z.object({
     return Number(data) > 0;
   }, "Amount tendered must be greater than zero."),
 });
+
+export type CustomerInfoTypes = z.infer<typeof customerInfoValidation>;

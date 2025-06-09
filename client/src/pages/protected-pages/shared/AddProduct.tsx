@@ -326,7 +326,7 @@ function AddProduct() {
                 isLoading={addProduct.isPending}
                 label="Upload Product"
                 labelWhileLoading="Uploading..."
-                spinnerClassName="border-white size-5 border-t-transparent"
+                spinnerClassName="border-white size-5 border-t-transparent border"
                 className="col-span-2 text-[0.8rem]"
               />
             </div>

@@ -2,21 +2,29 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 import InputBox from "../../../../../components/InputBox";
-import { customerInfoValidation } from "../../../../../validation/order.validation";
+import {
+  customerInfoValidation,
+  type CustomerInfoTypes,
+} from "../../../../../validation/order.validation";
 import { formatToPhpMoney } from "../../../../../utils/format-to-money";
 import { IoCash } from "react-icons/io5";
 import { useProductStore } from "../../../../../store/product.store";
 import { calculateTotalPrice } from "../../../../../utils/total-price";
 import { useMemo } from "react";
 import { useModalStore } from "../../../../../store/modal.store";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import useAxiosInterceptor from "../../../../../hooks/useAxiosInterceptor";
 import { INVOICE_URL } from "../../../../../api/request-api";
 import { useAuthStore } from "../../../../../store/auth.store";
+import type { AxiosError } from "axios";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
+import Button from "../../../../../components/Button";
 function CustomerInformation() {
   const { orderProducts } = useProductStore();
   const { setCurrentPage } = useModalStore();
   const { user } = useAuthStore();
+  const queryClient = useQueryClient();
   const axiosInstance = useAxiosInterceptor();
   const {
     register,
@@ -53,28 +61,26 @@ function CustomerInformation() {
   }, [orderProducts]);
 
   const printReceipt = useMutation({
-    mutationFn: async (data) => {
+    mutationFn: async (data: CustomerInfoTypes) => {
       const response = await axiosInstance.post(
         `${INVOICE_URL}/print-receipt`,
         {
           orders: orderProducts,
-          customer_name: "",
-          customer_email: "",
-          sub_total: 0,
-          discount_rate: 0,
-          tax_rate: 0,
-          total_amount: grand_total,
-          customer_change: formatToPhpMoney(
-            String(Number(watch("customer_paid")) - grand_total)
-          ),
-          customer_paid: 0,
+          customer_name: data.name,
+          customer_email: data.email,
+          customer_paid: data.customer_paid,
           cashier_id: user?.id,
         }
       );
       return response.data;
     },
     onSuccess: ({ message }) => {
+      toast.success(message);
+      queryClient.invalidateQueries({ queryKey: ["products", "pos_page"] });
       reset();
+    },
+    onError: (err: AxiosError<{ message: string }>) => {
+      toast.error(err.response?.data.message);
     },
   });
   return (
@@ -83,7 +89,6 @@ function CustomerInformation() {
         onSubmit={handleSubmit((data) => {
           console.log(grand_total);
           if (Number(data.customer_paid) < grand_total) {
-            alert("Running hehe");
             setError("customer_paid", {
               message: `The customer is required to pay ${formatToPhpMoney(
                 String(grand_total)
@@ -91,6 +96,7 @@ function CustomerInformation() {
             });
             return;
           }
+          printReceipt.mutate(data);
         })}
         className="flex flex-col pt-2 px-1.5 space-y-2 h-full"
       >
@@ -191,12 +197,15 @@ function CustomerInformation() {
           >
             Back
           </button>
-          <button
+          <Button
+            label="Print Receipt"
+            labelWhileLoading="Processing..."
+            spinnerClassName="border border-white size-4.5 border-t-transparent"
+            disabled={printReceipt.isPending}
+            isLoading={printReceipt.isPending}
             type="submit"
             className="self-end px-2 py-1.5 text-sm bg-primary text-white rounded-sm w-1/2 cursor-pointer"
-          >
-            Print Receipt
-          </button>
+          />
         </div>
       </form>
     </div>

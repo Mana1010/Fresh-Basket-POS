@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import About from "./pages/About";
 import "./App.css";
 import ProtectedLayout from "./layouts/ProtectedLayout";
@@ -19,6 +19,7 @@ import Profile from "./pages/protected-pages/shared/Profile";
 import EditInventory from "./pages/protected-pages/shared/EditInventory";
 import RoleAccessCheckPoint from "./pages/protected-pages/components/RoleAccessCheckPoint";
 import AccountPageLayout from "./layouts/AccountPageLayout";
+import ReceiptHistory from "./pages/protected-pages/shared/ReceiptHistory";
 function App() {
   const router = createBrowserRouter([
     {
@@ -114,6 +115,20 @@ function App() {
               element: <EditAccount />,
             },
           ],
+        },
+        {
+          path: "receipts",
+          element: (
+            <RoleAccessCheckPoint
+              allowedRoles={["admin", "manager"]}
+              navigateTo="/reports"
+            >
+              <>
+                <Outlet />
+              </>
+            </RoleAccessCheckPoint>
+          ),
+          children: [{ index: true, element: <ReceiptHistory /> }],
         },
       ],
     },

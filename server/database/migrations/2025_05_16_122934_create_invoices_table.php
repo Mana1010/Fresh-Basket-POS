@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('invoices', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->id();
             $table->foreignId('customer_id')->constrained('customers');
             $table->foreignId('user_id')->constrained('users');
-            $table->decimal('total_amount', 10, 2);
+            $table->decimal('customer_paid', 10, 2);
             $table->boolean('is_deleted')->default(false);
             $table->timestamps();
         });

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { PRODUCT_URL } from "../../../api/request-api";

@@ -14,7 +14,7 @@ function Transaction() {
   } = useForm({
     defaultValues: {
       quantity: 1,
-      barcode: "50012500",
+      barcode: "49012845",
     },
     resolver: zodResolver(transactionPanelValidation),
   });

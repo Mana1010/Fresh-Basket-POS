@@ -10,10 +10,11 @@ import { AUTH_URL } from "../../api/request-api";
 import { useNavigate } from "react-router-dom";
 import useLogout from "../../hooks/useLogout";
 import useAxiosInterceptor from "../../hooks/useAxiosInterceptor";
+import Button from "../../components/Button";
 
 function Home() {
   const navigate = useNavigate();
-  const { logout } = useLogout();
+  const { logout, isLogoutLoading } = useLogout();
   const axiosInstance = useAxiosInterceptor();
   const [roleIndex, setRoleIndex] = useState(0);
   const roles = ["Admin", "Manager", "Cashier"];
@@ -66,25 +67,28 @@ function Home() {
           !sessionToken ? (
             <LoginForm />
           ) : (
-            <div className="flex-grow flex items-center justify-center flex-col space-y-2">
-              <h1 className="text-secondary text-2xl text-center poppins-extrabold">
-                Authentication Successful
+            <div className="flex-grow flex items-center justify-center flex-col space-y-1.5">
+              <h1 className="text-secondary text-lg text-center poppins-extrabold">
+                You are aleady authenticated.
               </h1>
               <button
                 onClick={() => navigate(-1)}
-                className="w-full py-2 text-sm bg-primary rounded-sm text-white"
+                className="w-1/2 py-2 text-[0.8rem] bg-primary rounded-sm text-white"
               >
-                Go Back
+                Continue
               </button>
-              <span className="text-center text-secondary/45 py-2">
+              {/* <span className="text-center text-secondary/45 py-2">
                 ------------ OR -------------
-              </span>
-              <button
+              </span> */}
+              <Button
                 onClick={() => logout()}
-                className="w-full md:w-1/2 py-2 text-sm bg-red-500 rounded-sm text-white"
-              >
-                Logout
-              </button>
+                label="Logout"
+                labelWhileLoading="Logging out..."
+                isLoading={isLogoutLoading}
+                disabled={isLogoutLoading}
+                spinnerClassName="border border-white size-4 border-t-transparent"
+                className="w-1/2 bg-secondary/70 text-[0.8rem]"
+              />
             </div>
           )}
         </div>

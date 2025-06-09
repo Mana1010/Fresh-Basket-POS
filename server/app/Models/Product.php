@@ -19,6 +19,7 @@ class Product extends Model
         'tax_rate',
         'discount_rate',
         'manufacturer',
+        'is_deleted',
     ];
     public function category()
     {

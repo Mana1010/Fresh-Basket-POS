@@ -315,10 +315,12 @@ function AddInventory() {
             </div>
             <Button
               type="submit"
-              disabled={false}
+              isLoading={addInventory.isPending}
+              disabled={addInventory.isPending}
               label="Upload Inventory"
               labelWhileLoading="Uploading..."
-              className="col-span-full text-[0.8rem]"
+              spinnerClassName="border-white size-5 border-t-transparent border"
+              className="col-span-2 w-full text-[0.8rem]"
             />
           </div>
         </div>

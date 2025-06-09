@@ -51,7 +51,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
         Route::prefix('invoice')->controller(InvoiceController::class)->group(function () {
             Route::post('/print-receipt', 'print_receipt');
-
+            Route::get("/list", "receipt_list");
     });
 });
 

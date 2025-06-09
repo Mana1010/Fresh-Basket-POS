@@ -97,8 +97,9 @@ function Invoice() {
       </div>
 
       <button
+        disabled={orderProducts.length === 0}
         onClick={() => setCurrentPage("proceed_to_payment")}
-        className="self-end justify-self-end w-1/2 cursor-pointer bg-primary text-white py-1.5 text-sm rounded-sm hover:bg-primary/90 transition-colors duration-200"
+        className="self-end justify-self-end w-1/2 cursor-pointer bg-primary text-white disabled:cursor-default disabled:text-zinc-200 py-1.5 text-sm rounded-sm hover:bg-primary/90 transition-colors duration-200 disabled:bg-zinc-700/60"
       >
         <span className="text-[0.8rem] poppins-bold">Proceed to Pay</span>
       </button>
