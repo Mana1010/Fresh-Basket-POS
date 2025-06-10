@@ -134,6 +134,7 @@ try {
             Inventory::create([
                 'product_id' => $product_id,
                 'type' => 'out',
+                'financial_impact' => $totalAmount,
                 'stock' => -$stockPerProduct,
                 'reason' => 'customer_sale',
             ]);

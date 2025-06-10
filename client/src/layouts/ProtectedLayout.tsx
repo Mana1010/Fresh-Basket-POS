@@ -12,6 +12,8 @@ import AccountDetails from "../pages/protected-pages/shared/components/accounts-
 import useAxiosInterceptor from "../hooks/useAxiosInterceptor";
 import InventoryDetails from "../pages/protected-pages/shared/components/product-page/InventoryDetails";
 import RemoveCategoryConfirmation from "../pages/protected-pages/shared/components/product-page/RemoveCategoryConfirmation";
+import ReceiptHistory from "../pages/protected-pages/shared/ReceiptHistory";
+import ReceiptSummary from "../pages/protected-pages/shared/components/receipts-page/ReceiptSummary";
 function ProtectedLayout() {
   const breadcrumbs = useBreadCrumbs(
     BREADCRUMB_NAVIGATION_LIST as Record<string, unknown>[]
@@ -23,6 +25,7 @@ function ProtectedLayout() {
     isOpenAccountDetails,
     isOpenInventoryDetails,
     categoryToRemove,
+    isOpenReceiptDetails,
   } = useModalStore();
   const token = localStorage.getItem("session_token");
 
@@ -45,6 +48,7 @@ function ProtectedLayout() {
       {isOpenAccountDetails && <AccountDetails />}
       {isOpenInventoryDetails && <InventoryDetails />}
       {categoryToRemove && <RemoveCategoryConfirmation />}
+      {isOpenReceiptDetails && <ReceiptSummary />}
       <div className="flex-grow h-full flex flex-col gap-1">
         <Header />
         <div className="flex-grow flex w-full h-1">

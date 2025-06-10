@@ -10,6 +10,7 @@ type State = {
   productDetails: FullProductDetailsType | null;
   isOpenAccountDetails: boolean;
   isOpenInventoryDetails: boolean;
+  isOpenReceiptDetails: boolean;
   accountDetails: FullUserType | null;
   categoryToRemove: string | null;
   inventoryDetails: FullInventoryDetails | null;
@@ -28,6 +29,7 @@ type Action = {
   toggleAccountDetails: () => void;
   closeAccountDetails: () => void;
   toggleInventoryDetails: () => void;
+  toggleReceiptDetails: () => void;
   closeInventoryDetails: () => void;
   setAccountDetails: (data: FullUserType | null) => void;
   setInventoryDetails: (data: FullInventoryDetails | null) => void;
@@ -43,12 +45,13 @@ const store: (
   isOpenProductDetails: false,
   isOpenAccountDetails: false,
   isOpenInventoryDetails: false,
+  isOpenReceiptDetails: false,
   categoryToRemove: null,
   invoiceId: null,
   productDetails: null,
   accountDetails: null,
   inventoryDetails: null,
-  currentPage: "rate_us",
+  currentPage: "pos_page",
   reasonType: "",
   toggleSidebar: () => set({ isOpenSidebar: !get().isOpenSidebar }),
   toggleCategoryForm: (bool: boolean) => set({ isOpenAddCategoryForm: bool }),
@@ -65,6 +68,8 @@ const store: (
   toggleInventoryDetails: () =>
     set({ isOpenInventoryDetails: !get().isOpenInventoryDetails }),
   closeInventoryDetails: () => set({ isOpenInventoryDetails: false }),
+  toggleReceiptDetails: () =>
+    set({ isOpenReceiptDetails: !get().isOpenReceiptDetails }),
   setInventoryDetails: (data: FullInventoryDetails | null) =>
     set({ inventoryDetails: data }),
   setCurrentPage: (page: "pos_page" | "proceed_to_payment" | "rate_us") =>

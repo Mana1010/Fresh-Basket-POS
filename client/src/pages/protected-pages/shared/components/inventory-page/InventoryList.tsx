@@ -75,6 +75,8 @@ function InventoryList({
     setReasonFilter(value as ReasonType | "");
     setOpenFilterInventory(false);
   }
+
+  console.log(allInventories);
   return (
     <div className="flex-grow w-auto lg:w-full h-auto lg:h-1 overflow-x-auto">
       <div className="w-full h-full overflow-y-auto thin-scrollbar pr-1 flex flex-col">

@@ -60,4 +60,9 @@ export const BREADCRUMB_NAVIGATION_LIST = [
     breadcrumb: "Receipts",
     icon: IoReceipt,
   },
+  {
+    path: "/reports",
+    breadcrumb: "Reports",
+    icon: IoBarChart,
+  },
 ];

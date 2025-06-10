@@ -1,7 +1,6 @@
 import {
   IoAnalytics,
   IoBarChart,
-  IoChatbubbles,
   IoClipboard,
   IoCube,
   IoPeopleCircle,
@@ -24,13 +23,13 @@ export const navigationList = [
     path: ["pos"],
     icon: IoPrint,
   },
-  {
-    name: "Profile",
-    roles: ["cashier", "manager", "admin"],
-    link: "/profile",
-    path: ["profile"],
-    icon: IoPersonCircle,
-  },
+  // {
+  //   name: "Profile",
+  //   roles: ["cashier", "manager", "admin"],
+  //   link: "/profile",
+  //   path: ["profile"],
+  //   icon: IoPersonCircle,
+  // },
   {
     name: "Products",
     roles: ["manager", "admin"],

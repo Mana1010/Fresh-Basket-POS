@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -54,6 +55,9 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/print-receipt', 'print_receipt');
             Route::get("/list", "receipt_list");
             Route::post('/rate', 'rate');
+    });
+           Route::prefix('report')->controller(ReportController::class)->group(function () {
+            Route::get('/total-sales', 'total_sales');
     });
 });
 

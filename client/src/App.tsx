@@ -121,7 +121,7 @@ function App() {
           element: (
             <RoleAccessCheckPoint
               allowedRoles={["admin", "manager"]}
-              navigateTo="/reports"
+              navigateTo="/pos"
             >
               <>
                 <Outlet />
@@ -129,6 +129,20 @@ function App() {
             </RoleAccessCheckPoint>
           ),
           children: [{ index: true, element: <ReceiptHistory /> }],
+        },
+        {
+          path: "reports",
+          element: (
+            <RoleAccessCheckPoint
+              allowedRoles={["admin", "manager"]}
+              navigateTo="/pos"
+            >
+              <>
+                <Outlet />
+              </>
+            </RoleAccessCheckPoint>
+          ),
+          children: [{ index: true, element: <Reports /> }],
         },
       ],
     },

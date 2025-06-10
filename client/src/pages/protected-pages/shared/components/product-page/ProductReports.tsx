@@ -1,4 +1,3 @@
-import React from "react";
 import { BsBoxes } from "react-icons/bs";
 import { GrMoney } from "react-icons/gr";
 import { BiCategoryAlt } from "react-icons/bi";

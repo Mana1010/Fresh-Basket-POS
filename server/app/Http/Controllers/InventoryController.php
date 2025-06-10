@@ -16,10 +16,12 @@ class InventoryController extends Controller
            'reason' => 'required|in:customer_sale,supplier_delivery,damaged_or_spoiled',
            'stock' => 'required|numeric',
         ]);
-
+      $product = Product::findOrFail($validated['product_id']);
+       $total_amount = $validated['stock'] * ($product->price * (1 - ($product->discount_rate / 100))) * (1 + ($product->tax_rate / 100));
         Inventory::create([
             'product_id' => $validated['product_id'],
             'type' => $validated['type'],
+            'financial_impact' => $total_amount,
             'reason' => $validated['reason'],
             'stock' => $validated['stock'],
         ]);
@@ -35,7 +37,6 @@ public function all_inventories(Request $request) {
     $query = DB::table('inventories')
         ->join('products', 'inventories.product_id', '=', 'products.id')
         ->select('inventories.*', 'products.price', 'products.tax_rate', 'products.product_name', 'products.sku', 'products.product_thumbnail')
-        ->selectRaw('(inventories.stock * (products.price * (1 + products.tax_rate / 100))) AS financial_impact')
         ->orderBy('inventories.updated_at', 'desc');
 
     // Add search filter if exists
@@ -71,14 +72,20 @@ public function all_inventories(Request $request) {
         return response()->json(['data' => $inventory, 'product_stock' => $stock], 200);
     }
         public function edit_inventory(Request $request ,$inventory_id) {
+
          $validated = $request->validate([
            'product_id' => 'required|exists:products,id',
            'type' => 'required|in:in,out',
            'reason' => 'required|in:customer_sale,supplier_delivery,damaged_or_spoiled',
            'stock' => 'required|numeric',
         ]);
+       $product = Product::select('price', 'tax_rate', 'discount_rate')
+       ->findOrFail($validated['product_id']);
+       $total_amount = $validated['stock'] * ($product->price * (1 - ($product->discount_rate / 100))) * (1 + ($product->tax_rate / 100));
      $inventory = Inventory::findOrFail($inventory_id);
+    $inventory->financial_impact = $total_amount;
         $inventory->fill($validated);
+
         if($inventory->isDirty()) {
             $inventory->save();
         }

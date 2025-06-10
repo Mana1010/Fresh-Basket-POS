@@ -9,6 +9,7 @@ import {
   IoCog,
   IoCube,
   IoDocument,
+  IoImageOutline,
   IoInformationCircle,
   IoTrendingDown,
   IoTrendingUp,
@@ -38,13 +39,24 @@ function InventoryDetails() {
           <IoClose />
         </button>
         <div className="basis-1/2 relative h-full rounded-sm w-full border-r border-zinc-400/25 overflow-hidden bg-linear-to-r from-black/10 to-black/10">
-          <img
-            src={apple}
-            alt="thumbnail"
-            className="rounded-sm absolute object-center object-cover inset-0 -z-[1] h-full w-full"
-          />
+          {inventoryDetails?.product_thumbnail ? (
+            <img
+              src={""}
+              alt="thumbnail"
+              className="rounded-sm absolute object-center object-cover inset-0 -z-[1] h-full w-full"
+            />
+          ) : (
+            <div className="basis-1/2 relative h-full rounded-sm w-full border-r border-zinc-400/25 flex items-center justify-center flex-col">
+              <span className="text-secondary">
+                {" "}
+                <IoImageOutline size={50} />
+              </span>
+              <h1 className="text-secondary text-lg poppins-semibold">
+                No Thumbnail provided
+              </h1>
+            </div>
+          )}
         </div>
-
         <div className="flex-grow flex flex-col p-2">
           <div className="pt-2 flex flex-col gap-2 flex-grow justify-between">
             <div className="flex w-full justify-between">

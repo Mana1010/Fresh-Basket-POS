@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('product_id')->nullable()->constrained('products')->onDelete('set null');
             $table->enum('type', ['in', 'out'])->default('in');
             $table->integer('stock')->default(0);
+            $table->decimal('financial_impact', 10, 2);
             $table->enum('reason', ['customer_sale', 'supplier_delivery', 'damaged_or_spoiled'])->default('supplier_delivery');
             $table->boolean('is_deleted')->default(false);
             $table->timestamps();

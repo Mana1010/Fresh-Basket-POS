@@ -7,10 +7,10 @@ import { IoCaretDownOutline } from "react-icons/io5";
 function TotalStockInProducts() {
   const axiosInstance = useAxiosInterceptor();
   const totalInventories = useSuspenseQuery({
-    queryKey: ["inventory-stat", "total_inventories"],
+    queryKey: ["inventory-stat", "total_stock_in_products"],
     queryFn: async () => {
       const response = await axiosInstance.get(
-        `${INVENTORY_URL}/stats?type=total_inventories`
+        `${INVENTORY_URL}/stats?type=total_stock_in_products`
       );
       return response.data;
     },
@@ -18,7 +18,7 @@ function TotalStockInProducts() {
   });
   return (
     <RecordBox
-      label="Total "
+      label="Total Stocck in Product"
       value={formatToFormalNumber(totalInventories.data?.stat)}
       Icon={IoCaretDownOutline}
     />
