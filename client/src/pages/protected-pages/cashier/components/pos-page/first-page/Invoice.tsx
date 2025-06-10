@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { useProductStore } from "../../../../../../store/product.store";
 import { calculateTotalPrice } from "../../../../../../utils/total-price";
 import { formatToPhpMoney } from "../../../../../../utils/format-to-money";

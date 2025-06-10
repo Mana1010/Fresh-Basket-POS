@@ -22,10 +22,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import Button from "../../../../../components/Button";
 function CustomerInformation() {
   const { orderProducts } = useProductStore();
-  const { setCurrentPage } = useModalStore();
+  const { setCurrentPage, setInvoiceId } = useModalStore();
   const { user } = useAuthStore();
   const queryClient = useQueryClient();
   const axiosInstance = useAxiosInterceptor();
+
   const {
     register,
     reset,
@@ -74,17 +75,19 @@ function CustomerInformation() {
       );
       return response.data;
     },
-    onSuccess: ({ message }) => {
+    onSuccess: ({ message, invoice_id }) => {
       toast.success(message);
       queryClient.invalidateQueries({ queryKey: ["products", "pos_page"] });
+      setInvoiceId(invoice_id);
       reset();
+      setCurrentPage("rate_us");
     },
     onError: (err: AxiosError<{ message: string }>) => {
       toast.error(err.response?.data.message);
     },
   });
   return (
-    <div className="w-full h-full basis-[40%] border border-zinc-200 p-2 flex flex-col shrink-0 rounded-sm">
+    <div className="w-full h-full basis-[40%] border border-zinc-200 p-2 flex flex-col shrink-0 rounded-sm relative">
       <form
         onSubmit={handleSubmit((data) => {
           console.log(grand_total);

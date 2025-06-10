@@ -5,7 +5,7 @@ import useAxiosInterceptor from "../../../../../hooks/useAxiosInterceptor";
 import { useInView } from "react-intersection-observer";
 
 import { dateFormat } from "../../../../../helper/dateFormat";
-import { IoClipboard, IoFilter, IoStar, IoSwapVertical } from "react-icons/io5";
+import { IoClipboard, IoStar, IoSwapVertical } from "react-icons/io5";
 import { LuList } from "react-icons/lu";
 
 import SelectBox from "../../../components/SelectBox";
@@ -125,7 +125,7 @@ function ReceiptList({ debouncedSearchResult }: InventoryListProps) {
                       : `Unamed Cashier`}
                   </td>
                   <td className="flex items-center justify-center">
-                    {receipt.ratings !== null ? (
+                    {receipt.ratings ? (
                       <div className="flex items-center gap-0.5">
                         {Array.from({ length: 5 })
                           .fill(0)
@@ -133,7 +133,7 @@ function ReceiptList({ debouncedSearchResult }: InventoryListProps) {
                             <span
                               key={i}
                               className={`${
-                                Number(receipt.ratings) > i
+                                Number(receipt.ratings?.rating) > i
                                   ? "text-yellow-400"
                                   : "text-secondary/70"
                               }`}

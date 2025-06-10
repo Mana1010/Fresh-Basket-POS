@@ -13,8 +13,9 @@ type State = {
   accountDetails: FullUserType | null;
   categoryToRemove: string | null;
   inventoryDetails: FullInventoryDetails | null;
-  currentPage: "pos_page" | "proceed_to_payment";
+  currentPage: "pos_page" | "proceed_to_payment" | "rate_us";
   reasonType: "";
+  invoiceId: number | null;
 };
 
 type Action = {
@@ -22,7 +23,7 @@ type Action = {
   toggleCategoryForm: (bool: boolean) => void;
   toggleProductDetails: () => void;
   closeProductDetails: () => void;
-  setCurrentPage: (page: "pos_page" | "proceed_to_payment") => void;
+  setCurrentPage: (page: "pos_page" | "proceed_to_payment" | "rate_us") => void;
   setProductDetails: (data: FullProductDetailsType | null) => void;
   toggleAccountDetails: () => void;
   closeAccountDetails: () => void;
@@ -31,6 +32,7 @@ type Action = {
   setAccountDetails: (data: FullUserType | null) => void;
   setInventoryDetails: (data: FullInventoryDetails | null) => void;
   setCategoryToRemove: (category: string | null) => void;
+  setInvoiceId: (invoice_id: null | number) => void;
 };
 const store: (
   set: StoreApi<State & Action>["setState"],
@@ -41,11 +43,12 @@ const store: (
   isOpenProductDetails: false,
   isOpenAccountDetails: false,
   isOpenInventoryDetails: false,
-  categoryToRemove: null, //Not modal
+  categoryToRemove: null,
+  invoiceId: null,
   productDetails: null,
   accountDetails: null,
   inventoryDetails: null,
-  currentPage: "pos_page",
+  currentPage: "rate_us",
   reasonType: "",
   toggleSidebar: () => set({ isOpenSidebar: !get().isOpenSidebar }),
   toggleCategoryForm: (bool: boolean) => set({ isOpenAddCategoryForm: bool }),
@@ -64,10 +67,11 @@ const store: (
   closeInventoryDetails: () => set({ isOpenInventoryDetails: false }),
   setInventoryDetails: (data: FullInventoryDetails | null) =>
     set({ inventoryDetails: data }),
-  setCurrentPage: (page: "pos_page" | "proceed_to_payment") =>
+  setCurrentPage: (page: "pos_page" | "proceed_to_payment" | "rate_us") =>
     set({ currentPage: page }),
   setCategoryToRemove: (category: string | null) =>
     set({ categoryToRemove: category }),
+  setInvoiceId: (invoice_id: null | number) => set({ invoiceId: invoice_id }),
 });
 
 export const useModalStore = create<State & Action>(store);

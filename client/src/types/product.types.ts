@@ -10,6 +10,7 @@ export type FullProductDetailsType = Omit<
   "stock" | "price"
 > & {
   inventories_sum_stock: string | null; //the total stock
+  total_price: string;
   id: number;
   price: number;
   created_at: Date;

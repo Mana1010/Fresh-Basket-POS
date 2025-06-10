@@ -3,14 +3,15 @@ import useAxiosInterceptor from "../../../../../../hooks/useAxiosInterceptor";
 import { INVENTORY_URL } from "../../../../../../api/request-api";
 import { formatToFormalNumber } from "../../../../../../utils/format-to-money";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { IoClipboardOutline } from "react-icons/io5";
-function TotalInventory() {
+import { IoCaretUpOutline } from "react-icons/io5";
+
+function CumulativeStockInQuantity() {
   const axiosInstance = useAxiosInterceptor();
-  const totalInventories = useSuspenseQuery({
-    queryKey: ["inventory-stat", "total_inventories"],
+  const cumulativeStockInQuantity = useSuspenseQuery({
+    queryKey: ["inventory-stat", "cumulative_stock_in_quantity"],
     queryFn: async () => {
       const response = await axiosInstance.get(
-        `${INVENTORY_URL}/stats?type=total_inventories`
+        `${INVENTORY_URL}/stats?type=cumulative_stock_in_quantity`
       );
       return response.data;
     },
@@ -18,11 +19,11 @@ function TotalInventory() {
   });
   return (
     <RecordBox
-      label="Total Inventories"
-      value={formatToFormalNumber(totalInventories.data?.stat)}
-      Icon={IoClipboardOutline}
+      label="Cumulative Stock-In Quantity"
+      value={formatToFormalNumber(cumulativeStockInQuantity.data?.stat)}
+      Icon={IoCaretUpOutline}
     />
   );
 }
 
-export default TotalInventory;
+export default CumulativeStockInQuantity;

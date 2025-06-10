@@ -5,7 +5,6 @@ import { AxiosError } from "axios";
 import { PRODUCT_URL } from "../../../api/request-api";
 import useAxiosInterceptor from "../../../hooks/useAxiosInterceptor";
 import type { FullProductDetailsType } from "../../../types/product.types";
-
 import OrderTotalRecords from "./components/pos-page/pos-stats/OrderTotalRecords";
 import Spinner from "../../../components/Spinner";
 import OrderList from "./components/pos-page/OrderList";
@@ -17,6 +16,7 @@ import FirstPage from "./components/pos-page/FirstPage";
 import SecondPage from "./components/pos-page/SecondPage";
 import { useModalStore } from "../../../store/modal.store";
 import Title from "../../../components/Title";
+import Rating from "./components/pos-page/Rating";
 
 const LazyOrderCategories = lazy(
   () => import("./components/pos-page/pos-stats/OrderCategories")
@@ -97,7 +97,13 @@ function Pos() {
         </div>
         <OrderList />
       </div>
-      {currentPage === "pos_page" ? <FirstPage /> : <SecondPage />}
+      {currentPage === "pos_page" ? (
+        <FirstPage />
+      ) : currentPage === "proceed_to_payment" ? (
+        <SecondPage />
+      ) : (
+        <Rating />
+      )}
     </div>
   );
 }

@@ -60,13 +60,6 @@ export const navigationList = [
     icon: IoPeopleCircle,
   },
   {
-    name: "My Performance",
-    roles: ["cashier"],
-    link: "/reports",
-    path: ["reports"],
-    icon: IoAnalytics,
-  },
-  {
     name: "Cashier Metrics",
     roles: ["manager", "admin"],
     link: "/cashier-metrics",

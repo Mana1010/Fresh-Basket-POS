@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { ErrorBoundary } from "react-error-boundary";
 import { MdOutlineManageSearch } from "react-icons/md";
 import useSearchDebounce from "../../../hooks/useSearchDebounce";
@@ -8,7 +7,6 @@ import TableLoading from "./components/loading/TableLoading";
 import ReceiptList from "./components/receipts-page/ReceiptList";
 
 function ReceiptHistory() {
-  const navigate = useNavigate();
   const [searchInventory, setSearchInventory] = useState("");
   const debounceSearchResult = useSearchDebounce(searchInventory);
   return (

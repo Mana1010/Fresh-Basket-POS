@@ -3,8 +3,8 @@ import useAxiosInterceptor from "../../../../../../hooks/useAxiosInterceptor";
 import { INVENTORY_URL } from "../../../../../../api/request-api";
 import { formatToFormalNumber } from "../../../../../../utils/format-to-money";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { IoClipboardOutline } from "react-icons/io5";
-function TotalInventory() {
+import { IoCaretDownOutline } from "react-icons/io5";
+function TotalStockInProducts() {
   const axiosInstance = useAxiosInterceptor();
   const totalInventories = useSuspenseQuery({
     queryKey: ["inventory-stat", "total_inventories"],
@@ -18,11 +18,11 @@ function TotalInventory() {
   });
   return (
     <RecordBox
-      label="Total Inventories"
+      label="Total "
       value={formatToFormalNumber(totalInventories.data?.stat)}
-      Icon={IoClipboardOutline}
+      Icon={IoCaretDownOutline}
     />
   );
 }
 
-export default TotalInventory;
+export default TotalStockInProducts;

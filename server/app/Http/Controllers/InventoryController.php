@@ -85,4 +85,19 @@ public function all_inventories(Request $request) {
         return response()->json(['message' => 'Successfully updated the inventory'], 201);
     }
 
+    public function inventory_stats (Request $request) {
+        $type = $request->query('type');
+           $stat = 0;
+        if($type === "total_inventories") {
+            $stat = Inventory::count();
+        }
+        else if ($type === "cumulative_stock_out_quantity") {
+            $stat = Inventory::where('type', 'out')->selectRaw('SUM(ABS(stock)) as total')->value('total');
+        }
+        else if ($type === "cumulative_stock_in_quantity") {
+             $stat = Inventory::where('type', 'in')->selectRaw('SUM(ABS(stock)) as total')->value('total');
+        }
+    return response()->json(['stat' => $stat], 200);
+    }
+
 }

@@ -28,6 +28,9 @@ function ProductList({
 }: ProductListProps) {
   const [openFilterProduct, setOpenFilterProduct] = useState(false);
   const [openFilterPrice, setOpenFilterPrice] = useState(false);
+  const [filterPrice, setFilterPrice] = useState<"total_price" | "base_price">(
+    "total_price"
+  );
   const { toggleProductDetails, setProductDetails } = useModalStore();
   const { ref, inView } = useInView();
   const axiosInterceptor = useAxiosInterceptor();
@@ -38,11 +41,12 @@ function ProductList({
         "products",
         "products_page",
         sortProduct,
+        filterPrice,
         debouncedSearchedProduct,
       ],
       queryFn: async ({ pageParam = 1 }) => {
         const response = await axiosInterceptor.get(
-          `${PRODUCT_URL}/list?limit=10&page=${pageParam}&search=${debouncedSearchedProduct}&type=products_page&sort=${sortProduct}`
+          `${PRODUCT_URL}/list?limit=10&page=${pageParam}&search=${debouncedSearchedProduct}&type=products_page&sort=${sortProduct}&filterPrice=${filterPrice}`
         );
         return response.data.data;
       },
@@ -72,6 +76,13 @@ function ProductList({
     setSortProduct(value as "asc" | "desc" | "");
     setOpenFilterProduct(false);
   }
+
+  function handleFilterPrice(value: string) {
+    setFilterPrice(value as "total_price" | "base_price");
+    setOpenFilterPrice(false);
+  }
+
+  console.log(allProducts);
   return (
     <div className="flex-grow w-auto lg:w-full h-auto lg:h-1 overflow-x-auto">
       <div className="w-full h-full overflow-y-auto thin-scrollbar pr-1 flex flex-col">
@@ -126,11 +137,11 @@ function ProductList({
                   <AnimatePresence mode="wait">
                     {openFilterPrice && (
                       <SelectBox
-                        handleAction={() => {}}
+                        handleAction={handleFilterPrice}
                         setOpenFilterProduct={setOpenFilterPrice}
-                        values={["asc", "desc"]}
-                        options={["Price (With Tax)", "Price (Without Tax)"]}
-                        currentValue={"asc"}
+                        values={["total_price", "base_price"]}
+                        options={["Price (Total Price)", "Price (Base Price)"]}
+                        currentValue={filterPrice}
                         className="top-[85%] right-[-55px] absolute origin-top-left"
                       />
                     )}
@@ -169,7 +180,7 @@ function ProductList({
                 </td>
                 <td>
                   <span className="px-3 py-0.5 bg-green-300/35 border border-green-400 rounded-3xl">
-                    {formatToPhpMoney(String(product.price ?? 0))}
+                    {formatToPhpMoney(product.total_price ?? 0)}
                   </span>
                 </td>
                 <td>{product.tax_rate}</td>

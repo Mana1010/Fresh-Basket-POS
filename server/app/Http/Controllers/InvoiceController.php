@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use App\Models\Inventory;
 use App\Models\Invoice;
+use App\Models\InvoiceRating;
 use App\Models\Order;
 use App\Models\Product;
 use Exception;
+use Google\Service\Datastream\Validation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -24,11 +26,10 @@ public function receipt_list(Request $request)
     $receipts = Invoice::with([
             'customer:id,name',
             'cashier:id,employer_name',
-            'ratings:id,rating',
+            'ratings',
         ])
         ->withSum('orders', 'total_price')
       ->leftJoin('customers', 'invoices.customer_id', '=', 'customers.id')
-      ->leftJoin('users', 'invoices.user_id', '=', 'users.id')
         ->when($search, function  ($query) use ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('invoice_code', 'like', "%{$search}%")
@@ -50,7 +51,6 @@ public function receipt_list(Request $request)
       $receipts->orderBy('created_at', 'desc');
         }
        $data = $receipts->simplePaginate($limit);
-
     return response()->json(['data' => $data], 200);
 }
     public function print_receipt(Request $request) {
@@ -65,8 +65,8 @@ try {
     $customer_id = $customer?->id;
 
     $orders = $request->input('orders');
-
-    DB::transaction(function () use ($orders, $validated, &$customer, &$customer_id) {
+    $invoice_id = null; //initial
+    DB::transaction(function () use ($orders, $validated, &$customer, &$customer_id, &$invoice_id) {
         $products = Product::withSum('inventories', 'stock')->get()->keyBy('id');
 
         // Pre-check all stocks
@@ -109,7 +109,7 @@ try {
             'customer_paid' => $validated['customer_paid'],
             'total_amount' => 0, // temporary, update after loop
         ]);
-
+        $invoice_id = $invoice->id;
         $totalAmount = 0;
 
         foreach ($orders as $order) {
@@ -140,12 +140,30 @@ try {
         }
 
         // Update the invoice with the real total
-        $invoice->update(['total_amount' => round($totalAmount, 2)]);
+       $invoice->update(['total_amount' => round($totalAmount, 2)]);
     });
 
-    return response()->json(['message' => 'Order processed successfully']);
+    return response()->json(['message' => 'Order processed successfully', 'invoice_id' => $invoice_id]);
 } catch (\Throwable $e) {
     return response()->json(['message' => $e->getMessage()], 422);
 }
+}
+public function rate(Request $request) {
+    $validated = $request->validate([
+        'rating' => ['numeric', 'required', 'min:0', 'max:5'],
+        'invoice_id' => ['required', 'numeric', 'exists:invoices,id'],
+    ]);
+try {
+
+    InvoiceRating::create([
+        'rating' => $validated['rating'],
+        'invoice_id' => $validated['invoice_id'],
+    ]);
+    return response()->json(['Thank you for your feedback⭐'], 201);
+}
+catch(Validation $err ) {
+    return response()->json(['message' => $err->getMessage()], 422);
+}
+
 }
 };

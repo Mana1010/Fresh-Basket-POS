@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { lazy, Suspense, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { ErrorBoundary } from "react-error-boundary";
@@ -9,7 +9,45 @@ import Title from "../../../components/Title";
 import InventoryList from "./components/inventory-page/InventoryList";
 import type { ReasonType } from "../../../types/inventory.types";
 import TableLoading from "./components/loading/TableLoading";
+import RecordBox from "../components/RecordBox";
+import type { IconType } from "react-icons/lib";
+import {
+  IoCaretDownOutline,
+  IoCaretUpOutline,
+  IoClipboardOutline,
+} from "react-icons/io5";
+const LazyTotalInventory = lazy(
+  () => import("./components/inventory-page/inventory-stat/TotalInventory")
+);
 
+const LazyCumulativeStockOutQuantity = lazy(
+  () =>
+    import(
+      "./components/inventory-page/inventory-stat/CumulativeStockOutQuantity"
+    )
+);
+const LazyCumulativeStockInQuantity = lazy(
+  () =>
+    import(
+      "./components/inventory-page/inventory-stat/CumulativeStockInQuantity"
+    )
+);
+type InventoryStatProps = {
+  children: ReactNode;
+  label: string;
+  value: string;
+  Icon: IconType;
+  className?: string;
+};
+function InventoryStat({ children, ...props }: InventoryStatProps) {
+  return (
+    <Suspense fallback={<RecordBox {...props} isLoading={true} />}>
+      <ErrorBoundary fallback={<RecordBox {...props} isLoading={true} />}>
+        {children}
+      </ErrorBoundary>
+    </Suspense>
+  );
+}
 function Inventory() {
   const navigate = useNavigate();
   const [searchInventory, setSearchInventory] = useState("");
@@ -19,24 +57,27 @@ function Inventory() {
     <div className="flex flex-col gap-2 w-full h-auto lg:h-full">
       <Title title="Inventory" />
       <div className="grid gap-1.5 grid-cols-4 p-2 border border-zinc-200 rounded-sm">
-        {/* <ProductStat
-          label="Total Number of Products"
-          value="25"
-          Icon={AiOutlineProduct}
+        <InventoryStat
+          label="Total Number of Inventories"
+          value=""
+          Icon={IoClipboardOutline}
         >
-          <LazyTotalProduct />
-        </ProductStat>
-        <ProductStat
-          label="Total Amount of Products"
-          value="₱ 25.00"
-          Icon={PiMoneyLight}
-          className="col-span-2"
+          <LazyTotalInventory />
+        </InventoryStat>
+        <InventoryStat
+          label="Cumulative Stock-Out Quantity"
+          value=""
+          Icon={IoCaretDownOutline}
         >
-          <LazyTotalAmountProduct />
-        </ProductStat>
-        <ProductStat label="Total Categories" value="5" Icon={LuShapes}>
-          <LazyTotalProductCategories />
-        </ProductStat> */}
+          <LazyCumulativeStockOutQuantity />
+        </InventoryStat>
+        <InventoryStat
+          label="Cumulative Stock-In Quantity"
+          value=""
+          Icon={IoCaretUpOutline}
+        >
+          <LazyCumulativeStockInQuantity />
+        </InventoryStat>
       </div>
       <div className="w-full flex-grow gap-2 flex flex-col">
         <div className="flex space-x-1.5 items-center w-full">

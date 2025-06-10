@@ -22,6 +22,7 @@ class ProductController extends Controller
           $search = $request->query('search');
           $type = $request->query('type');
           $sort = $request->query('sort');
+          $filterPrice = $request->query('filterPrice');
         // $sort = $request->query('sort');
         // $filter = $request->query('filter');
 
@@ -34,16 +35,35 @@ class ProductController extends Controller
        return response()->json(['data' => $products], 200);
     }
 $products = Product::with('category')
-    ->where('product_name', 'like', "%$search%")
-    ->orWhere('sku', 'like', "%$search%")
-    ->orWhere('manufacturer', 'like', "%$search%")
-    ->orWhere('barcode', 'like', "%$search%")
-    ->withSum('inventories', 'stock');
+->when($search, function ($query) use ($search) {
+        $query->where(function ($q) use ($search) {
+            $q->where('product_name', 'like', "%{$search}%")
+              ->orWhere('sku', 'like', "%{$search}%")
+              ->orWhere('manufacturer', 'like', "%{$search}%")
+              ->orWhere('barcode', 'like', "%{$search}%");
+        });
+    });
+
 
 if ($sort === "asc" || $sort === "desc") {
     $products->orderBy('price', $sort);
 } else {
     $products->orderBy('created_at', 'desc');
+}
+
+if($filterPrice === "total_price") {
+   $products
+        ->leftJoin('inventories', 'products.id', '=', 'inventories.product_id')
+        ->select('products.*')
+        ->selectRaw('COALESCE(SUM(inventories.stock), 0) as inventories_sum_stock')
+        ->selectRaw('products.price * (1 - COALESCE(products.discount_rate, 0) / 100) * (1 + COALESCE(products.tax_rate, 0) / 100) as total_price')
+        ->groupBy('products.id');
+}
+else {
+     $products->select([
+        'products.*',
+        'products.price as total_price'  // Alias here too for consistency
+    ])->withSum('inventories', 'stock');
 }
 
 $data = $products->simplePaginate(10);
