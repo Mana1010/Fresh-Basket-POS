@@ -21,3 +21,15 @@ export type ReceiptType = {
     rating: number;
   } | null;
 };
+
+export type ReceiptMail = {
+  invoice_code: string;
+  createdAt: Date;
+  cashier: string;
+  subtotal: string;
+  customer_paid: string;
+  customer_name: string;
+  customer_email: string;
+  total_amount: string;
+  amount_change: string;
+};

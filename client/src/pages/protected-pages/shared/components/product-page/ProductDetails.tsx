@@ -1,4 +1,3 @@
-import apple from "../../../../../assets/Frame 1.png";
 import { useNavigate } from "react-router-dom";
 import {
   IoBarcode,

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { IoStar } from "react-icons/io5";
 import Button from "../../../../../components/Button";
 import { useMutation } from "@tanstack/react-query";
 import useAxiosInterceptor from "../../../../../hooks/useAxiosInterceptor";
@@ -10,7 +9,8 @@ import { useModalStore } from "../../../../../store/modal.store";
 import starRating from "../../../../../assets/star-rating.png";
 import { GiRoundStar } from "react-icons/gi";
 function Rating() {
-  const { setCurrentPage, invoiceId } = useModalStore();
+  const { setCurrentPage, invoiceId, setInvoiceId } = useModalStore();
+
   const axiosInstance = useAxiosInterceptor();
   const [rating, setRating] = useState(0);
   const rateMe = useMutation({
@@ -21,9 +21,10 @@ function Rating() {
       });
       return response.data;
     },
-    onSuccess: ({ message, invoice_id }) => {
-      console.log(invoice_id);
-      toast.success(message);
+    onSuccess: () => {
+      toast.success("Thank you for your rating!");
+      setCurrentPage("pos_page");
+      setInvoiceId(null);
     },
     onError: (err: AxiosError<{ message: string }>) => {
       toast.error(err.response?.data.message);

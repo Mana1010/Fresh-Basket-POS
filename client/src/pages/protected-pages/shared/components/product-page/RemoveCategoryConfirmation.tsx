@@ -24,6 +24,7 @@ function RemoveCategoryConfirmation() {
       toast.success(message);
       queryClient.invalidateQueries({ queryKey: ["product-details"] });
       queryClient.invalidateQueries({ queryKey: ["all-product-categories"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
       setCategoryToRemove("");
       setConfirmation("");
     },

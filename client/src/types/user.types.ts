@@ -18,3 +18,9 @@ export type BasicUserType = {
   profile_picture: string | null;
   employer_name: string;
 } & Pick<UserType, "role">;
+
+export type CashierMetricsType = {
+  total_quantity: string;
+  total_ratings: string;
+  total_sales: string;
+} & FullUserType;

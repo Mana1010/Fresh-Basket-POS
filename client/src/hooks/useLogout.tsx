@@ -4,8 +4,9 @@ import { AUTH_URL } from "../api/request-api";
 import { toast } from "sonner";
 import { useAuthStore } from "../store/auth.store";
 import { useNavigate } from "react-router-dom";
-
+import { useQueryClient } from "@tanstack/react-query";
 function useLogout() {
+  const queryClient = useQueryClient();
   const axiosInterceptor = useAxiosInterceptor();
   const { setUser } = useAuthStore();
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ function useLogout() {
       navigate("/");
     },
     onError: ({ message }) => {
+      queryClient.resetQueries({ queryKey: ["user-data"] });
       console.log(message);
       toast.success("Something went wrong, please try again");
     },

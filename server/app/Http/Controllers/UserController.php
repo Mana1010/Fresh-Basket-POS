@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class UserController extends Controller
@@ -162,5 +163,23 @@ $validated['password_confirmation'] = $validated['password_confirmation'] ?? '';
         $account->status = $validated['status'];
         $account->save();
         return response()->json(['message' => 'Account status updated successfully', 'status' => $account->status], 201);
+    }
+
+    public function cashier_metrics(Request $request) {
+        $limit = $request->query('limit');
+       $users = DB::table('users')
+        ->select([
+            'users.*',
+            DB::raw('COALESCE(SUM(orders.total_price), 0) as total_sales'),
+            DB::raw('COALESCE(SUM(orders.quantity), 0) as total_quantity'),
+            DB::raw('COALESCE(SUM(invoice_ratings.rating), 0) as total_ratings')
+        ])
+        ->leftJoin('invoices', 'users.id', '=', 'invoices.user_id')
+        ->leftJoin('orders', 'invoices.id', '=', 'orders.invoice_id')
+        ->leftJoin('invoice_ratings', 'invoices.id', '=', 'invoice_ratings.invoice_id')
+        ->where('users.role', 'cashier')
+        ->groupBy('users.id')
+        ->simplePaginate($limit ?? 10);
+    return response()->json(['data' => $users], 200);
     }
 }

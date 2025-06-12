@@ -9,9 +9,9 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 
-Route::post('/auth/login', [AuthController::class, 'login'])->middleware(['throttle:10,1']);
+Route::post('/auth/login', [AuthController::class, 'login'])->middleware(['throttle:5,1']);
  Route::get('/auth/check-auth', [AuthController::class, 'check_auth']);
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum','throttle:60,1'])->group(function () {
     Route::prefix('auth')->controller(AuthController::class)->group(function () {
         Route::get('/user', 'user');
         // Route::get('/check-auth', 'check_auth');
@@ -19,6 +19,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
         Route::prefix('user')->controller(UserController::class)->group(function () {
         Route::get('/user-information', 'user_information');
+        Route::get('/cashier-metrics', 'cashier_metrics');
     });
 
        Route::prefix('account')->controller(UserController::class)->group(function () {
@@ -28,8 +29,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/create-account', 'add_account');
          Route::patch('/edit-account/{account_id}', 'edit_account');
             Route::patch('toggle-status-account/{account_id}', 'toggle_status_account');
-
     });
+
       Route::prefix('product')->controller(ProductController::class)->group(function () {
         Route::get('/list', 'all_products');
         Route::get('/all-categories', 'all_categories');
@@ -58,7 +59,9 @@ Route::middleware('auth:sanctum')->group(function () {
     });
            Route::prefix('report')->controller(ReportController::class)->group(function () {
             Route::get('/total-sales', 'total_sales');
+              Route::get('/total-product-sold', 'total_product_sold');
+              Route::get('/best-seller-product', 'best_seller_product');
+               Route::get('/least-seller-product', 'least_seller_product');
+               Route::get('/highest-rating-cashier', 'highest_rating_cashier');
     });
 });
-
-

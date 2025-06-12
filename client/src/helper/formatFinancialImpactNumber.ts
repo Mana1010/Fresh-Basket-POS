@@ -4,7 +4,7 @@ export function formatFinancialImpactNumber(value: string, reason: ReasonType) {
   const isNegative = value.startsWith("-");
   const parsedValue = parseFloat(value).toFixed(2);
 
-  return isNegative && reason === "customer_sale"
+  return reason === "customer_sale"
     ? `+${formatToPhpMoney(parsedValue.toString().slice(1))}`
     : isNegative
     ? `-${formatToPhpMoney(parsedValue.toString().slice(1))}`

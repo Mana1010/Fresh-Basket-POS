@@ -47,7 +47,6 @@ function Products() {
   const navigate = useNavigate();
   const [searchProduct, setSearchProduct] = useState("");
   const [sortProduct, setSortProduct] = useState<"asc" | "desc" | "">("");
-  const [filterProductPrice, setFilterProductPrice] = useState("");
   const debouncedSearchedProduct = useSearchDebounce(searchProduct);
   return (
     <div className="flex flex-col gap-2 w-full h-auto lg:h-full">

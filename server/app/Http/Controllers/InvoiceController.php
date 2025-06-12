@@ -8,6 +8,7 @@ use App\Models\Invoice;
 use App\Models\InvoiceRating;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\User;
 use Exception;
 use Google\Service\Datastream\Validation;
 use Illuminate\Http\Request;
@@ -63,10 +64,13 @@ public function receipt_list(Request $request)
 try {
     $customer = Customer::where('email', $validated['customer_email'])->first();
     $customer_id = $customer?->id;
-
     $orders = $request->input('orders');
     $invoice_id = null; //initial
-    DB::transaction(function () use ($orders, $validated, &$customer, &$customer_id, &$invoice_id) {
+    $invoice_code = null;
+    $subtotal = 0;
+    $totalPayableAmount = 0;
+
+    DB::transaction(function () use ($orders, $validated, &$customer, &$customer_id, &$invoice_id, &$invoice_code, &$subtotal, &$total_amount, &$totalPayableAmount) {
         $products = Product::withSum('inventories', 'stock')->get()->keyBy('id');
 
         // Pre-check all stocks
@@ -90,6 +94,7 @@ try {
                 'email' => $validated['customer_email'],
                 'name' => $validated['customer_name'],
             ]);
+
             $customer_id = $customer->id;
             $customer = $customer->name;
         } else {
@@ -109,6 +114,7 @@ try {
             'customer_paid' => $validated['customer_paid'],
             'total_amount' => 0, // temporary, update after loop
         ]);
+        $invoice_code = $invoice->invoice_code;
         $invoice_id = $invoice->id;
         $totalAmount = 0;
 
@@ -117,11 +123,12 @@ try {
             $tax_rate = $order['tax_rate'] / 100;
             $discount_rate = $order['discount_rate'] / 100;
             $stockPerProduct = $order['inventories_sum_stock'];
-            $subtotal = $order['price'] * $stockPerProduct;
-            $total_price = ($subtotal * (1 - $discount_rate)) * (1 + $tax_rate);
+            $subtotalPerProduct = $order['price'] * $stockPerProduct;
+            $total_price = ($subtotalPerProduct * (1 - $discount_rate)) * (1 + $tax_rate);
 
+            $subtotal += $subtotalPerProduct;
             $totalAmount += $total_price;
-
+            $totalPayableAmount += $total_price;
             Order::create([
                 'customer_id' => $customer_id,
                 'product_id' => $product_id,
@@ -143,8 +150,17 @@ try {
         // Update the invoice with the real total
        $invoice->update(['total_amount' => round($totalAmount, 2)]);
     });
-
-    return response()->json(['message' => 'Order processed successfully', 'invoice_id' => $invoice_id]);
+$cashier_name = User::findOrFail($validated['cashier_id']);
+    return response()->json(['message' => 'Order processed successfully', 'invoice_id' => $invoice_id, 'data' => [
+        'invoice_code' => $invoice_code,
+        'customer_name' => $customer->name,
+        'customer_email' => $validated['customer_email'],
+        'cashier' => $cashier_name->employer_name,
+        'subtotal' => $subtotal,
+        'total_amount' => $totalPayableAmount,
+        'customer_paid' => $validated['customer_paid'],
+        'amount_change' => $validated['customer_paid'] - $total_amount,
+    ]]);
 } catch (\Throwable $e) {
     return response()->json(['message' => $e->getMessage()], 422);
 }

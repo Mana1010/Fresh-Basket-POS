@@ -8,7 +8,7 @@ import useLogout from "../../../hooks/useLogout";
 import { IoLogOut } from "react-icons/io5";
 import SidebarLoading from "./loading/SidebarLoading";
 function Sidebar() {
-  const { logout } = useLogout();
+  const { logout, isLogoutLoading } = useLogout();
   const navigate = useNavigate();
   const role = useAuthStore((user) => user.user?.role);
 
@@ -57,6 +57,7 @@ function Sidebar() {
         </div>
       </div>{" "}
       <button
+        disabled={isLogoutLoading}
         onClick={() => logout()}
         className="text-2xl cursor-pointer text-secondary"
       >

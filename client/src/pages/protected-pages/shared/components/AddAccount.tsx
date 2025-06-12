@@ -184,7 +184,7 @@ function AddAccount() {
                   name="employer_name"
                   label="Employee Name"
                   type="text"
-                  placeholder="Enter Product Name"
+                  placeholder="Enter Employee Name"
                   errorMessage={errors.employer_name?.message}
                   isRequired
                 />

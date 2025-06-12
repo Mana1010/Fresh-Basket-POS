@@ -20,8 +20,12 @@ import type { AxiosError } from "axios";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import Button from "../../../../../components/Button";
+import axios from "axios";
+import type { ReceiptMail } from "../../../../../types/invoice.types";
+import { dateFormat } from "../../../../../helper/dateFormat";
 function CustomerInformation() {
-  const { orderProducts } = useProductStore();
+  const { orderProducts, clearOrderProducts, productsMap, setLastScannedItem } =
+    useProductStore();
   const { setCurrentPage, setInvoiceId } = useModalStore();
   const { user } = useAuthStore();
   const queryClient = useQueryClient();
@@ -41,6 +45,63 @@ function CustomerInformation() {
       customer_paid: "0",
     },
     resolver: zodResolver(customerInfoValidation),
+  });
+
+  const total_discount = orderProducts.reduce(
+    (acc, { price, discount_rate = 0, inventories_sum_stock }) => {
+      const discount = Number(discount_rate) / 100;
+      const subtotal = Number(price) * Number(inventories_sum_stock); /// total price before discount
+      const total = subtotal * discount;
+      return acc + total;
+    },
+    0
+  );
+  const total_tax = orderProducts.reduce(
+    (acc, { price, tax_rate = 0, inventories_sum_stock }) => {
+      const tax = Number(tax_rate) / 100;
+      const subtotal = Number(price) * Number(inventories_sum_stock); // total price before tax
+      const total = subtotal * tax;
+
+      return acc + total;
+    },
+    0
+  );
+  const sendReceipt = useMutation({
+    mutationFn: async (data: ReceiptMail) => {
+      try {
+        const response = await axios.post(
+          "https://hook.us2.make.com/ujb861ge9xcmyc7az3xp17vc5mouwwit",
+          {
+            cashier: data.cashier,
+            receipt_id: data.invoice_code,
+            customer_name: data.customer_name ?? "Unknown Name",
+            customer_email: data.customer_email,
+            subtotal: formatToPhpMoney(data.subtotal),
+            total_amount: formatToPhpMoney(data.total_amount),
+            customer_paid: formatToPhpMoney(data.customer_paid),
+            total_discount: formatToPhpMoney(String(total_discount)),
+            total_tax: formatToPhpMoney(String(total_tax)),
+            created_at: dateFormat(new Date()),
+            brand_logo:
+              "https://res.cloudinary.com/dskxv2dic/image/upload/v1749603966/icon/brand-logo_nwqvnm.png",
+            customer_change: formatToPhpMoney(data.amount_change),
+          }
+        );
+        console.log(response);
+        return response.data; // Return data instead of statusText
+      } catch (error) {
+        console.error("Error sending receipt:", error);
+        throw error; // Re-throw to trigger onError
+      }
+    },
+    onSuccess: (data) => {
+      toast.success("Successfully sent the receipt");
+      reset();
+    },
+    onError: (error) => {
+      console.error("Mutation failed:", error);
+      toast.error("Failed to send receipt");
+    },
   });
   const grand_total = useMemo(() => {
     return orderProducts.reduce(
@@ -75,11 +136,14 @@ function CustomerInformation() {
       );
       return response.data;
     },
-    onSuccess: ({ message, invoice_id }) => {
+    onSuccess: ({ message, invoice_id, data }) => {
       toast.success(message);
+      setLastScannedItem(null);
       queryClient.invalidateQueries({ queryKey: ["products", "pos_page"] });
       setInvoiceId(invoice_id);
-      reset();
+      clearOrderProducts();
+      productsMap.clear();
+      sendReceipt.mutate(data);
       setCurrentPage("rate_us");
     },
     onError: (err: AxiosError<{ message: string }>) => {

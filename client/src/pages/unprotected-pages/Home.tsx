@@ -11,12 +11,14 @@ import { useNavigate } from "react-router-dom";
 import useLogout from "../../hooks/useLogout";
 import useAxiosInterceptor from "../../hooks/useAxiosInterceptor";
 import Button from "../../components/Button";
-
+import { useAuthStore } from "../../store/auth.store";
+import brandLogo from "../../assets/brand-logo.png";
 function Home() {
   const navigate = useNavigate();
   const { logout, isLogoutLoading } = useLogout();
   const axiosInstance = useAxiosInterceptor();
   const [roleIndex, setRoleIndex] = useState(0);
+  const { user } = useAuthStore();
   const roles = ["Admin", "Manager", "Cashier"];
   const sessionToken = localStorage.getItem("session_token");
   const checkAuth: UseQueryResult<{ message: string }, AxiosError> = useQuery({
@@ -72,8 +74,10 @@ function Home() {
                 You are aleady authenticated.
               </h1>
               <button
-                onClick={() => navigate(-1)}
-                className="w-1/2 py-2 text-[0.8rem] bg-primary rounded-sm text-white"
+                onClick={() =>
+                  navigate(user?.role === "cashier" ? "/pos" : "/reports")
+                }
+                className="w-1/2 py-2 text-[0.8rem] bg-primary rounded-sm text-white cursor-pointer"
               >
                 Continue
               </button>
@@ -92,7 +96,9 @@ function Home() {
             </div>
           )}
         </div>
-        <div className="rounded-md h-full bg-primary hidden md:flex pt-2"></div>
+        <div className="rounded-md h-full hidden md:flex pt-2 w-full items-center justify-center">
+          <img src={brandLogo} width={400} height={400} />
+        </div>
       </div>
     </div>
   );

@@ -9,7 +9,6 @@ import {
 } from "../../../validation/product.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import AddCategoryForm from "./components/product-page/AddCategoryForm";
-import PreviewProductThumbnail from "./components/product-page/PreviewProductThumbnail";
 import { useModalStore } from "../../../store/modal.store";
 import { AnimatePresence } from "framer-motion";
 import useAxiosInterceptor from "../../../hooks/useAxiosInterceptor";
@@ -120,22 +119,22 @@ function AddProduct() {
     },
   });
 
-  function handleUploadProductThumbnail(e: ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    const reader = new FileReader();
-    if (!file) return "No File attach";
-    reader.onload = (e) => {
-      if (e.target?.result && typeof e.target.result === "string") {
-        setPreviewProductThumbnail(e.target?.result);
-        uploadProductThumbnail.mutate(file);
-      }
-    };
-    reader.onerror = () => {
-      toast.error("Something went wrong while uploading the file");
-    };
+  // function handleUploadProductThumbnail(e: ChangeEvent<HTMLInputElement>) {
+  //   const file = e.target.files?.[0];
+  //   const reader = new FileReader();
+  //   if (!file) return "No File attach";
+  //   reader.onload = (e) => {
+  //     if (e.target?.result && typeof e.target.result === "string") {
+  //       setPreviewProductThumbnail(e.target?.result);
+  //       uploadProductThumbnail.mutate(file);
+  //     }
+  //   };
+  //   reader.onerror = () => {
+  //     toast.error("Something went wrong while uploading the file");
+  //   };
 
-    reader.readAsDataURL(file);
-  }
+  //   reader.readAsDataURL(file);
+  // }
 
   return (
     <div className="pt-3 bg-white/20 rounded-sm border border-zinc-800/15 p-2 w-full h-full relative">
@@ -237,8 +236,8 @@ function AddProduct() {
           <h1 className="text-primary text-sm poppins-semibold">
             Product Details
           </h1>
-          <div className="grid grid-cols-1 lg:grid-cols-2 py-2 flex-grow lg:h-1">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 justify-center overflow-y-auto pr-2">
+          <div className="grid grid-cols-1 py-2 flex-grow lg:h-1">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 w-full justify-center overflow-y-auto pr-2">
               <InputBox
                 register={register}
                 tabIndex={1}
@@ -330,7 +329,7 @@ function AddProduct() {
                 className="col-span-2 text-[0.8rem]"
               />
             </div>
-            <div className="flex flex-col justify-center w-full items-center h-full p-3">
+            {/* <div className="flex flex-col justify-center w-full items-center h-full p-3">
               <input
                 {...register("product_thumbnail")}
                 onChange={handleUploadProductThumbnail}
@@ -346,7 +345,7 @@ function AddProduct() {
                   setValue("product_thumbnail", null);
                 }}
               />
-            </div>
+            </div> */}
           </div>
         </div>
       </form>

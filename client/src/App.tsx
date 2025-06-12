@@ -20,6 +20,8 @@ import EditInventory from "./pages/protected-pages/shared/EditInventory";
 import RoleAccessCheckPoint from "./pages/protected-pages/components/RoleAccessCheckPoint";
 import AccountPageLayout from "./layouts/AccountPageLayout";
 import ReceiptHistory from "./pages/protected-pages/shared/ReceiptHistory";
+import CashierMetrics from "./pages/protected-pages/shared/CashierMetrics";
+import NotFound from "./pages/NotFound";
 function App() {
   const router = createBrowserRouter([
     {
@@ -27,8 +29,8 @@ function App() {
       element: <Home />,
     },
     {
-      path: "/about",
-      element: <About />,
+      path: "*",
+      element: <NotFound />,
     },
     {
       path: "/",
@@ -143,6 +145,20 @@ function App() {
             </RoleAccessCheckPoint>
           ),
           children: [{ index: true, element: <Reports /> }],
+        },
+        {
+          path: "cashier-metrics",
+          element: (
+            <RoleAccessCheckPoint
+              allowedRoles={["admin", "manager"]}
+              navigateTo="/pos"
+            >
+              <>
+                <Outlet />
+              </>
+            </RoleAccessCheckPoint>
+          ),
+          children: [{ index: true, element: <CashierMetrics /> }],
         },
       ],
     },

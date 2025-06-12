@@ -12,6 +12,7 @@ type Action = {
   removeOrderProduct: (id: number) => void;
   setLastScannedItem: (data: FullProductDetailsTypePos | null) => void;
   updateOrderProduct: (id: number, newData: FullProductDetailsTypePos) => void;
+  clearOrderProducts: () => void;
 };
 const store = (
   set: StoreApi<State & Action>["setState"],
@@ -20,6 +21,7 @@ const store = (
   orderProducts: [],
   productsMap: new Map(),
   lastScannedItem: null,
+  clearOrderProducts: () => set({ orderProducts: [] }),
   setOrderProducts: (data: FullProductDetailsTypePos) =>
     set({ orderProducts: [data, ...get().orderProducts] }),
   removeOrderProduct: (id: number) =>

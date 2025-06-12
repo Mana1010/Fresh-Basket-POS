@@ -7,7 +7,6 @@ import { useInView } from "react-intersection-observer";
 import { dateFormat } from "../../../../../helper/dateFormat";
 import { IoClipboard, IoStar, IoSwapVertical } from "react-icons/io5";
 import { LuList } from "react-icons/lu";
-
 import SelectBox from "../../../components/SelectBox";
 import { AnimatePresence } from "framer-motion";
 import TableLoading from "../loading/TableLoading";
@@ -61,7 +60,7 @@ function ReceiptList({ debouncedSearchResult }: InventoryListProps) {
     setSortByCustomerName(value as "all" | "asc" | "desc");
     setOpenSortCustomerName(false);
   }
-  console.log(data);
+  console.log(allReceipts);
   return (
     <div className="flex-grow w-auto lg:w-full h-auto lg:h-1 overflow-x-auto">
       <div className="w-full h-full overflow-y-auto thin-scrollbar pr-1 flex flex-col">
@@ -114,15 +113,17 @@ function ReceiptList({ debouncedSearchResult }: InventoryListProps) {
                   className="border-b border-zinc-200 hover:bg-secondary/85 group transition-opacity duration-75 ease-in-out"
                 >
                   <td>
-                    {receipt.customer ? receipt.customer.name : `Customer ${i}`}
+                    {receipt.customer?.name
+                      ? receipt.customer.name
+                      : `Customer ${i}`}
                   </td>
                   <td>{receipt.invoice_code}</td>
                   <td>{formatToPhpMoney(receipt.customer_paid)}</td>
                   <td>{formatToPhpMoney(receipt.orders_sum_total_price)}</td>
                   <td>
-                    {receipt.cashier
+                    {receipt?.cashier.employer_name
                       ? receipt.cashier.employer_name
-                      : `Unamed Cashier`}
+                      : `Unnamed Cashier`}
                   </td>
                   <td className="flex items-center justify-center">
                     {receipt.ratings ? (

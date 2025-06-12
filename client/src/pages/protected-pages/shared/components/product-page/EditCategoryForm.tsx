@@ -48,6 +48,7 @@ function EditCategoryForm({
     onSuccess: ({ message }) => {
       toast.success(message);
       queryClient.invalidateQueries({ queryKey: ["product-details"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
       queryClient.invalidateQueries({ queryKey: ["all-product-categories"] });
       reset();
       setSelectedCategoryToEdit("");

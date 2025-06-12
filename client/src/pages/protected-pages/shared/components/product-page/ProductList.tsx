@@ -85,7 +85,7 @@ function ProductList({
   console.log(allProducts);
   return (
     <div className="flex-grow w-auto lg:w-full h-auto lg:h-1 overflow-x-auto">
-      <div className="w-full h-full overflow-y-auto thin-scrollbar pr-1 flex flex-col">
+      <div className="w-auto lg:w-full h-full overflow-x-auto thin-scrollbar pr-1 flex flex-col">
         <table className="w-full table-fixed">
           <thead className="product-thead">
             <tr className="divide-x divide-zinc-300/70">
@@ -159,7 +159,9 @@ function ProductList({
               <tr
                 key={`${product.barcode}-${i}`} // Better key using product ID
                 className={`border-b border-zinc-200 hover:bg-secondary/85 group transition-opacity duration-75 ease-in-out ${
-                  product.inventories_sum_stock === null && "bg-red-500/35"
+                  (!Number(product.inventories_sum_stock) ||
+                    !product.inventories_sum_stock) &&
+                  "bg-red-500/35"
                 }`}
               >
                 <td>{product.product_name}</td>
@@ -172,7 +174,8 @@ function ProductList({
                   </span>
                 </td>
                 <td>
-                  {product.inventories_sum_stock === null ? (
+                  {!product.inventories_sum_stock ||
+                  !Number(product.inventories_sum_stock) ? (
                     <span className="text-[0.7rem]">Out of Stock</span>
                   ) : (
                     formatToFormalNumber(product.inventories_sum_stock ?? "0")

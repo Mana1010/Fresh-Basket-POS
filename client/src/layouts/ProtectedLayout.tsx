@@ -82,8 +82,9 @@ function ProtectedLayout() {
                 );
               })}
             </div>
-
-            <Outlet />
+            <div className="flex-grow h-1 overflow-y-auto lg:h-full lg:overflow-y-hidden">
+              <Outlet />
+            </div>
           </div>
         </div>
       </div>

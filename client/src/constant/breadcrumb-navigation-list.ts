@@ -65,4 +65,9 @@ export const BREADCRUMB_NAVIGATION_LIST = [
     breadcrumb: "Reports",
     icon: IoBarChart,
   },
+  {
+    path: "/cashier-metrics",
+    breadcrumb: "Cashier Metrics",
+    icon: IoAnalytics,
+  },
 ];
