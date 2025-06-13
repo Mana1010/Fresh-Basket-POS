@@ -35,7 +35,7 @@ class ProductFactory extends Factory
             // Foreign key ID referring to a product category
             // Make sure to have seeded categories if using this
             // 'product_category_id' => $this->faker->numberBetween(1, 10),
-            'product_category_id' => 1,
+            'product_category_id' => $this->faker->numberBetween(1, 3),
 
             // Tax rate applied to the product (e.g., 0.15 = 15%)
             'tax_rate' => $this->faker->numberBetween(1, 100),

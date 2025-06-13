@@ -19,6 +19,7 @@ class InventoryFactory extends Factory
         return [
             'product_id' => $this->faker->numberBetween(2, 30),
             'type' => 'in',
+            'financial_impact' => $this->faker->randomFloat(2, 10, 30000),
             'stock' => $this->faker->numberBetween(1, 1000),
             'reason' => 'supplier_delivery',
             'is_deleted' => false,

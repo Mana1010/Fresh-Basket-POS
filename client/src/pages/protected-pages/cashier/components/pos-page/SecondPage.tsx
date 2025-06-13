@@ -37,6 +37,7 @@ function CustomerInformation() {
     watch,
     handleSubmit,
     setError,
+    getValues,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -74,8 +75,8 @@ function CustomerInformation() {
           {
             cashier: data.cashier,
             receipt_id: data.invoice_code,
-            customer_name: data.customer_name ?? "Unknown Name",
-            customer_email: data.customer_email,
+            customer_name: getValues("name") ?? "Unknown Name",
+            customer_email: getValues("email"),
             subtotal: formatToPhpMoney(data.subtotal),
             total_amount: formatToPhpMoney(data.total_amount),
             customer_paid: formatToPhpMoney(data.customer_paid),

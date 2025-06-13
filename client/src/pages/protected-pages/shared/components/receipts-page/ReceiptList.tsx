@@ -28,7 +28,7 @@ function ReceiptList({ debouncedSearchResult }: InventoryListProps) {
       queryKey: ["receipts", sortByCustomerName, debouncedSearchResult],
       queryFn: async ({ pageParam = 1 }) => {
         const response = await axiosInterceptor.get(
-          `${INVOICE_URL}/list?limit=10&page=${pageParam}&search=${debouncedSearchResult}&sort=${sortByCustomerName}&sort_total_amount=${""}`
+          `${INVOICE_URL}/list?limit=10&page=${pageParam}&search=${debouncedSearchResult}`
         );
         return response.data.data;
       },
@@ -180,7 +180,7 @@ function ReceiptList({ debouncedSearchResult }: InventoryListProps) {
             </span>
             <span className="text-zinc-800/60 text-xl poppins-semibold">
               {" "}
-              No inventory available
+              No receipts available
             </span>
           </div>
         )}

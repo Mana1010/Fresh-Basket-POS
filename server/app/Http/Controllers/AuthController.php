@@ -21,8 +21,8 @@ class AuthController extends Controller
     }
         if($type === "credential-based") {
         $validated = $request->validate([
-            'username' => 'required|string|max:20',
-            'password' => 'required|string|max:128'
+               'username' => ['required', 'string', 'max:20', 'regex:/^[A-Z0-9]+$/i'],
+                'password' => ['required', 'string', 'max:72'],
         ]);
         $user = User::where('username', $validated["username"])->select('role', 'id', 'username', 'password', 'status')->first();
         if(!$user || !Hash::check($validated["password"], $user->password)) {

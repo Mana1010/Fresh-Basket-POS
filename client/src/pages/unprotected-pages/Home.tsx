@@ -97,7 +97,7 @@ function Home() {
           )}
         </div>
         <div className="rounded-md h-full hidden md:flex pt-2 w-full items-center justify-center">
-          <img src={brandLogo} width={400} height={400} />
+          <img src={brandLogo} width={300} height={300} />
         </div>
       </div>
     </div>

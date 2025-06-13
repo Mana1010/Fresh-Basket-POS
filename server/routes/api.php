@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/login', [AuthController::class, 'login'])->middleware(['throttle:5,1']);
  Route::get('/auth/check-auth', [AuthController::class, 'check_auth']);
-Route::middleware(['auth:sanctum','throttle:60,1'])->group(function () {
+Route::middleware(['auth:sanctum','throttle:100,1'])->group(function () {
     Route::prefix('auth')->controller(AuthController::class)->group(function () {
         Route::get('/user', 'user');
         // Route::get('/check-auth', 'check_auth');

@@ -22,8 +22,6 @@ public function receipt_list(Request $request)
 {
     $limit = $request->query('limit', 10);
     $search = $request->query('search');
-    $sort = $request->query('sort');
-    $sort_total_amount = $request->query('sort_total_amount');
     $receipts = Invoice::with([
             'customer:id,name',
             'cashier:id,employer_name',
@@ -34,23 +32,12 @@ public function receipt_list(Request $request)
         ->when($search, function  ($query) use ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('invoice_code', 'like', "%{$search}%")
-                  ->orWhere('customers.name', 'like', "%{$search}%")
                   ->orWhereHas('cashier', function ($subQuery) use ($search) {
                       $subQuery->where('employer_name', 'like', "%{$search}%");
                   });
             });
         });
-
-        if($sort_total_amount === '' && ($sort === 'desc' || $sort === 'asc')) {
-          $receipts->orderBy('customers.name', $sort)
-             ->select('invoices.*')
-             ->selectRaw('SUM(orders.total_price) as orders_sum_total_price')
-             ->leftJoin('orders', 'invoices.id', '=', 'orders.invoice_id')
-             ->groupBy('invoices.id');
-            }
-        else {
       $receipts->orderBy('created_at', 'desc');
-        }
        $data = $receipts->simplePaginate($limit);
     return response()->json(['data' => $data], 200);
 }
@@ -153,8 +140,6 @@ try {
 $cashier_name = User::findOrFail($validated['cashier_id']);
     return response()->json(['message' => 'Order processed successfully', 'invoice_id' => $invoice_id, 'data' => [
         'invoice_code' => $invoice_code,
-        'customer_name' => $customer->name,
-        'customer_email' => $validated['customer_email'],
         'cashier' => $cashier_name->employer_name,
         'subtotal' => $subtotal,
         'total_amount' => $totalPayableAmount,

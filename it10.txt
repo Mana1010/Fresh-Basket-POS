@@ -1,0 +1,22 @@
+
+
+🔐 Security Implementation Summary
+
+Input validation and sanitization implemented using Laravel Validator and regex
+
+SQL injection mitigated through Laravel’s Eloquent ORM and prepared statements
+
+Passwords securely hashed using Laravel's Hash facade (bcrypt)
+
+Brute force protection with login throttling (5 attempts per minute)
+
+Basic rate limiting: max 60 requests per minute per IP
+
+Role-based access control (RBAC) for secure route authorization
+
+Sensitive customer data (e.g., name, email) encrypted before storage
+
+HTTPS enforced in production using URL::forceScheme('https')
+
+Transaction logs recorded (e.g., receipt ID, cashier, customer name) for monitoring and auditing
+
